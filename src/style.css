@@ -1,0 +1,3941 @@
+*{box-sizing:border-box}html,body,#root{margin:0;min-height:100%}body{background:#FAFAF7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Arial,sans-serif;font-weight:600}button,input,textarea,select{font:inherit}.app{min-height:100vh;background:#FAFAF7}.screen{max-width:540px;margin:0 auto;padding-bottom:92px}.page{padding:max(28px,env(safe-area-inset-top)) 22px 24px}.eyebrow{color:#5F6F65;font-size:calc(17px * var(--ui-font-scale));margin-bottom:10px;font-weight:800}h1{font-size:calc(36px * var(--ui-font-scale));line-height:1.06;margin:0 0 22px;font-weight:850;letter-spacing:-.045em}h2{font-size:calc(26px * var(--ui-font-scale));line-height:1.15;margin:8px 0;font-weight:850;letter-spacing:-.035em}.dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.dashboard div{background:white;border:1px solid #EFEDE6;border-radius:20px;padding:16px 10px}.dashboard strong{font-size:calc(34px * var(--ui-font-scale));display:block;line-height:1}.dashboard span{display:block;color:#666;font-size:calc(13px * var(--ui-font-scale));margin-top:8px}.bigNumber{font-size:calc(78px * var(--ui-font-scale));line-height:1;font-weight:850;letter-spacing:-.07em;margin-top:20px}.muted{color:#666;font-size:calc(20px * var(--ui-font-scale));margin:12px 0 28px;font-weight:650}.primary,.secondary,.danger,.fileButton{width:100%;min-height:58px;border-radius:18px;border:none;font-size:calc(20px * var(--ui-font-scale));font-weight:850;margin:12px 0;display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}.primary{background:#1F3B2D;color:white}.primary:disabled,.secondary:disabled{opacity:.45}.secondary{background:#ECE9E0;color:#111}.danger{background:#F3DADA;color:#8A1E1E}.fileButton{background:#ECE9E0;color:#111;position:relative;overflow:hidden}.fileButton input{position:absolute;inset:0;opacity:0}textarea,.smallTextarea{width:100%;min-height:300px;border:2px solid #E5E1D8;border-radius:18px;background:white;padding:16px;font-size:calc(17px * var(--ui-font-scale));line-height:1.45;outline:none;font-weight:650}.smallTextarea{min-height:150px}.search,input,select{width:100%;height:54px;border:2px solid #E5E1D8;border-radius:16px;padding:0 16px;font-size:calc(19px * var(--ui-font-scale));background:white;outline:none;margin:8px 0 14px;font-weight:650}label{display:block;margin-top:14px;font-weight:850;color:#333}.metaGrid{background:white;border:1px solid #EFEDE6;border-radius:22px;padding:14px;margin-bottom:14px}.segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.segmented button,.filterRow button{border:none;border-radius:999px;padding:10px 12px;background:#ECE9E0;color:#666;font-weight:850}.segmented button.active,.filterRow button.active{background:#1F3B2D;color:white}.filterRow{display:flex;gap:8px;overflow-x:auto;margin:14px 0}.sourceList{display:grid;gap:12px}.sourceCard{background:white;border:1px solid #EFEDE6;border-radius:22px;padding:18px;box-shadow:0 8px 18px rgba(0,0,0,.03)}.sourceCard p{color:#666;margin:8px 0}.sourceStats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.sourceStats span{background:#EFEDE6;border-radius:999px;padding:8px 10px;font-size:calc(13px * var(--ui-font-scale));font-weight:800}.list{margin-top:18px}.item{background:white;border:1px solid #EFEDE6;border-radius:18px;padding:14px;margin-bottom:12px;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px}.inlinePlay{width:44px;height:44px;border:none;border-radius:50%;background:#1F3B2D;color:white;font-weight:850}.item strong{font-size:calc(20px * var(--ui-font-scale));font-weight:850}.item p{color:#666;margin:8px 0 0;font-size:calc(16px * var(--ui-font-scale));font-weight:650}.item small{color:#5F6F65;display:block;margin-top:8px;font-weight:800;line-height:1.35}.item span,.tag{color:#5F6F65;font-weight:850;font-size:calc(13px * var(--ui-font-scale))}.topbar{display:flex;justify-content:space-between;align-items:center;color:#666;font-size:calc(18px * var(--ui-font-scale));margin-bottom:18px;font-weight:850}.plain{width:44px;height:44px;border:none;background:#ECE9E0;border-radius:50%;font-size:calc(28px * var(--ui-font-scale));font-weight:850}.smallButton{min-height:44px;border:none;background:#ECE9E0;border-radius:14px;padding:0 16px;font-weight:850}.listenCard,.detailCard{background:white;border-radius:28px;padding:24px 20px;min-height:430px;box-shadow:0 10px 30px rgba(0,0,0,.05);display:flex;flex-direction:column;justify-content:center}.detailCard{min-height:auto;margin-bottom:18px;justify-content:flex-start}.frontText{font-size:calc(38px * var(--ui-font-scale));line-height:1.12;font-weight:850;margin:18px 0 12px;letter-spacing:-.04em}.cnText{font-size:calc(23px * var(--ui-font-scale));color:#444;margin-bottom:16px;font-weight:800}.bigPlay{min-height:62px;border:none;border-radius:18px;background:#1F3B2D;color:white;font-weight:850;font-size:calc(21px * var(--ui-font-scale))}.preview{margin-top:18px;background:#FAFAF7;border-radius:18px;padding:12px}.preview p{font-size:calc(18px * var(--ui-font-scale));line-height:1.35;margin:8px 0;color:#333}.meaningPanel{margin-top:18px;border-top:1px solid #EFEDE6;padding-top:16px}.meaningPanel h3{font-size:calc(25px * var(--ui-font-scale));margin:0 0 12px}.meaningPanel p{font-size:calc(18px * var(--ui-font-scale));line-height:1.38;color:#333}.rateRow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.rateRow button{min-height:58px;border:none;border-radius:16px;background:#ECE9E0;font-size:calc(18px * var(--ui-font-scale));font-weight:850}.settingBox{background:white;border-radius:18px;padding:18px;margin:18px 0;border:1px solid #EFEDE6}.settingBox.compact{padding:14px}.debug,.audioMsg{color:#5F6F65;background:#EFEDE6;border-radius:14px;padding:10px 12px;font-size:calc(14px * var(--ui-font-scale));font-weight:800;margin:8px 0}.debug p{margin:7px 0;word-break:break-word}.tabs{position:fixed;bottom:0;left:0;right:0;min-height:72px;padding:8px 10px max(8px,env(safe-area-inset-bottom));background:rgba(250,250,247,.92);backdrop-filter:blur(16px);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #E5E1D8}.tabs button{border:none;background:transparent;color:#777;font-size:calc(14px * var(--ui-font-scale));font-weight:850;border-radius:14px}.tabs button.active{background:#ECE9E0;color:#111}.font-normal .frontText{font-size:calc(33px * var(--ui-font-scale))}.font-xlarge .frontText{font-size:calc(43px * var(--ui-font-scale))}.font-xlarge h1{font-size:calc(40px * var(--ui-font-scale))}.font-xlarge .muted{font-size:calc(23px * var(--ui-font-scale))}
+/* V1.5 Audio Player upgrade */
+.heroPlayer{background:white;border:1px solid #EFEDE6;border-radius:28px;padding:20px;margin:16px 0 18px;box-shadow:0 12px 28px rgba(0,0,0,.04)}
+.heroPlayer p{margin:0 0 6px;color:#5F6F65;font-size:calc(16px * var(--ui-font-scale));font-weight:850}.heroPlayer h2{margin:0 0 10px}.dashboard.soft div{background:#F3F0E8}.segmented{grid-template-columns:repeat(4,1fr)}.playerControls{display:grid;grid-template-columns:1.5fr .8fr .8fr;gap:10px;margin-top:16px}.roundControl{min-height:62px;border:none;border-radius:18px;background:#ECE9E0;color:#111;font-weight:850;font-size:calc(17px * var(--ui-font-scale))}.mutedHidden{color:#777;font-size:calc(34px * var(--ui-font-scale))}.listenCard{justify-content:flex-start;padding-top:28px}.listenCard .preview{margin-bottom:4px}@media(max-width:420px){.page{padding-left:18px;padding-right:18px}.segmented button{font-size:calc(13px * var(--ui-font-scale));padding:9px 6px}.playerControls{grid-template-columns:1fr}.roundControl{min-height:54px}.frontText{font-size:calc(34px * var(--ui-font-scale))}}
+
+/* V1.5.1 Audio Controls upgrade */
+.audioRows{margin-top:14px;display:grid;gap:12px}
+.audioLine{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;background:#FAFAF7;border:1px solid #EFEDE6;border-radius:18px;padding:12px;transition:background .15s ease, transform .15s ease}
+.audioLine.playing,.libraryExample.playing,.audioItem.playing{background:#E9F0EA;border-color:#C7D8CC}
+.audioLine.playing{transform:scale(1.01)}
+.miniAudio{width:44px;height:44px;border:none;border-radius:50%;background:#1F3B2D;color:white;font-size:calc(19px * var(--ui-font-scale));font-weight:850;display:flex;align-items:center;justify-content:center}
+.lineText{font-size:calc(19px * var(--ui-font-scale));line-height:1.38;font-weight:800;color:#222}
+.mainLineText{font-size:calc(31px * var(--ui-font-scale));letter-spacing:-.035em;line-height:1.12;font-weight:850}
+.lineMeaning{font-size:calc(20px * var(--ui-font-scale));line-height:1.35;color:#555;margin-top:6px;font-weight:800}
+.exampleAudioList{display:grid;gap:10px}.miniTitle{font-size:calc(14px * var(--ui-font-scale));color:#5F6F65;font-weight:850;margin:4px 0 0 4px;text-transform:uppercase;letter-spacing:.03em}.compactButton{min-height:48px;font-size:calc(17px * var(--ui-font-scale));margin-top:10px}.repeatSeg{grid-template-columns:repeat(3,1fr)}
+.audioItem{grid-template-columns:44px 1fr}.itemHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.libraryExamples{display:grid;gap:8px;margin-top:12px}.libraryExample{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;background:#FAFAF7;border:1px solid #EFEDE6;border-radius:14px;padding:8px}.libraryExample button{width:34px;height:34px;border:none;border-radius:50%;background:#ECE9E0;color:#111;font-size:calc(15px * var(--ui-font-scale));font-weight:850}.libraryExample span{font-size:calc(16px * var(--ui-font-scale));line-height:1.35;color:#333}.recallBox{padding:20px 0}
+@media(max-width:420px){.mainLineText{font-size:calc(28px * var(--ui-font-scale))}.lineText{font-size:calc(17px * var(--ui-font-scale))}.audioLine{grid-template-columns:44px 1fr;padding:10px}.miniAudio{width:40px;height:40px}}
+
+
+/* V1.5.2 Stable Audio UX */
+.miniAudio,.inlinePlay,.libraryExample button{background:#1F3B2D;color:#fff;box-shadow:0 4px 10px rgba(31,59,45,.14);font-size:0;transition:transform .12s ease, background .12s ease, box-shadow .12s ease}
+.libraryExample button{background:#ECE9E0;color:#1F3B2D;box-shadow:none}
+.miniAudio:active,.inlinePlay:active,.libraryExample button:active{transform:scale(.94)}
+.playIcon{width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:12px solid currentColor;margin-left:3px;display:inline-block}
+.libraryExample .playIcon{border-top-width:6px;border-bottom-width:6px;border-left-width:9px;margin-left:2px}
+.audioLine{border-radius:20px;background:#FFFFFF}
+.exampleAudioLine{background:#FBFAF6}
+.mainAudioLine{background:#F7F5EF}
+.audioLine.playing,.libraryExample.playing,.audioItem.playing{background:#E7F1EA;border-color:#B9D2C1;box-shadow:0 8px 18px rgba(31,59,45,.08)}
+.audioLine.playing .miniAudio,.audioItem.playing .inlinePlay,.libraryExample.playing button{background:#143326;color:white}
+.audioMsg{position:relative;z-index:1}
+
+/* V1.6.1 Feed Learning Fix */
+.learnTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-bottom:8px}.learnTop select{margin:0}.smallPill{height:54px;border:none;border-radius:16px;background:#ECE9E0;color:#111;font-weight:850;padding:0 14px;white-space:nowrap}.learnSwitch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.learnSwitch button{height:58px;border:none;border-radius:18px;background:#ECE9E0;color:#666;font-size:calc(20px * var(--ui-font-scale));font-weight:850}.learnSwitch button.active{background:#1F3B2D;color:#fff}.feedActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}.feedList{display:grid;gap:10px;margin-top:14px}.feedRow{display:grid;grid-template-columns:46px 1fr;gap:12px;align-items:center;background:#fff;border:1px solid #EFEDE6;border-radius:20px;padding:13px 14px;box-shadow:0 6px 14px rgba(0,0,0,.025)}.feedRow.playing{background:#E8F1EA;border-color:#BCD4C3}.feedText strong{font-size:calc(23px * var(--ui-font-scale));line-height:1.15;font-weight:850;letter-spacing:-.025em}.feedText p{font-size:calc(17px * var(--ui-font-scale));line-height:1.28;color:#666;margin:5px 0 0}.feedText small{display:block;color:#5F6F65;font-size:calc(13px * var(--ui-font-scale));font-weight:850;margin-top:7px}.cleanPlay,.mainPlay,.tinyPlay{border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto}.cleanPlay{width:44px;height:44px;background:#1F3B2D;color:#fff}.cleanPlay span,.mainPlay span,.tinyPlay span{width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid currentColor;margin-left:3px}.mainPlay{width:62px;height:62px;background:#1F3B2D;color:#fff}.mainPlay span{border-top-width:10px;border-bottom-width:10px;border-left-width:16px}.tinyPlay{width:38px;height:38px;background:#ECE9E0;color:#1F3B2D}.tinyPlay span{border-top-width:6px;border-bottom-width:6px;border-left-width:9px}.deepCard{background:white;border:1px solid #EFEDE6;border-radius:28px;padding:20px;box-shadow:0 10px 28px rgba(0,0,0,.04)}.deepMain{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;background:#F7F5EF;border:1px solid #EFEDE6;border-radius:22px;padding:14px;margin:14px 0 20px}.deepMain.playing,.deepRow.playing{background:#E8F1EA;border-color:#BCD4C3}.deepMain h2{font-size:calc(34px * var(--ui-font-scale));line-height:1.08;margin:0;letter-spacing:-.045em}.deepMain p{font-size:calc(22px * var(--ui-font-scale));color:#555;margin:8px 0 0}.deepRows{display:grid;gap:10px}.deepRow{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center;background:#fff;border:1px solid #EFEDE6;border-radius:18px;padding:12px}.deepRow p{font-size:calc(20px * var(--ui-font-scale));line-height:1.35;margin:0;color:#222}.simpleSource{display:grid;gap:12px}.sourceActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sourceActions button{min-height:46px;border:none;border-radius:14px;background:#ECE9E0;color:#111;font-weight:850}.sourceActions button:first-child{background:#1F3B2D;color:#fff}.previewList{display:grid;gap:10px;margin-top:18px}.previewItem{background:#fff;border:1px solid #EFEDE6;border-radius:18px;padding:15px}.previewItem strong{font-size:calc(21px * var(--ui-font-scale));line-height:1.2}.previewItem p{font-size:calc(17px * var(--ui-font-scale));color:#666;margin:6px 0}.previewItem small{color:#5F6F65;font-weight:850}.tabs button{font-size:calc(15px * var(--ui-font-scale))}@media(max-width:420px){.deepMain{grid-template-columns:58px 1fr}.mainPlay{width:52px;height:52px}.deepMain h2{font-size:calc(28px * var(--ui-font-scale))}.feedText strong{font-size:calc(21px * var(--ui-font-scale))}.feedActions{grid-template-columns:1fr}.learnTop{grid-template-columns:1fr}.smallPill{width:100%}}
+
+/* V1.6.2 Learning Flow Fix */
+.modeSwitch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px}
+.modeSwitch button{min-height:58px;border:none;border-radius:18px;background:#ECE9E0;color:#5d5d5d;font-size:calc(18px * var(--ui-font-scale));font-weight:850;padding:0 12px}
+.modeSwitch button.active{background:#1F3B2D;color:#fff}
+.modeSwitch span{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.22);font-size:calc(13px * var(--ui-font-scale));margin-left:6px;padding:0 7px}
+.learnTop{grid-template-columns:1.4fr .72fr}
+.learnTop select{height:54px}
+.slimActions{margin-top:6px}.slimActions .compactButton{min-height:44px;font-size:calc(16px * var(--ui-font-scale));border-radius:15px}
+.emptyState{background:#fff;border:1px solid #EFEDE6;border-radius:20px;padding:22px;color:#5F6F65;font-weight:850;text-align:center}
+.feedText small{display:none}.feedText strong{display:block}.feedRow{cursor:pointer}.feedRow .feedText p{color:#5d5d5d}.navActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.fullLine{width:100%;margin-top:10px}.navActions button:disabled,.feedActions button:disabled,.fullLine:disabled{opacity:.45}.deepCard .feedActions{margin-top:8px}.deepCard .compactButton{margin:0}.deepMain h2{word-break:break-word}.deepMain h2:only-child{margin-bottom:0}.metaGrid:before{content:'Paste text below. If your text includes SOURCE_TITLE / CATEGORY / TAGS, the form will auto-fill.';display:block;color:#5F6F65;background:#F3F0E8;border-radius:14px;padding:10px 12px;font-size:calc(14px * var(--ui-font-scale));font-weight:850;margin-bottom:8px;line-height:1.35}.sourceCard h2{margin-bottom:6px}.sourceActions button{font-size:calc(16px * var(--ui-font-scale))}.previewItem{cursor:pointer}.previewItem small{display:block;margin-top:8px}.tag{font-size:calc(14px * var(--ui-font-scale));letter-spacing:.02em;text-transform:none}.audioMsg{line-height:1.35}
+@media(max-width:420px){.modeSwitch{grid-template-columns:1fr}.learnTop{grid-template-columns:1fr}.navActions{grid-template-columns:1fr 1fr}.sourceActions{grid-template-columns:1fr}.feedText strong{font-size:calc(22px * var(--ui-font-scale))}.modeSwitch button{font-size:calc(17px * var(--ui-font-scale))}}
+
+/* V1.6.3 UI & Library Refinement */
+.screen{max-width:580px}
+.page{padding:max(24px,env(safe-area-inset-top)) 18px 24px}
+.modeHint{margin:4px 0 8px;color:#5F6F65;background:#F3F0E8;border-radius:14px;padding:10px 12px;font-size:calc(14px * var(--ui-font-scale));line-height:1.35;font-weight:850}
+.feedRow{grid-template-columns:42px 1fr;padding:11px 12px;border-radius:18px}
+.cleanPlay{width:40px;height:40px}
+.cleanPlay span{border-top-width:6px;border-bottom-width:6px;border-left-width:10px}
+.feedText strong{font-size:calc(22px * var(--ui-font-scale))}.feedText p{font-size:calc(16px * var(--ui-font-scale))}
+.deepCard{padding:16px;border-radius:24px}
+.deepMain{grid-template-columns:64px 1fr;padding:12px;margin:12px 0 16px;border-radius:20px}
+.mainPlay{width:56px;height:56px}.mainPlay span{border-top-width:9px;border-bottom-width:9px;border-left-width:14px}
+.deepMain h2{font-size:calc(32px * var(--ui-font-scale))}.deepMain p{font-size:calc(20px * var(--ui-font-scale))}
+.deepRow{padding:10px 11px;border-radius:16px;grid-template-columns:38px 1fr}
+.deepRow p{font-size:calc(19px * var(--ui-font-scale))}.tinyPlay{width:34px;height:34px}.tinyPlay span{border-top-width:5px;border-bottom-width:5px;border-left-width:8px}
+.navActions,.deepCard .feedActions{gap:8px;margin-top:10px}.deepCard .compactButton{min-height:50px;border-radius:16px;font-size:calc(16px * var(--ui-font-scale));background:#F0EDE6}.deepCard .compactButton:active{transform:scale(.98)}
+.categoryChips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 0 14px;scrollbar-width:none}.categoryChips::-webkit-scrollbar{display:none}.categoryChips button{border:none;border-radius:999px;background:#ECE9E0;color:#666;padding:10px 14px;font-weight:850;white-space:nowrap;font-size:calc(14px * var(--ui-font-scale))}.categoryChips button.active{background:#1F3B2D;color:white}
+.sourceTools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}.sourceTools button{min-height:44px;border:none;border-radius:14px;background:#ECE9E0;color:#111;font-weight:850;font-size:calc(15px * var(--ui-font-scale))}.sourceTools .dangerLite{background:#F3DADA;color:#8A1E1E}.sourceActions button{font-size:calc(15px * var(--ui-font-scale))}.sourceActions button:first-child{background:#1F3B2D;color:white}.sourceCard h2{font-size:calc(26px * var(--ui-font-scale))}.sourceStats span{font-size:calc(12px * var(--ui-font-scale));padding:7px 9px}.previewItem{padding:13px 14px}.previewItem strong{font-size:calc(20px * var(--ui-font-scale))}.previewItem p{font-size:calc(16px * var(--ui-font-scale))}
+@media(max-width:420px){.screen{max-width:100%}.page{padding-left:14px;padding-right:14px}.deepCard{padding:14px}.deepMain{grid-template-columns:58px 1fr}.deepMain h2{font-size:calc(28px * var(--ui-font-scale))}.deepRow p{font-size:calc(18px * var(--ui-font-scale))}.navActions{grid-template-columns:1fr 1fr}.deepCard .feedActions{grid-template-columns:1fr 1fr}.sourceActions{grid-template-columns:1fr 1fr}.sourceTools{grid-template-columns:1fr 1fr}.feedRow{padding:10px 11px}.cleanPlay{width:38px;height:38px}h1{font-size:calc(34px * var(--ui-font-scale))}.modeSwitch button{min-height:54px}.learnSwitch button{height:54px}.search,input,select{height:50px}.tabs{min-height:68px}.tabs button{font-size:calc(14px * var(--ui-font-scale))}}
+
+/* V1.6.4 Audio + Library Fix */
+.modeHint{font-size:calc(13px * var(--ui-font-scale));padding:8px 12px;margin:4px 0 10px}
+.mainPlay{width:50px;height:50px}
+.mainPlay span{border-top-width:8px;border-bottom-width:8px;border-left-width:13px}
+.deepMain{grid-template-columns:58px 1fr}
+.deepMain h2{font-size:calc(30px * var(--ui-font-scale))}
+.threeActions{grid-template-columns:1fr 1fr 1fr}
+.threeActions button{min-height:44px;font-size:calc(14px * var(--ui-font-scale));padding:0 8px}
+.sourceSummary{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.sourceSummary span{background:#EFEDE6;border-radius:999px;padding:8px 10px;font-size:calc(13px * var(--ui-font-scale));font-weight:850;color:#111}
+.libraryHint{color:#5F6F65;background:#F3F0E8;border-radius:14px;padding:10px 12px;font-size:calc(14px * var(--ui-font-scale));line-height:1.35;font-weight:850;margin:8px 0 12px}
+@media(max-width:420px){.mainPlay{width:48px;height:48px}.deepMain{grid-template-columns:54px 1fr}.deepMain h2{font-size:calc(27px * var(--ui-font-scale))}.threeActions{grid-template-columns:1fr}.threeActions button{min-height:42px}}
+
+/* V1.6.5 Source Queue & UI Scale Fix */
+.learnControlPanel{display:grid;grid-template-columns:1fr .42fr;gap:10px;align-items:stretch;margin:4px 0 10px}
+.currentSourceButton{border:2px solid #E2DED6;background:#fff;border-radius:18px;min-height:58px;padding:10px 14px;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:3px;color:#111}
+.currentSourceButton span{font-size:calc(12px * var(--ui-font-scale));color:#5F6F65;text-transform:uppercase;letter-spacing:.04em;font-weight:850}
+.currentSourceButton strong{font-size:calc(18px * var(--ui-font-scale));line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.02em}
+.learnControlPanel select{height:58px;margin:0;border-width:2px;border-radius:18px;font-size:calc(18px * var(--ui-font-scale));padding-left:16px;background:#fff}
+.scopeSwitch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 12px}
+.scopeSwitch button{height:48px;border:none;border-radius:16px;background:#ECE9E0;color:#666;font-size:calc(16px * var(--ui-font-scale));font-weight:850}
+.scopeSwitch button.active{background:#1F3B2D;color:#fff}
+.scopeSwitch span{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:999px;background:rgba(255,255,255,.22);font-size:calc(12px * var(--ui-font-scale));margin-left:4px;padding:0 6px}
+.queueMiniSwitch{display:flex;gap:8px;margin:8px 0 10px;overflow-x:auto;scrollbar-width:none}
+.queueMiniSwitch::-webkit-scrollbar{display:none}
+.queueMiniSwitch button{min-height:38px;border:none;border-radius:999px;background:#ECE9E0;color:#666;font-size:calc(14px * var(--ui-font-scale));font-weight:850;padding:0 14px;white-space:nowrap}
+.queueMiniSwitch button.active{background:#1F3B2D;color:#fff}
+.queueMiniSwitch span{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:999px;background:rgba(255,255,255,.24);font-size:calc(12px * var(--ui-font-scale));margin-left:4px;padding:0 6px}
+/* Scale down audio buttons 10%-15% */
+.cleanPlay{width:34px;height:34px}
+.cleanPlay span{border-top-width:5px;border-bottom-width:5px;border-left-width:8px;margin-left:2px}
+.feedRow{grid-template-columns:36px 1fr;min-height:62px}
+.mainPlay{width:42px;height:42px}
+.mainPlay span{border-top-width:7px;border-bottom-width:7px;border-left-width:11px;margin-left:2px}
+.deepMain{grid-template-columns:48px 1fr;min-height:74px}
+.tinyPlay{width:32px;height:32px}
+.tinyPlay span{border-top-width:5px;border-bottom-width:5px;border-left-width:7px;margin-left:2px}
+.deepRow{grid-template-columns:36px 1fr}.deepMain h2{font-size:calc(29px * var(--ui-font-scale))}.feedText strong{font-size:calc(21px * var(--ui-font-scale))}
+.sourceActions.threeActions{grid-template-columns:1fr 1fr 1fr}.sourceActions.threeActions button{min-height:44px;font-size:calc(14px * var(--ui-font-scale));line-height:1.1;padding:0 8px}.sourceCard{padding:20px 18px}.sourceCard h2{font-size:calc(25px * var(--ui-font-scale))}
+@media(max-width:420px){.learnControlPanel{grid-template-columns:1fr .45fr}.currentSourceButton{min-width:0}.currentSourceButton strong{font-size:calc(16px * var(--ui-font-scale))}.learnControlPanel select{font-size:calc(16px * var(--ui-font-scale));padding-left:12px}.scopeSwitch button{height:46px;font-size:calc(15px * var(--ui-font-scale))}.cleanPlay{width:34px;height:34px}.feedRow{grid-template-columns:36px 1fr}.mainPlay{width:42px;height:42px}.deepMain{grid-template-columns:48px 1fr}.deepMain h2{font-size:calc(26px * var(--ui-font-scale))}.sourceActions.threeActions{grid-template-columns:1fr 1fr 1fr}.sourceActions.threeActions button{font-size:calc(13px * var(--ui-font-scale));padding:0 6px}.page{padding-left:12px;padding-right:12px}}
+
+
+/* V1.6.7 Import Auto Detect + Safer Play Hit Area */
+.feedRow{grid-template-columns:72px 1fr;cursor:default;align-items:center}
+.playHitArea{width:72px;height:64px;margin-left:-6px;display:flex;align-items:center;justify-content:center;border-radius:18px;cursor:pointer;touch-action:manipulation}
+.playHitArea:active{background:#F3F0E8}
+.feedText{min-height:56px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border-radius:14px;padding-left:0}
+.feedText:active{background:#FAF8F2}
+.patternBox{background:#F7F5EF;border:1px solid #EFEDE6;border-radius:16px;padding:12px 14px;margin:8px 0 12px;color:#222}
+.patternBox strong{display:block;color:#5F6F65;text-transform:uppercase;letter-spacing:.04em;font-size:calc(13px * var(--ui-font-scale));margin-bottom:6px}
+.patternBox p{font-size:calc(18px * var(--ui-font-scale));line-height:1.35;margin:0;font-weight:750}
+.bilingualLine span{display:inline}
+.bilingualLine em{display:block;color:#666;font-size:calc(16px * var(--ui-font-scale));font-style:normal;font-weight:750;line-height:1.35;margin-top:4px}
+.practiceBox{background:#F7F5EF;border:1px solid #EFEDE6;border-radius:20px;display:grid;gap:8px;margin:12px 0;padding:14px}
+.practiceBox label{margin-top:0}
+.practiceBox input,.practiceBox textarea{margin-bottom:4px}
+.practiceResult{color:#5F6F65;font-size:calc(15px * var(--ui-font-scale));font-weight:900;line-height:1.35;margin:0}
+.metaGrid:before{content:'Paste ChatGPT formatted content. SOURCE_TITLE / CATEGORY / TAGS / TYPE / PATTERN / DIALOGUE can be auto-detected.'}
+@media(max-width:420px){.feedRow{grid-template-columns:68px 1fr}.playHitArea{width:68px;height:62px;margin-left:-6px}.feedText{min-height:54px}}
+.reviewMini {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.74em;
+  font-weight: 800;
+}
+.emptyState {
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--card);
+  color: var(--muted);
+  font-weight: 800;
+  font-size:calc(20px * var(--ui-font-scale));
+}
+
+/* V1.6.9 Import Preview */
+.importPreview{background:#fff;border:1px solid #EFEDE6;border-radius:22px;padding:14px;margin:14px 0;box-shadow:0 8px 18px rgba(0,0,0,.025)}
+.previewStats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.previewStats span{background:#F3F0E8;border-radius:16px;min-height:54px;padding:8px 6px;text-align:center;color:#5F6F65;font-size:calc(12px * var(--ui-font-scale));font-weight:850;display:flex;flex-direction:column;justify-content:center}
+.previewStats strong{display:block;color:#111;font-size:calc(22px * var(--ui-font-scale));line-height:1;margin-bottom:3px}
+.importPreview p{margin:0 0 8px;color:#333;font-size:calc(17px * var(--ui-font-scale));font-weight:850}
+.importPreview small{display:block;color:#5F6F65;font-size:calc(13px * var(--ui-font-scale));line-height:1.35;font-weight:850}
+.sampleImportList{display:grid;gap:8px;margin-top:12px}
+.sampleImportList div{background:#FAFAF7;border:1px solid #EFEDE6;border-radius:14px;padding:10px 12px}
+.sampleImportList b{display:block;font-size:calc(17px * var(--ui-font-scale));line-height:1.2}
+.sampleImportList em{display:block;margin-top:5px;color:#666;font-size:calc(13px * var(--ui-font-scale));font-style:normal;font-weight:850}
+.copyFormatButton{margin-top:0;margin-bottom:14px}
+@media(max-width:420px){.previewStats{gap:6px}.previewStats span{font-size:calc(11px * var(--ui-font-scale));min-height:50px}.previewStats strong{font-size:calc(20px * var(--ui-font-scale))}.importPreview{padding:12px}}
+
+/* V1.7.3 iPhone stability guard */
+.fatalScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#FAFAF7}
+.fatalPanel{width:100%;max-width:520px;background:#fff;border:1px solid #EFEDE6;border-radius:24px;padding:22px;box-shadow:0 18px 40px rgba(0,0,0,.08)}
+.fatalPanel h1{font-size:calc(32px * var(--ui-font-scale));margin:0 0 10px}
+.fatalPanel p{font-size:calc(18px * var(--ui-font-scale));line-height:1.4;color:#5F6F65;font-weight:800;margin:0 0 12px}
+.fatalPanel small{display:block;color:#777;line-height:1.35;margin-bottom:16px;word-break:break-word}
+.fatalActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:420px){.fatalActions{grid-template-columns:1fr}.fatalPanel h1{font-size:calc(28px * var(--ui-font-scale))}}
+
+/* V1.7.4 Recall Mode for iPhone-first memory practice */
+.studyModeSwitch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:12px 0 10px;
+  background:#F3F0E8;
+  border-radius:18px;
+  padding:5px;
+}
+.studyModeSwitch button{
+  min-height:46px;
+  border:none;
+  border-radius:14px;
+  background:transparent;
+  color:#5F6F65;
+  font-size:calc(16px * var(--ui-font-scale));
+  font-weight:850;
+}
+.studyModeSwitch button.active{
+  background:#1F3B2D;
+  color:white;
+  box-shadow:0 6px 14px rgba(31,59,45,.12);
+}
+.deepDisplaySwitch{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin:0 0 14px;
+}
+.deepDisplaySwitch button{
+  min-height:42px;
+  border:none;
+  border-radius:14px;
+  background:#ECE9E0;
+  color:#5d5d5d;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:900;
+}
+.deepDisplaySwitch button.active{
+  background:#1F3B2D;
+  color:white;
+}
+.recallPromptCard{
+  background:#F7F5EF;
+  border:1px solid #EFEDE6;
+  border-radius:24px;
+  padding:20px 18px;
+  margin:12px 0 14px;
+}
+.recallLabel{
+  color:#5F6F65;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:850;
+  margin-bottom:10px;
+}
+.recallChinese{
+  color:#111;
+  font-size:calc(31px * var(--ui-font-scale));
+  line-height:1.18;
+  font-weight:850;
+  letter-spacing:-.02em;
+  word-break:break-word;
+}
+.recallCue{
+  color:#5F6F65;
+  font-size:calc(17px * var(--ui-font-scale));
+  line-height:1.3;
+  font-weight:850;
+  margin-top:12px;
+}
+.recallReveal{
+  margin:16px 0 0;
+  min-height:56px;
+  border-radius:18px;
+  font-size:calc(19px * var(--ui-font-scale));
+}
+.recallActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+.recallActions .compactButton{
+  margin:0;
+  min-height:56px;
+}
+.dialogueRecallAnswer{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+.dialogueRecallAnswer p{
+  background:white;
+  border:1px solid #EFEDE6;
+  border-radius:16px;
+  font-size:calc(22px * var(--ui-font-scale));
+  line-height:1.3;
+  margin:0;
+  padding:12px;
+}
+@media(min-width:430px) and (max-width:580px){
+  .page{padding-left:20px;padding-right:20px}
+  .deepCard{padding:18px;border-radius:26px}
+  .recallChinese{font-size:calc(34px * var(--ui-font-scale))}
+  .deepMain h2{font-size:calc(34px * var(--ui-font-scale))}
+  .deepRow p{font-size:calc(21px * var(--ui-font-scale))}
+  .studyModeSwitch button{min-height:48px}
+}
+@media(max-width:420px){
+  .studyModeSwitch button{min-height:44px;font-size:calc(15px * var(--ui-font-scale))}
+  .recallPromptCard{padding:18px 16px;border-radius:22px}
+  .recallChinese{font-size:calc(29px * var(--ui-font-scale))}
+  .recallReveal{min-height:54px}
+}
+
+/* V1.7.5 Pattern and Mini Dialogue learning types */
+.learnTypeMore{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:10px;
+  margin:10px 0 14px;
+  background:#F7F5EF;
+  border:1px solid #EFEDE6;
+  border-radius:18px;
+  padding:8px 10px 8px 14px;
+}
+.learnTypeMore span{
+  color:#5F6F65;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.moreTypeButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.moreTypeButtons button{
+  min-height:46px;
+  border:none;
+  background:#fff;
+  border-radius:14px;
+  padding:0 10px;
+  font-size:calc(16px * var(--ui-font-scale));
+  font-weight:850;
+  color:#111;
+}
+.moreTypeButtons button.active{
+  background:#1F3B2D;
+  color:#fff;
+}
+.formatGuide{
+  background:#fff;
+  border:1px solid #EFEDE6;
+  border-radius:22px;
+  padding:14px;
+  margin:0 0 14px;
+}
+.formatGuide h2{
+  font-size:calc(22px * var(--ui-font-scale));
+  margin:0 0 8px;
+  letter-spacing:-.02em;
+}
+.formatGuide p{
+  margin:0 0 12px;
+  color:#5F6F65;
+  font-size:calc(14px * var(--ui-font-scale));
+  line-height:1.35;
+  font-weight:850;
+}
+.formatGuideGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.formatGuideGrid div{
+  background:#FAFAF7;
+  border:1px solid #EFEDE6;
+  border-radius:14px;
+  padding:10px;
+}
+.formatGuideGrid strong{
+  display:block;
+  font-size:calc(15px * var(--ui-font-scale));
+  color:#1F3B2D;
+}
+.formatGuideGrid span{
+  display:block;
+  margin:4px 0 8px;
+  color:#666;
+  font-size:calc(12px * var(--ui-font-scale));
+  line-height:1.25;
+  font-weight:850;
+}
+.formatGuideGrid code{
+  display:block;
+  color:#111;
+  font-size:calc(12px * var(--ui-font-scale));
+  line-height:1.25;
+  white-space:normal;
+  word-break:break-word;
+}
+.formatGuide details{
+  margin-top:10px;
+  background:#F7F5EF;
+  border-radius:14px;
+  padding:10px 12px;
+}
+.formatGuide summary{
+  color:#1F3B2D;
+  font-size:calc(15px * var(--ui-font-scale));
+  font-weight:850;
+}
+.formatGuide pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  margin:10px 0 0;
+  color:#222;
+  font-size:calc(12px * var(--ui-font-scale));
+  line-height:1.35;
+  font-weight:700;
+}
+.sourceStats,
+.sourceSummary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.sourceStats span,
+.sourceSummary span{
+  white-space:nowrap;
+}
+.smallTextarea{
+  min-height:120px;
+}
+@media(min-width:430px) and (max-width:580px){
+  .learnTypeMore{border-radius:20px;padding:9px 12px 9px 16px}
+  .moreTypeButtons button{min-height:50px;font-size:calc(17px * var(--ui-font-scale))}
+}
+@media(max-width:420px){
+  .formatGuideGrid{grid-template-columns:1fr}
+  .moreTypeButtons{grid-template-columns:1fr}
+}
+
+.simpleLearnHeader .sourceReadout{
+  cursor:default;
+}
+.simpleLearnHeader .sourceReadout:active{
+  background:#fff;
+}
+.simpleLearnHeader .sourcePicker{
+  margin:0;
+  cursor:pointer;
+  position:relative;
+}
+.learnControlPanel .sourcePicker .sourceSelect{
+  width:100%;
+  height:auto;
+  min-height:26px;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:0 26px 0 0;
+  font-size:calc(18px * var(--ui-font-scale));
+  font-weight:900;
+  line-height:1.12;
+  color:#111;
+  letter-spacing:-.02em;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.learnControlPanel .sourcePicker .sourceSelect:disabled{
+  color:#777;
+}
+.themeFlowPanel{
+  background:#fff;
+  border:1px solid #EFEDE6;
+  border-radius:22px;
+  padding:12px;
+  margin:0 0 14px;
+}
+.learnPage{
+  padding-top:max(16px,env(safe-area-inset-top));
+}
+.learnCourseHeader{
+  display:grid;
+  grid-template-columns:1fr 112px;
+  gap:12px;
+  align-items:start;
+  margin-bottom:10px;
+}
+.learnCourseHeader span,
+.stageListHeader span{
+  display:block;
+  color:#5F6F65;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:950;
+  letter-spacing:.08em;
+  line-height:1.1;
+  text-transform:uppercase;
+}
+.learnCourseHeader h1{
+  font-size:calc(26px * var(--ui-font-scale));
+  line-height:1.08;
+  letter-spacing:-.03em;
+  margin:5px 0 5px;
+}
+.learnCourseHeader p{
+  color:#666;
+  font-size:calc(14px * var(--ui-font-scale));
+  line-height:1.25;
+  margin:0;
+}
+.learnCourseHeader select{
+  height:46px;
+  min-width:0;
+  margin:0;
+  border-radius:14px;
+  font-size:calc(16px * var(--ui-font-scale));
+  padding:0 10px;
+}
+.compactModeSwitch{
+  grid-template-columns:1fr 1fr;
+  margin:8px 0 10px;
+}
+.compactModeSwitch button{
+  min-height:48px;
+  font-size:calc(17px * var(--ui-font-scale));
+}
+.stageOnlyPanel{
+  margin-top:4px;
+}
+.stageListPanel{
+  display:grid;
+  gap:10px;
+}
+.stageListHeader{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:center;
+  background:#fff;
+  border:1px solid #EFEDE6;
+  border-radius:18px;
+  padding:10px;
+}
+.stageListHeader .smallButton{
+  min-height:42px;
+  margin:0;
+}
+.stageListHeader strong{
+  display:block;
+  color:#111;
+  font-size:calc(19px * var(--ui-font-scale));
+  font-weight:950;
+  line-height:1.15;
+}
+.themeFlowHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.themeFlowHeader span{
+  display:block;
+  color:#5F6F65;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:950;
+  letter-spacing:.08em;
+  line-height:1.1;
+  text-transform:uppercase;
+}
+.themeFlowHeader strong{
+  display:block;
+  color:#111;
+  font-size:calc(18px * var(--ui-font-scale));
+  font-weight:950;
+  line-height:1.15;
+}
+.stageSixButton{
+  min-height:42px;
+  border:none;
+  border-radius:999px;
+  background:#1F3B2D;
+  color:#fff;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:950;
+  line-height:1;
+  padding:0 14px;
+  white-space:nowrap;
+}
+.themeStageGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.themeStageButton{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  grid-template-areas:"num title count" "num cap count";
+  align-items:center;
+  gap:2px 10px;
+  min-height:64px;
+  border:1px solid #EFEDE6;
+  border-radius:16px;
+  background:#F7F5EF;
+  color:#111;
+  padding:12px;
+  text-align:left;
+}
+.themeStageButton.active{
+  background:#1F3B2D;
+  border-color:#1F3B2D;
+  color:#fff;
+}
+.stageNumber{
+  grid-area:num;
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#fff;
+  color:#1F3B2D;
+  font-size:calc(17px * var(--ui-font-scale));
+  font-weight:950;
+}
+.themeStageButton.active .stageNumber{
+  background:rgba(255,255,255,.16);
+  color:#fff;
+}
+.themeStageButton strong{
+  grid-area:title;
+  font-size:calc(18px * var(--ui-font-scale));
+  font-weight:950;
+  line-height:1.1;
+}
+.themeStageButton small{
+  grid-area:cap;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:850;
+  line-height:1.2;
+  opacity:.75;
+}
+.themeStageButton em{
+  grid-area:count;
+  border-radius:999px;
+  background:#fff;
+  color:#1F3B2D;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-style:normal;
+  font-weight:950;
+  line-height:1;
+  padding:6px 9px;
+}
+.themeStageButton.active em{
+  background:rgba(255,255,255,.16);
+  color:#fff;
+}
+.quickFilterLabel{
+  margin:4px 0 8px;
+  color:#5F6F65;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:950;
+  letter-spacing:.08em;
+  line-height:1.1;
+  text-transform:uppercase;
+}
+.learnTypeGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0 16px;
+}
+.learnTypeGrid button{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-height:64px;
+  border:none;
+  border-radius:18px;
+  background:#ECE9E0;
+  color:#666;
+  font-size:calc(20px * var(--ui-font-scale));
+  font-weight:850;
+  line-height:1.05;
+  padding:0 8px;
+}
+.learnTypeGrid button strong{
+  display:block;
+  font-size:calc(20px * var(--ui-font-scale));
+  line-height:1.05;
+}
+.learnTypeGrid button span{
+  min-width:32px;
+  height:24px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.45);
+  color:inherit;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:900;
+  line-height:1;
+}
+.learnTypeGrid button.active{
+  background:#1F3B2D;
+  color:#fff;
+}
+.learnTypeGrid button.active span{
+  background:rgba(255,255,255,.16);
+}
+.rolePlayPanel{
+  display:grid;
+  gap:10px;
+  background:#F7F5EF;
+  border:1px solid #EFEDE6;
+  border-radius:18px;
+  padding:12px;
+  margin:8px 0 12px;
+}
+.rolePlayHead,
+.rolePlayActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  align-items:center;
+}
+.rolePlayHead strong{
+  color:#1F3B2D;
+  font-size:calc(18px * var(--ui-font-scale));
+  font-weight:850;
+}
+.rolePlayPanel select{
+  height:48px;
+  margin:0;
+  border-radius:14px;
+  background:#fff;
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.rolePlayActions .compactButton{
+  min-height:48px;
+  margin:0;
+}
+.deepRow.roleTurn{
+  background:#FFF7E0;
+  border-color:#E7D393;
+}
+.deepRow.roleTurn p:before{
+  content:"Your turn · ";
+  color:#8A651C;
+  font-weight:850;
+}
+.speakerPill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:28px;
+  margin-right:8px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#F3F0E8;
+  color:#1F3B2D;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:900;
+  vertical-align:middle;
+}
+.sectionTitleRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:12px 0 8px;
+}
+.sectionTitleRow .miniTitle{
+  margin:0;
+}
+.sectionPlayButton{
+  min-height:40px;
+  border:none;
+  border-radius:999px;
+  background:#ECE9E0;
+  color:#1F3B2D;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:850;
+  line-height:1;
+  padding:0 15px;
+  white-space:nowrap;
+  touch-action:manipulation;
+}
+.sectionPlayButton.active{
+  background:#1F3B2D;
+  color:#fff;
+}
+@media(max-width:420px){
+  .learnCourseHeader{
+    grid-template-columns:1fr 94px;
+    gap:9px;
+  }
+  .learnCourseHeader h1{
+    font-size:calc(23px * var(--ui-font-scale));
+  }
+  .learnCourseHeader select{
+    font-size:calc(14px * var(--ui-font-scale));
+    padding:0 8px;
+  }
+  .themeFlowHeader{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .stageSixButton{
+    width:100%;
+  }
+  .learnTypeGrid button{
+    min-height:58px;
+  }
+  .learnTypeGrid button strong{
+    font-size:calc(17px * var(--ui-font-scale));
+  }
+  .learnTypeGrid button span{
+    height:22px;
+    min-width:30px;
+    font-size:calc(12px * var(--ui-font-scale));
+  }
+  .rolePlayHead,
+  .rolePlayActions{
+    grid-template-columns:1fr;
+  }
+  .rolePlayPanel select{
+    height:46px;
+  }
+  .sectionPlayButton{
+    min-height:38px;
+    font-size:calc(13px * var(--ui-font-scale));
+    padding:0 13px;
+  }
+}
+
+/* V1.7.9 iPhone detail viewport: use more of the screen width. */
+@media(max-width:580px){
+  .screen{
+    width:100%;
+    max-width:100%;
+  }
+  .page{
+    padding-left:max(8px, env(safe-area-inset-left));
+    padding-right:max(8px, env(safe-area-inset-right));
+  }
+  .deepCard{
+    padding-left:10px;
+    padding-right:10px;
+  }
+  .deepMain,
+  .rolePlayPanel,
+  .deepRow{
+    margin-left:0;
+    margin-right:0;
+  }
+  .deepRow{
+    padding-left:10px;
+    padding-right:10px;
+  }
+}
+
+@media(min-width:430px) and (max-width:580px){
+  .page{
+    padding-left:max(10px, env(safe-area-inset-left));
+    padding-right:max(10px, env(safe-area-inset-right));
+  }
+  .deepCard{
+    padding-left:12px;
+    padding-right:12px;
+  }
+}
+
+/* Mandy V2 learning flow shell */
+.tabs{grid-template-columns:repeat(5,1fr)}
+.tabs button{font-size:calc(12px * var(--ui-font-scale))}
+.pageHeader{margin-bottom:14px}
+.pageHeader span{display:block;color:#5F6F65;font-size:calc(12px * var(--ui-font-scale));font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+.pageHeader h1{font-size:calc(31px * var(--ui-font-scale));margin:5px 0 6px;letter-spacing:-.035em}
+.pageHeader p{color:#666;font-size:calc(16px * var(--ui-font-scale));line-height:1.35;margin:0;font-weight:750}
+.v2CourseHero,.progressCard,.v2Panel,.contentBlockCard,.expressionCard,.reactionCard,.talkCard{background:#fff;border:1px solid #EFEDE6;border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(0,0,0,.025)}
+.v2CourseHero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.v2CourseHero span,.nextStepBox span{display:block;color:#5F6F65;font-size:calc(12px * var(--ui-font-scale));font-weight:950;letter-spacing:.06em;text-transform:uppercase}
+.v2CourseHero h2{font-size:calc(26px * var(--ui-font-scale));margin:5px 0;letter-spacing:-.035em}
+.v2CourseHero p,.contentBlockCard p,.expressionCard p,.reactionCard p,.talkCard p{color:#666;font-size:calc(16px * var(--ui-font-scale));line-height:1.35;margin:6px 0 0}
+.progressTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.progressTop strong,.v2Panel h2{font-size:calc(21px * var(--ui-font-scale));margin:0;font-weight:950;letter-spacing:-.02em}
+.progressBar{height:12px;background:#ECE9E0;border-radius:999px;overflow:hidden}
+.progressBar span{display:block;height:100%;background:#1F3B2D;border-radius:inherit}
+.nextStepBox{background:#F7F5EF;border-radius:18px;padding:12px;margin:14px 0}
+.nextStepBox strong{display:block;font-size:calc(24px * var(--ui-font-scale));margin-top:3px}
+.nextStepBox small{color:#666;font-weight:850}
+.quickEntryGrid,.addContentGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.quickEntryGrid button,.addContentGrid button,.pathList button{border:none;border-radius:18px;background:#ECE9E0;color:#111;min-height:70px;padding:12px;text-align:left;font-weight:900}
+.quickEntryGrid button strong,.addContentGrid strong{display:block;font-size:calc(18px * var(--ui-font-scale))}
+.quickEntryGrid button span,.addContentGrid span{display:block;color:#5F6F65;font-size:calc(13px * var(--ui-font-scale));margin-top:5px}
+.pathList{display:grid;gap:8px;margin-top:12px}
+.pathList button{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;background:#F7F5EF}
+.pathList button>span{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#fff;color:#1F3B2D}
+.pathList small,.contentBlockCard small,.expressionCard small{display:block;color:#5F6F65;font-size:calc(13px * var(--ui-font-scale));font-weight:850;margin-top:5px}
+.practiceTabs,.expressionTabs,.userSwitch{display:flex;gap:8px;overflow-x:auto;margin:10px 0 14px;scrollbar-width:none}
+.practiceTabs::-webkit-scrollbar,.expressionTabs::-webkit-scrollbar,.userSwitch::-webkit-scrollbar{display:none}
+.practiceTabs button,.expressionTabs button,.userSwitch button{border:none;border-radius:999px;background:#ECE9E0;color:#666;min-height:42px;padding:0 14px;white-space:nowrap;font-weight:900}
+.practiceTabs button.active,.expressionTabs button.active,.userSwitch button.active{background:#1F3B2D;color:#fff}
+.infoGrid{display:grid;gap:10px;margin-top:12px}
+.infoGrid div{background:#F7F5EF;border-radius:16px;padding:12px}
+.infoGrid strong{color:#1F3B2D;font-size:calc(15px * var(--ui-font-scale))}
+.infoGrid p{font-size:calc(17px * var(--ui-font-scale));line-height:1.35;margin:5px 0 0}
+.dialogueCleanList,.shadowList,.expressionList,.reactionList{display:grid;gap:10px;margin-top:12px}
+.dialogueCleanLine,.shadowRow{background:#F7F5EF;border:1px solid #EFEDE6;border-radius:18px;padding:12px}
+.dialogueCleanLine span{display:inline-flex;border-radius:999px;background:#ECE9E0;color:#1F3B2D;font-size:calc(13px * var(--ui-font-scale));font-weight:950;padding:6px 9px;margin-bottom:8px}
+.dialogueCleanLine p,.shadowRow strong{font-size:calc(20px * var(--ui-font-scale));line-height:1.35;margin:0}
+.dialogueCleanLine em,.miniExample em,.miniDialogueBox em{display:block;color:#666;font-size:calc(16px * var(--ui-font-scale));font-style:normal;margin-top:4px}
+.shadowRow{display:grid;grid-template-columns:34px 1fr;gap:10px}
+.shadowRow>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;color:#1F3B2D;font-weight:950}
+.shadowRow p{color:#666;margin:4px 0 0}
+.shadowActions{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.shadowActions button{border:none;border-radius:12px;min-height:38px;background:#ECE9E0;font-weight:850}
+.expressionTabs button span{font-size:calc(12px * var(--ui-font-scale));opacity:.75}
+.miniExample,.miniDialogueBox{background:#F7F5EF;border-radius:14px;padding:10px;margin-top:8px;font-weight:750}
+.miniDialogueBox p{margin:7px 0 0;color:#111}
+.reactionCard span{display:block;color:#5F6F65;font-size:calc(12px * var(--ui-font-scale));font-weight:950;text-transform:uppercase}
+.reactionCard strong{display:block;font-size:calc(23px * var(--ui-font-scale));margin-top:5px}
+.talkCard small{color:#5F6F65;font-weight:900}
+.helpfulList{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.helpfulList span{background:#ECE9E0;border-radius:999px;padding:7px 10px;font-size:calc(13px * var(--ui-font-scale));font-weight:850}
+.talkTurn{background:#F7F5EF;border-radius:16px;padding:12px;margin-top:10px}
+.secondaryHeading{font-size:calc(24px * var(--ui-font-scale));margin-top:24px}
+.activeCourseCard{border-color:#B9D2C1;background:#F7FBF8}
+.settingsUserSwitch{margin-bottom:8px}
+@media(max-width:420px){.quickEntryGrid,.addContentGrid{grid-template-columns:1fr}.v2CourseHero{grid-template-columns:1fr}.shadowActions{grid-template-columns:1fr 1fr}.tabs button{font-size:calc(11px * var(--ui-font-scale))}}
+
+/* V2.2.0 Mandy UI Alignment */
+.learnTitleBlock h1{font-size:calc(64px * var(--ui-font-scale));margin:0 0 10px;letter-spacing:-.05em}
+.learnTitleBlock p{font-size:calc(48px * var(--ui-font-scale));color:#9497a0;margin:0 0 24px;font-weight:700}
+.learnLessonCard,.learnNextCard,.learnPathCard{background:#fff;border:1px solid #e5e6eb;border-radius:30px;padding:24px;box-shadow:0 2px 10px rgba(33,43,54,.06);margin-bottom:18px}
+.learnLessonCard .label,.learnNextCard .label{font-size:calc(20px * var(--ui-font-scale));color:#63646d;font-weight:850;margin:0 0 10px}
+.learnLessonCard h2{font-size:calc(54px * var(--ui-font-scale));line-height:1.1;margin:0 0 12px}
+.learnLessonCard .goalChip{background:#e8f0f2;border-radius:18px;padding:14px 16px;font-size:calc(34px * var(--ui-font-scale));color:#2f6f5c;font-weight:800;line-height:1.3}
+.learnLessonCard .metaRow{display:flex;justify-content:space-between;color:#868792;font-size:calc(38px * var(--ui-font-scale));font-weight:800;margin-top:16px}
+.progressBar{height:16px;background:#ececf1;border-radius:999px;overflow:hidden;margin-top:12px}
+.progressBar span{display:block;height:100%;background:#1fad56;border-radius:999px}
+.learnNextCard{background:#d9f2e8;border-color:#c4e7db}
+.learnNextCard h3{font-size:calc(60px * var(--ui-font-scale));line-height:1.1;margin:6px 0 10px}
+.learnNextCard p{font-size:calc(37px * var(--ui-font-scale));color:#56606a;line-height:1.35;margin:0 0 12px;font-weight:700}
+.learnNextCard .primary{margin:0}
+.learnSectionTitle{font-size:calc(46px * var(--ui-font-scale));margin:10px 0 14px;letter-spacing:-.03em}
+.learnQuickGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.learnQuickCard{border:none;border-radius:30px;padding:18px;text-align:left;min-height:170px;display:grid;gap:8px;box-shadow:0 2px 8px rgba(20,32,52,.06)}
+.learnQuickCard span{font-size:calc(34px * var(--ui-font-scale))}
+.learnQuickCard strong{font-size:calc(48px * var(--ui-font-scale));line-height:1.05}
+.learnQuickCard small{font-size:calc(34px * var(--ui-font-scale));color:#8f95a0;font-weight:700}
+.learnQuickCard.dialogue{background:#edf1fa}
+.learnQuickCard.shadowing{background:#f4ebf9}
+.learnQuickCard.vocabulary{background:#f7f4e8}
+.learnQuickCard.guided{background:#eaf4f4}
+.learnPathCard .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.learnPathCard .head h2{margin:0;font-size:calc(56px * var(--ui-font-scale))}
+.learnPathCard .head button{border:none;background:none;color:#2f6f5c;font-size:calc(42px * var(--ui-font-scale));font-weight:850}
+.learnPathCard .rows{display:grid}
+.learnPathCard .row{display:grid;grid-template-columns:64px 1fr 24px;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid #ececf1;background:transparent;border-left:none;border-right:none}
+.learnPathCard .row:last-child{border-bottom:none}
+.learnPathCard .row .dot{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(32px * var(--ui-font-scale));background:#ececf1;color:#7b7f88}
+.learnPathCard .row strong{display:block;font-size:calc(50px * var(--ui-font-scale));line-height:1.1}
+.learnPathCard .row small{display:block;font-size:calc(36px * var(--ui-font-scale));color:#9da2ac;margin-top:2px}
+.learnPathCard .row em{font-style:normal;color:#d0d2d8;font-size:calc(34px * var(--ui-font-scale));text-align:right}
+.learnPathCard .row.done .dot{background:#1fad56;color:#fff}
+.learnPathCard .row.done small{color:#1fad56}
+.learnPathCard .row.current .dot{background:#171b3b;color:#fff}
+.learnPathCard .row.current small{color:#f06524}
+
+.addContentSub{font-size:calc(38px * var(--ui-font-scale));color:#667b98;margin-top:-10px;margin-bottom:14px;font-weight:850}
+.addHintCard{background:#fff;border:1px solid #d8deec;border-radius:28px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:14px}
+.addHintCard strong{font-size:calc(42px * var(--ui-font-scale));color:#1e4698}
+.addHintCard p{font-size:calc(35px * var(--ui-font-scale));line-height:1.35;color:#2a4ea0;margin:8px 0 0}
+.addHintCard.secondary strong,.addHintCard.secondary p{color:#3e4b5d}
+.addContentGrid{display:grid;gap:12px}
+.addContentGrid button{border:1px solid #d8deec;background:#fff;border-radius:28px;padding:18px 20px;text-align:left;display:grid;gap:8px}
+.addContentGrid button strong{font-size:calc(52px * var(--ui-font-scale));line-height:1.1}
+.addContentGrid button span{font-size:calc(34px * var(--ui-font-scale));color:#597091;line-height:1.35;font-weight:700}
+.requiredFieldsCard{background:#fff;border:1px solid #d8deec;border-radius:28px;padding:18px 20px;margin-top:14px}
+.requiredFieldsCard strong{font-size:calc(42px * var(--ui-font-scale));color:#5f7090}
+.requiredFieldsCard div{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.requiredFieldsCard span{background:#edf1f7;border-radius:18px;padding:14px 16px;font-size:calc(36px * var(--ui-font-scale));color:#3f4f67;font-weight:800}
+
+.libraryFolderToolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.libraryFolderToolbar button{min-height:52px;border:none;border-radius:16px;background:#e8f0f2;color:#2f6f5c;font-size:calc(16px * var(--ui-font-scale));font-weight:850}
+.libraryTopActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.continueShelfCard{background:#edf6f2;border:1px solid #d2e9de;border-radius:22px;padding:14px 16px;margin:10px 0 14px}
+.continueShelfCard p{margin:0;color:#43635a;font-size:calc(13px * var(--ui-font-scale));font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.continueShelfCard h2{margin:6px 0 3px;font-size:calc(22px * var(--ui-font-scale));line-height:1.2}
+.continueShelfCard small{display:block;color:#607373;font-size:calc(13px * var(--ui-font-scale));font-weight:700}
+.libraryShelfChips{display:flex;gap:8px;overflow:auto;padding:2px 0 8px}
+.libraryShelfChips span{background:#eef1f8;border-radius:999px;padding:6px 12px;white-space:nowrap;font-size:calc(13px * var(--ui-font-scale));font-weight:800;color:#4f6588}
+.courseShelfGrid{display:grid;gap:12px}
+.shelfCard{border-radius:20px}
+.libraryOrganizerPanel{margin-top:14px;padding-top:12px;border-top:1px solid #ececf1}
+.folderSection{border:1px solid #ececf1;border-radius:22px;padding:12px;margin-top:12px;background:#fafbff}
+.folderHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.folderHeader strong{font-size:calc(18px * var(--ui-font-scale))}
+.folderHeader button{border:none;border-radius:10px;background:#edf1fa;padding:6px 10px;font-size:calc(13px * var(--ui-font-scale));font-weight:800;color:#40506e}
+.subFolderBox{border-left:3px solid #d6ddee;padding-left:10px;margin-top:10px}
+.coursePath{font-size:calc(12px * var(--ui-font-scale));color:#6d7280;font-weight:800}
+.dialogueCleanLine.touchRow{width:100%;text-align:left;border:1px solid #efe5d8;background:#fdfaf5;display:block;color:inherit;font:inherit;cursor:pointer}
+.dialogueCleanLine.touchRow .lineIcons{display:inline-flex;align-items:center;gap:6px;float:right}
+.dialogueCleanLine.touchRow .lineIcons i,.dialogueCleanLine.touchRow .lineIcons b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:#eef1f3;color:#5f6877;font-style:normal;font-size:calc(12px * var(--ui-font-scale));font-weight:800;line-height:1}
+.dialogueCleanLine.touchRow .lineIcons b{cursor:pointer}
+.dialogueCleanLine.touchRow p{clear:both;padding-top:6px}
+.dialogueCleanLine.touchRow.unaligned{border-color:#f0ba72;background:#fff7ea}
+.shadowRow.unaligned{border-color:#f0ba72;background:#fff7ea}
+
+.lineAdjustOverlay{position:fixed;inset:0;background:rgba(0,0,0,.28);display:flex;align-items:flex-end;z-index:30}
+.lineAdjustSheet{width:100%;background:#fff;border-radius:22px 22px 0 0;padding:16px 14px 18px;max-height:84vh;overflow:auto}
+.lineAdjustHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.lineAdjustHead strong{font-size:calc(19px * var(--ui-font-scale))}
+.lineAdjustHead button{border:none;border-radius:999px;background:#eceff3;color:#4d5667;min-height:34px;padding:0 12px;font-weight:850}
+.lineAdjustSheet p{font-size:calc(16px * var(--ui-font-scale));line-height:1.45;margin:0 0 12px}
+.lineAdjustGrid{display:grid;gap:10px}
+.lineAdjustGrid label{font-size:calc(14px * var(--ui-font-scale));color:#5f6978;font-weight:800}
+.lineAdjustGrid label>div{display:grid;grid-template-columns:84px 1fr 84px;gap:8px;align-items:center;margin-top:6px}
+.lineAdjustGrid button{border:none;border-radius:12px;min-height:40px;background:#f2efe8;font-weight:850}
+.lineAdjustGrid span{display:grid;place-items:center;min-height:40px;background:#f8fafc;border-radius:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(18px * var(--ui-font-scale));color:#24313f}
+.lineAdjustActions{display:grid;gap:8px;margin-top:14px}
+.lineAdjustActions button{border:none;border-radius:14px;min-height:44px;background:#eceff3;color:#253343;font-size:calc(15px * var(--ui-font-scale));font-weight:850;text-align:left;padding:0 12px}
+.loginPage h1{margin:0 0 8px}
+.loginPage .settingBox p{color:#5f6978;font-size:calc(15px * var(--ui-font-scale));line-height:1.45}
+.practiceTabs button,.expressionTabs button{outline:none;-webkit-tap-highlight-color:transparent}
+
+.settingsTopBar{position:sticky;top:0;background:#1d4a3f;color:#fff;text-align:center;padding:12px;border-radius:16px;font-size:calc(18px * var(--ui-font-scale));font-weight:850;margin-bottom:12px;z-index:2}
+.voiceRoleBox h2{font-size:calc(30px * var(--ui-font-scale));margin:0 0 8px}
+.voiceRoleBox>p{font-size:calc(16px * var(--ui-font-scale));color:#57606b;line-height:1.45;margin:0 0 10px;font-weight:700}
+.voiceRoleGroup{margin-top:14px}
+.voiceRoleGroup h3{font-size:calc(20px * var(--ui-font-scale));margin:0 0 4px}
+.voiceRoleGroup small{display:block;color:#8c9098;margin-bottom:8px;font-size:calc(14px * var(--ui-font-scale));font-weight:700}
+.voiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.voiceCard{position:relative;border:1px solid #d9deea;background:#fff;border-radius:16px;padding:10px 12px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px}
+.voiceCard strong{display:block;font-size:calc(16px * var(--ui-font-scale));line-height:1.1}
+.voiceCard small{display:block;color:#8f96a4;font-size:calc(13px * var(--ui-font-scale));margin-top:2px}
+.voiceCard span{color:#1fad56;font-size:calc(22px * var(--ui-font-scale));font-weight:900;min-width:18px;text-align:center}
+.voiceCard em{font-style:normal;background:#eef0f6;border-radius:999px;padding:6px 10px;font-size:calc(13px * var(--ui-font-scale));color:#7c8390;font-weight:850}
+.voiceCard.active{border:2px solid #1fad56;background:#ecf7f0}
+.settingPills{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.settingPills.two{grid-template-columns:1fr 1fr}
+.settingPills button{border:none;border-radius:999px;background:#eef0f6;color:#8c9098;min-height:44px;font-size:calc(15px * var(--ui-font-scale));font-weight:850}
+.settingPills button.active{background:#184d43;color:#fff}
+.settingBox .hint{font-size:calc(14px * var(--ui-font-scale));color:#89919f;line-height:1.35;margin:6px 0 0;font-weight:700}
+
+@media(max-width:540px){
+  .learnTitleBlock h1{font-size:calc(52px * var(--ui-font-scale))}
+  .learnTitleBlock p{font-size:calc(20px * var(--ui-font-scale))}
+  .learnLessonCard h2{font-size:calc(22px * var(--ui-font-scale))}
+  .learnLessonCard .goalChip{font-size:calc(16px * var(--ui-font-scale))}
+  .learnLessonCard .metaRow{font-size:calc(16px * var(--ui-font-scale))}
+  .learnNextCard h3{font-size:calc(48px * var(--ui-font-scale))}
+  .learnNextCard p{font-size:calc(18px * var(--ui-font-scale))}
+  .learnSectionTitle{font-size:calc(16px * var(--ui-font-scale))}
+  .learnQuickCard{min-height:136px}
+  .learnQuickCard span{font-size:calc(28px * var(--ui-font-scale))}
+  .learnQuickCard strong{font-size:calc(20px * var(--ui-font-scale))}
+  .learnQuickCard small{font-size:calc(16px * var(--ui-font-scale))}
+  .learnPathCard .head h2{font-size:calc(18px * var(--ui-font-scale))}
+  .learnPathCard .head button{font-size:calc(16px * var(--ui-font-scale))}
+  .learnPathCard .row{grid-template-columns:46px 1fr 16px}
+  .learnPathCard .row .dot{width:46px;height:46px;font-size:calc(22px * var(--ui-font-scale))}
+  .learnPathCard .row strong{font-size:calc(18px * var(--ui-font-scale))}
+  .learnPathCard .row small{font-size:calc(14px * var(--ui-font-scale))}
+  .learnPathCard .row em{font-size:calc(18px * var(--ui-font-scale))}
+  .addContentSub{font-size:calc(18px * var(--ui-font-scale))}
+  .addHintCard strong{font-size:calc(18px * var(--ui-font-scale))}
+  .addHintCard p{font-size:calc(16px * var(--ui-font-scale))}
+  .addContentGrid button strong{font-size:calc(22px * var(--ui-font-scale))}
+  .addContentGrid button span{font-size:calc(16px * var(--ui-font-scale))}
+  .requiredFieldsCard strong{font-size:calc(18px * var(--ui-font-scale))}
+  .requiredFieldsCard span{font-size:calc(16px * var(--ui-font-scale))}
+}
+
+/* V2.3.0 Compact iPhone flow */
+.learnTitleBlock h1{font-size:calc(44px * var(--ui-font-scale));line-height:1.05;margin-bottom:8px}
+.learnTitleBlock p{font-size:calc(16px * var(--ui-font-scale));color:#8c9098;margin:0 0 16px}
+.learnLessonCard,.learnNextCard,.learnPathCard{padding:16px;border-radius:22px;margin-bottom:12px}
+.learnLessonCard .label,.learnNextCard .label{font-size:calc(14px * var(--ui-font-scale));margin-bottom:8px}
+.learnLessonCard h2{font-size:calc(31px * var(--ui-font-scale));line-height:1.2;margin:0 0 9px}
+.learnLessonCard .goalChip{padding:10px 12px;font-size:calc(21px * var(--ui-font-scale));border-radius:14px}
+.learnLessonCard .metaRow{font-size:calc(18px * var(--ui-font-scale));margin-top:10px}
+.learnNextCard h3{font-size:calc(33px * var(--ui-font-scale));margin:4px 0 8px}
+.learnNextCard p{font-size:calc(17px * var(--ui-font-scale));margin-bottom:10px}
+.learnSectionTitle{font-size:calc(34px * var(--ui-font-scale));margin:6px 0 10px}
+.learnQuickGrid{gap:10px}
+.learnQuickCard{min-height:132px;padding:14px;border-radius:22px}
+.learnQuickCard span{font-size:calc(26px * var(--ui-font-scale))}
+.learnQuickCard strong{font-size:calc(30px * var(--ui-font-scale))}
+.learnQuickCard small{font-size:calc(17px * var(--ui-font-scale))}
+.learnPathCard .head h2{font-size:calc(34px * var(--ui-font-scale))}
+.learnPathCard .head button{font-size:calc(24px * var(--ui-font-scale))}
+.learnPathCard .row{grid-template-columns:44px 1fr 16px;padding:12px 0}
+.learnPathCard .row .dot{width:44px;height:44px;font-size:calc(20px * var(--ui-font-scale))}
+.learnPathCard .row strong{font-size:calc(29px * var(--ui-font-scale))}
+.learnPathCard .row small{font-size:calc(18px * var(--ui-font-scale))}
+.learnPathCard .row em{font-size:calc(18px * var(--ui-font-scale))}
+
+.practicePage .pageHeader h1{font-size:calc(28px * var(--ui-font-scale));line-height:1.2}
+.practiceStatusBar{display:flex;align-items:center;gap:10px;background:#f1f6f3;border:1px solid #d6e5dd;border-radius:16px;padding:10px 12px;margin:0 0 10px}
+.practiceStatusBar strong{font-size:calc(20px * var(--ui-font-scale));color:#184d43}
+.practiceStatusBar span{font-size:calc(13px * var(--ui-font-scale));color:#4f6259;font-weight:800}
+.compactPracticeTabs{margin:6px 0 10px}
+.compactPracticeTabs button{display:grid;gap:2px;align-items:center;padding:8px 12px;min-height:44px}
+.compactPracticeTabs button small{font-size:calc(11px * var(--ui-font-scale));opacity:.8;font-weight:800}
+.compactPanel{padding:12px;border-radius:18px;margin:8px 0}
+.compactPanel h2{font-size:calc(20px * var(--ui-font-scale))}
+.compactActions button,.compactActions select{min-height:40px;font-size:calc(13px * var(--ui-font-scale))}
+.compactActions select{border:1px solid #dfe3ea;border-radius:12px;background:#fff;padding:0 10px;margin:0}
+.sourceActions button.activeAction{background:#184d43;color:#fff}
+
+.dialogueCleanList,.shadowList,.expressionList,.reactionList{gap:8px;margin-top:10px}
+.dialogueCleanLine,.shadowRow{padding:10px;border-radius:14px}
+.dialogueCleanLine p,.shadowRow strong{font-size:calc(17px * var(--ui-font-scale));line-height:1.35}
+.dialogueCleanLine em,.shadowRow p,.miniExample em,.miniDialogueBox em{font-size:calc(14px * var(--ui-font-scale))}
+.shadowActions{grid-template-columns:repeat(4,1fr)}
+.shadowActions button{min-height:34px;font-size:calc(12px * var(--ui-font-scale))}
+
+.expressionCard strong{font-size:calc(17px * var(--ui-font-scale))}
+.expressionCard p{font-size:calc(14px * var(--ui-font-scale))}
+.miniExample,.miniDialogueBox{padding:8px;border-radius:12px}
+.miniDialogueBox p{font-size:calc(14px * var(--ui-font-scale));line-height:1.35}
+
+.reactionModeSwitch{grid-template-columns:repeat(3,1fr)}
+.reactionCard strong{font-size:calc(19px * var(--ui-font-scale));line-height:1.32}
+
+.spellingItemStrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:8px 0 10px;scrollbar-width:none}
+.spellingItemStrip::-webkit-scrollbar{display:none}
+.spellingItemStrip button{border:none;border-radius:999px;background:#ece9e0;color:#56606a;min-width:34px;min-height:34px;font-size:calc(13px * var(--ui-font-scale));font-weight:850}
+.spellingItemStrip button.active{background:#184d43;color:#fff}
+.spellingHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.starToggle{border:none;border-radius:999px;background:#ece9e0;color:#4e5d57;min-height:32px;padding:0 10px;font-size:calc(12px * var(--ui-font-scale));font-weight:850}
+.starToggle.active{background:#184d43;color:#fff}
+
+.talkCard{display:grid;gap:10px}
+.talkTurn{padding:10px;border-radius:12px}
+.talkTurn strong{font-size:calc(16px * var(--ui-font-scale));line-height:1.35}
+.talkTurn details{margin-top:6px}
+.talkTurn summary{cursor:pointer;color:#4f6259;font-weight:850;font-size:calc(13px * var(--ui-font-scale))}
+
+@media(max-width:540px){
+  .learnTitleBlock h1{font-size:calc(40px * var(--ui-font-scale))}
+  .learnLessonCard h2{font-size:calc(19px * var(--ui-font-scale))}
+  .learnLessonCard .goalChip{font-size:calc(15px * var(--ui-font-scale))}
+  .learnLessonCard .metaRow{font-size:calc(15px * var(--ui-font-scale))}
+  .learnNextCard h3{font-size:calc(30px * var(--ui-font-scale))}
+  .learnNextCard p{font-size:calc(16px * var(--ui-font-scale))}
+  .learnSectionTitle{font-size:calc(16px * var(--ui-font-scale))}
+  .learnQuickCard strong{font-size:calc(19px * var(--ui-font-scale))}
+  .learnQuickCard small{font-size:calc(14px * var(--ui-font-scale))}
+  .learnPathCard .head h2{font-size:calc(18px * var(--ui-font-scale))}
+  .learnPathCard .row strong{font-size:calc(17px * var(--ui-font-scale))}
+  .learnPathCard .row small{font-size:calc(13px * var(--ui-font-scale))}
+  .practiceStatusBar strong{font-size:calc(18px * var(--ui-font-scale))}
+  .practiceStatusBar span{font-size:calc(12px * var(--ui-font-scale))}
+  .compactPracticeTabs button{padding:7px 10px}
+  .compactActions{grid-template-columns:1fr 1fr 1fr}
+}
+
+/* V2.3.1 Practice status-dot navigation + lighter dialogue row actions */
+.compactPracticeTabs{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(82px,1fr));
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+}
+.compactPracticeTabs button{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 12px;
+  min-height:46px;
+  border-radius:16px;
+  border:1px solid #e4e8e6;
+  background:#f6f7f6;
+  color:#4a5550;
+  font-size:calc(15px * var(--ui-font-scale));
+  font-weight:850;
+}
+.compactPracticeTabs button span{white-space:nowrap}
+.compactPracticeTabs button.active{
+  background:#ecf5f1;
+  border-color:#c9ddd3;
+  color:#173f33;
+}
+.statusDot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  border:1.6px solid #c8c9cb;
+  background:#fff;
+  flex:0 0 auto;
+}
+.statusDot.current{background:#1e5546;border-color:#1e5546}
+.statusDot.done{background:#fff;border-color:#6fb798}
+.statusDot.not_started{background:#fff;border-color:#c8c9cb}
+
+.dialogueCleanLine.touchRow .lineIcons{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  float:right;
+}
+.dialogueCleanLine.touchRow .lineIcons i,
+.dialogueCleanLine.touchRow .lineIcons b{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  border-radius:7px;
+  background:#eef1f3;
+  color:#5f6877;
+  font-style:normal;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:800;
+  line-height:1;
+}
+.dialogueCleanLine.touchRow .lineIcons b{cursor:pointer}
+.dialogueCleanLine.touchRow p{clear:both;padding-top:6px}
+.miniExample{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:start}
+
+@media(max-width:540px){
+  .compactPracticeTabs{
+    grid-template-columns:repeat(5,minmax(74px,1fr));
+    gap:6px;
+  }
+}
+
+/* V2.3.2 Content-first compact refinement */
+.practicePage{
+  padding-left:max(10px, env(safe-area-inset-left));
+  padding-right:max(10px, env(safe-area-inset-right));
+}
+.practicePage .pageHeader{margin-bottom:10px}
+.practicePage .pageHeader h1{margin-bottom:4px}
+.practicePage .pageHeader p{font-size:calc(14px * var(--ui-font-scale))}
+.practicePage .practiceStatusBar{
+  margin:0 0 8px;
+  border-radius:14px;
+  padding:9px 10px;
+}
+.practicePage .compactPracticeTabs{margin:4px 0 8px}
+.practicePage .compactPanel{
+  margin:6px 0;
+  padding:10px;
+  border-radius:16px;
+}
+.practicePage .compactPanel h2{font-size:calc(18px * var(--ui-font-scale))}
+.practicePage .v2Panel,
+.practicePage .expressionCard,
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  border-radius:16px;
+  box-shadow:0 4px 10px rgba(0,0,0,.02);
+}
+.practicePage .dialogueCleanList,
+.practicePage .shadowList,
+.practicePage .expressionList,
+.practicePage .reactionList{
+  margin-top:8px;
+  gap:7px;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow{
+  padding:9px 9px 8px;
+  border-radius:12px;
+}
+.practicePage .shadowRow{grid-template-columns:28px 1fr;gap:8px}
+.practicePage .shadowRow>span{
+  width:26px;
+  height:26px;
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.practicePage .dialogueCleanLine p,
+.practicePage .shadowRow strong{
+  font-size:calc(15px * var(--ui-font-scale));
+  line-height:1.28;
+  letter-spacing:-.01em;
+}
+.practicePage .dialogueCleanLine em,
+.practicePage .shadowRow p,
+.practicePage .expressionCard p,
+.practicePage .miniExample em,
+.practicePage .miniDialogueBox em{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+
+/* Weak visual weight for helper buttons */
+.practicePage .sourceActions button,
+.practicePage .shadowActions button,
+.practicePage .starToggle,
+.practicePage .spellingItemStrip button{
+  background:#f1efea;
+  color:#64706a;
+  border:1px solid #e3ded3;
+  box-shadow:none;
+  font-weight:780;
+}
+.practicePage .sourceActions button.activeAction{
+  background:#e8efe9;
+  color:#20483b;
+  border-color:#cfe0d6;
+}
+.practicePage .shadowActions{
+  gap:6px;
+  margin-top:7px;
+}
+.practicePage .shadowActions button{
+  min-height:31px;
+  border-radius:10px;
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.practicePage .sourceActions{gap:7px}
+.practicePage .sourceActions button{
+  min-height:38px;
+  border-radius:11px;
+  font-size:calc(12px * var(--ui-font-scale));
+  padding:0 6px;
+}
+.practicePage .sourceActions select{
+  height:38px;
+  min-height:38px;
+  border-radius:11px;
+  font-size:calc(12px * var(--ui-font-scale));
+  padding:0 9px;
+}
+.practicePage .miniExample,
+.practicePage .miniDialogueBox{
+  padding:7px;
+  border-radius:10px;
+  margin-top:6px;
+}
+.practicePage .smallTextarea{
+  min-height:118px;
+  padding:11px;
+  font-size:calc(14px * var(--ui-font-scale));
+}
+.practicePage .talkTurn{
+  padding:9px;
+  border-radius:10px;
+}
+.practicePage .spellingHead small{font-size:calc(12px * var(--ui-font-scale))}
+
+@media(max-width:540px){
+  .practicePage{
+    padding-left:max(8px, env(safe-area-inset-left));
+    padding-right:max(8px, env(safe-area-inset-right));
+  }
+  .practicePage .compactPracticeTabs{
+    grid-template-columns:repeat(5,minmax(70px,1fr));
+    gap:5px;
+  }
+  .practicePage .compactPracticeTabs button{
+    min-height:42px;
+    padding:8px 8px;
+    font-size:calc(14px * var(--ui-font-scale));
+  }
+}
+
+/* V2.3.3 Practice expression bilingual + content-first spacing */
+.practicePage{
+  padding-left:max(6px, env(safe-area-inset-left));
+  padding-right:max(6px, env(safe-area-inset-right));
+}
+.practicePage .compactPanel{
+  padding:9px 8px;
+}
+.practicePage .v2Panel,
+.practicePage .expressionCard,
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  margin:5px 0;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow,
+.practicePage .expressionCard,
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  border-radius:11px;
+}
+.practicePage .dialogueCleanLine p,
+.practicePage .shadowRow strong,
+.practicePage .expressionCard strong{
+  line-height:1.24;
+}
+
+.practicePage .expressionCardTop{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.practicePage .expressionCardText{
+  min-width:0;
+  flex:1;
+}
+.practicePage .expressionCardTools{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.practicePage .iconPlayButton,
+.practicePage .compactLinePlay{
+  border:1px solid #d8ded8;
+  background:#f5f4ef;
+  color:#5f6b66;
+  min-height:32px;
+  border-radius:9px;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:760;
+  padding:0 8px;
+}
+.practicePage .iconPlayButton{
+  width:32px;
+  min-width:32px;
+  padding:0;
+  display:grid;
+  place-items:center;
+}
+.practicePage .iconPlayButton span{
+  width:0;
+  height:0;
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+  border-left:8px solid currentColor;
+  margin-left:2px;
+}
+.practicePage .compactLinePlay.activeAction,
+.practicePage .iconPlayButton.activeAction{
+  background:#e8efe9;
+  color:#194839;
+  border-color:#c4d8cb;
+}
+.practicePage .compactExampleRow,
+.practicePage .miniDialogueLineRow{
+  grid-template-columns:26px 1fr;
+  gap:7px;
+  align-items:flex-start;
+  margin-top:5px;
+}
+.practicePage .slimTinyPlay{
+  width:26px;
+  height:26px;
+  border-radius:999px;
+}
+.practicePage .slimTinyPlay span{
+  border-top-width:4px;
+  border-bottom-width:4px;
+  border-left-width:7px;
+  margin-left:1px;
+}
+.practicePage .compactExampleRow>div,
+.practicePage .miniDialogueLineRow>div{
+  min-width:0;
+}
+.practicePage .compactExampleRow span,
+.practicePage .miniDialogueLineRow span{
+  display:block;
+  color:#1b1b1b;
+  font-weight:760;
+  line-height:1.27;
+}
+.practicePage .miniLineLabel{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:22px;
+  height:22px;
+  border-radius:999px;
+  background:#ecebe5;
+  color:#55625c;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:900;
+  margin:0 0 4px;
+  padding:0 6px;
+}
+.practicePage .compactMiniDialogueBox{
+  padding:6px;
+  margin-top:5px;
+}
+.practicePage .compactMiniDialogueBox .miniExample{
+  background:#fff;
+  border:1px solid #ece9e1;
+}
+.practicePage .miniExample em,
+.practicePage .miniDialogueBox em{
+  margin-top:3px;
+}
+
+@media(max-width:540px){
+  .practicePage{
+    padding-left:max(6px, env(safe-area-inset-left));
+    padding-right:max(6px, env(safe-area-inset-right));
+  }
+  .practicePage .compactPanel{
+    padding:8px 7px;
+  }
+}
+
+/* V2.3.4 Practice content-first mobile width optimization */
+.practicePage{
+  padding-left:max(4px, env(safe-area-inset-left));
+  padding-right:max(4px, env(safe-area-inset-right));
+}
+.practicePage .compactPanel{
+  padding:7px 6px;
+  border-radius:14px;
+}
+.practicePage .v2Panel,
+.practicePage .expressionCard,
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  margin:4px 0;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow,
+.practicePage .expressionCard,
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  border-radius:10px;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow{
+  padding:8px 7px;
+}
+.practicePage .shadowRow{
+  grid-template-columns:24px 1fr;
+  gap:6px;
+}
+.practicePage .shadowRow>span{
+  width:24px;
+  height:24px;
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.practicePage .dialogueCleanLine p,
+.practicePage .shadowRow strong,
+.practicePage .expressionCard strong,
+.practicePage .reactionCard strong{
+  line-height:1.22;
+}
+.practicePage .expressionCard{
+  padding:8px 7px;
+}
+.practicePage .reactionCard,
+.practicePage .talkCard{
+  padding:8px 7px;
+}
+.practicePage .modeSwitch{
+  gap:5px;
+  margin:5px 0 7px;
+}
+.practicePage .modeSwitch button{
+  min-height:40px;
+  padding:8px 6px;
+}
+.practicePage .compactActions{
+  gap:5px;
+}
+.practicePage .sourceActions{
+  gap:6px;
+}
+.practicePage .sourceActions button,
+.practicePage .sourceActions select{
+  min-height:36px;
+  height:36px;
+}
+.practicePage .expressionCardTop{
+  gap:6px;
+}
+.practicePage .expressionCardTools{
+  gap:5px;
+}
+.practicePage .compactExampleRow,
+.practicePage .miniDialogueLineRow{
+  grid-template-columns:24px 1fr;
+  gap:6px;
+}
+.practicePage .miniLineLabel{
+  min-width:20px;
+  height:20px;
+  font-size:calc(10px * var(--ui-font-scale));
+}
+.practicePage .slimTinyPlay{
+  width:24px;
+  height:24px;
+}
+.practicePage .smallTextarea{
+  min-height:104px;
+  padding:10px;
+}
+
+@media(max-width:540px){
+  .practicePage{
+    padding-left:max(3px, env(safe-area-inset-left));
+    padding-right:max(3px, env(safe-area-inset-right));
+  }
+  .practicePage .compactPanel{
+    padding:6px 5px;
+  }
+}
+
+/* V2.3.5 Spelling IA refresh: grouped controls + lightweight focus */
+.practicePage .spellingControlStack{
+  display:grid;
+  gap:5px;
+  margin:3px 0 6px;
+}
+.practicePage .spellingControlGroup{
+  display:grid;
+  gap:4px;
+}
+.practicePage .spellingControlGroup small{
+  font-size:calc(10px * var(--ui-font-scale));
+  font-weight:880;
+  color:#6a746f;
+  letter-spacing:.01em;
+}
+.practicePage .spellingSegmentRow{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+}
+.practicePage .spellingModeRow{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.practicePage .spellingSegmentRow button{
+  position:relative;
+  min-height:33px;
+  border-radius:11px;
+  border:1px solid #dfe4de;
+  background:#f5f3ee;
+  color:#5c6762;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:820;
+  padding:0 7px 0 16px;
+}
+.practicePage .spellingSegmentRow button.active{
+  background:#edf4ef;
+  border-color:#bad1c3;
+  color:#1d4a3b;
+}
+.practicePage .spellingSegmentRow button.active::before{
+  content:'';
+  position:absolute;
+  left:7px;
+  top:50%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:currentColor;
+  transform:translateY(-50%);
+}
+.practicePage .spellingFilterHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.practicePage .spellingFilterToggle{
+  min-height:28px;
+  border-radius:999px;
+  border:1px solid #d9dfd9;
+  background:#f8f7f3;
+  color:#61706a;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:820;
+  padding:0 10px;
+}
+.practicePage .spellingFilterToggle.open{
+  background:#ecf4ef;
+  border-color:#c4d8cb;
+  color:#214a3d;
+}
+.practicePage .spellingTagRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.practicePage .spellingTagRow button{
+  min-height:28px;
+  border-radius:999px;
+  border:1px solid #dde2dc;
+  background:#f6f5f1;
+  color:#5c6762;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:820;
+  padding:0 10px;
+}
+.practicePage .spellingTagRow button.active{
+  background:#e9f2ec;
+  border-color:#b8cebf;
+  color:#1f493a;
+}
+.practicePage .spellingFocusSummary{
+  margin:0;
+  font-size:calc(11px * var(--ui-font-scale));
+  color:#61706a;
+  font-weight:780;
+}
+.practicePage .spellingItemStrip{
+  gap:5px;
+  margin:6px 0 7px;
+}
+.practicePage .spellingItemStrip button{
+  min-width:30px;
+  min-height:30px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .spellingWorkCard{
+  gap:8px;
+  padding:8px 7px;
+}
+.practicePage .spellingWorkCard .spellingHead{
+  margin-bottom:1px;
+}
+.practicePage .spellingWorkCard .spellingHead small{
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.practicePage .spellingWorkCard .sourceActions{
+  gap:5px;
+}
+.practicePage .spellingWorkCard .sourceActions button{
+  min-height:34px;
+}
+
+@media(max-width:540px){
+  .practicePage .spellingSegmentRow button{
+    min-height:32px;
+    font-size:calc(11px * var(--ui-font-scale));
+  }
+  .practicePage .spellingFocusSummary{
+    font-size:calc(10px * var(--ui-font-scale));
+  }
+}
+
+/* V2.4.0 IA + iPhone content-first refinement */
+.screen{
+  max-width:440px;
+}
+.page{
+  padding-left:max(10px, env(safe-area-inset-left));
+  padding-right:max(10px, env(safe-area-inset-right));
+}
+.globalSettingsButton{
+  position:fixed;
+  right:max(12px, env(safe-area-inset-right));
+  top:max(10px, env(safe-area-inset-top));
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:12px;
+  background:rgba(29,74,63,.92);
+  color:#fff;
+  font-size:calc(18px * var(--ui-font-scale));
+  font-weight:850;
+  z-index:30;
+}
+.moduleSubTabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  margin:2px 0 10px;
+  position:sticky;
+  top:max(4px, env(safe-area-inset-top));
+  z-index:6;
+  background:rgba(250,250,247,.94);
+  backdrop-filter:blur(8px);
+  padding:2px 0;
+  scrollbar-width:none;
+}
+.moduleSubTabs::-webkit-scrollbar{
+  display:none;
+}
+.moduleSubTabs button{
+  min-height:32px;
+  border:1px solid #d9dfd8;
+  border-radius:999px;
+  background:#f3f2ed;
+  color:#5f6a65;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:850;
+  padding:0 11px;
+  white-space:nowrap;
+}
+.moduleSubTabs button.active{
+  background:#e8f0ea;
+  border-color:#b8cebf;
+  color:#1f493a;
+}
+.moduleCaption{
+  margin:4px 0 8px;
+  color:#61706a;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:820;
+}
+.libraryStatsGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.libraryStatsGrid>div{
+  background:#f6f5f0;
+  border:1px solid #e8e4da;
+  border-radius:12px;
+  padding:10px 8px;
+  text-align:center;
+}
+.libraryStatsGrid strong{
+  display:block;
+  color:#184d43;
+  font-size:calc(22px * var(--ui-font-scale));
+  line-height:1;
+  font-weight:900;
+}
+.libraryStatsGrid span{
+  display:block;
+  margin-top:4px;
+  color:#63706a;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:820;
+}
+.twoActions{
+  grid-template-columns:1fr 1fr;
+}
+.deepCard,
+.v2Panel,
+.expressionCard,
+.reactionCard,
+.talkCard{
+  border-radius:14px;
+}
+.dialogueCleanLine p,
+.shadowRow strong,
+.expressionCard strong,
+.reactionCard strong{
+  line-height:1.2;
+}
+.tabs{
+  grid-template-columns:repeat(5,1fr);
+}
+@media(max-width:420px){
+  .page{
+    padding-left:max(8px, env(safe-area-inset-left));
+    padding-right:max(8px, env(safe-area-inset-right));
+  }
+  .moduleSubTabs{
+    margin-bottom:8px;
+  }
+  .moduleSubTabs button{
+    min-height:30px;
+    font-size:calc(11px * var(--ui-font-scale));
+    padding:0 10px;
+  }
+  .libraryStatsGrid{
+    gap:7px;
+  }
+  .libraryStatsGrid strong{
+    font-size:calc(20px * var(--ui-font-scale));
+  }
+}
+
+/* V2.4.1 iPhone 375/393 density tuning */
+.practicePage .pageHeader{
+  margin-bottom:8px;
+}
+.practicePage .pageHeader h1{
+  font-size:calc(24px * var(--ui-font-scale));
+  line-height:1.18;
+  margin-bottom:3px;
+}
+.practicePage .pageHeader p{
+  font-size:calc(13px * var(--ui-font-scale));
+  line-height:1.28;
+}
+.practicePage .v2Panel{
+  padding:9px 8px;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow,
+.practicePage .reactionCard,
+.practicePage .talkCard,
+.practicePage .expressionCard{
+  padding:8px 7px;
+}
+.practicePage .sourceActions button,
+.practicePage .sourceActions select{
+  min-height:34px;
+  height:34px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .spellingSegmentRow button{
+  min-height:31px;
+  font-size:calc(11px * var(--ui-font-scale));
+}
+@media(max-width:420px){
+  .screen{
+    max-width:100%;
+  }
+  .globalSettingsButton{
+    width:36px;
+    height:36px;
+    font-size:calc(16px * var(--ui-font-scale));
+  }
+  .practicePage{
+    padding-left:max(6px, env(safe-area-inset-left));
+    padding-right:max(6px, env(safe-area-inset-right));
+  }
+  .practicePage .pageHeader h1{
+    font-size:calc(22px * var(--ui-font-scale));
+  }
+  .practicePage .v2Panel{
+    padding:8px 7px;
+  }
+}
+
+/* V2.4.2 Learn page compact hierarchy */
+.learnPage .learnTitleBlock h1{
+  font-size:calc(34px * var(--ui-font-scale));
+  letter-spacing:-.03em;
+  margin:0 0 6px;
+}
+.learnPage .learnTitleBlock p{
+  font-size:calc(15px * var(--ui-font-scale));
+  margin:0 0 12px;
+}
+.learnPage .learnLessonCard,
+.learnPage .learnNextCard,
+.learnPage .learnPathCard{
+  border-radius:16px;
+  padding:12px 11px;
+  margin-bottom:9px;
+}
+.learnPage .learnLessonCard h2{
+  font-size:calc(22px * var(--ui-font-scale));
+  line-height:1.2;
+  margin-bottom:7px;
+}
+.learnPage .learnLessonCard .goalChip{
+  font-size:calc(14px * var(--ui-font-scale));
+  border-radius:12px;
+  padding:8px 10px;
+}
+.learnPage .learnLessonCard .metaRow{
+  font-size:calc(13px * var(--ui-font-scale));
+  margin-top:8px;
+}
+.learnPage .learnSectionTitle{
+  font-size:calc(18px * var(--ui-font-scale));
+  margin:8px 0 9px;
+}
+.learnPage .learnQuickGrid{
+  gap:7px;
+}
+.learnPage .learnQuickCard{
+  border-radius:14px;
+  padding:10px;
+  min-height:100px;
+}
+.learnPage .learnQuickCard span{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.learnPage .learnQuickCard strong{
+  font-size:calc(17px * var(--ui-font-scale));
+}
+.learnPage .learnQuickCard small{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .head h2{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .head button{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .row{
+  grid-template-columns:34px 1fr 12px;
+  gap:8px;
+  padding:8px 0;
+}
+.learnPage .learnPathCard .row .dot{
+  width:34px;
+  height:34px;
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .row strong{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .row small{
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.learnPage .learnPathCard .row em{
+  font-size:calc(14px * var(--ui-font-scale));
+}
+
+/* V2.5.0 Learn/Input redesign (iPhone-first) */
+.learnInputPage{
+  padding-bottom:112px;
+}
+.learnInputTop{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.learnInputBrand small{
+  display:block;
+  color:#0b8a61;
+  letter-spacing:.14em;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:900;
+}
+.learnInputBrand h1{
+  margin:2px 0 0;
+  font-size:calc(56px * var(--ui-font-scale));
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.learnInputTopActions{
+  display:flex;
+  gap:10px;
+}
+.learnTopIconButton{
+  width:58px;
+  height:58px;
+  border:none;
+  border-radius:50%;
+  background:#edf1fb;
+  color:#5b6d8c;
+  font-size:calc(28px * var(--ui-font-scale));
+  font-weight:900;
+  display:grid;
+  place-items:center;
+}
+.learnTopIconButton.active{
+  background:#020d34;
+  color:#fff;
+}
+.moduleSubTabs.learnSubTabs{
+  position:sticky;
+  top:max(6px, env(safe-area-inset-top));
+  z-index:8;
+  background:#f3f4fb;
+  border-radius:20px;
+  padding:8px 0 8px;
+  margin-bottom:10px;
+}
+.learnSubTabs button{
+  min-height:48px;
+  padding:0 22px;
+  border-radius:22px;
+  font-size:calc(35px * var(--ui-font-scale));
+  font-weight:900;
+}
+.learnSubTabs button.active{
+  background:#020d34;
+  color:#fff;
+  box-shadow:0 8px 18px rgba(2,13,52,.24);
+}
+.learnLessonHeroCard,
+.learnOverviewPathCard,
+.learnSectionIntroCard,
+.learnInfoCard,
+.learnInfoGridCard,
+.learnDialoguePlayerCard,
+.learnExpressionHeaderCard,
+.learnExpressionInputCard{
+  background:#fff;
+  border:1px solid #dce2f2;
+  border-radius:26px;
+  box-shadow:0 4px 12px rgba(27,39,67,.08);
+}
+.learnLessonHeroCard{
+  padding:16px;
+  margin-bottom:12px;
+}
+.learnLessonHeroHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.learnLessonHeroHead span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:32px;
+  border:1px solid #c8d9d4;
+  border-radius:999px;
+  padding:0 12px;
+  font-size:calc(14px * var(--ui-font-scale));
+  color:#0d7856;
+  font-weight:880;
+}
+.learnLessonHeroHead .heroPlay{
+  width:52px;
+  height:52px;
+  border:none;
+  border-radius:50%;
+  background:#020d34;
+  color:#fff;
+  font-size:calc(20px * var(--ui-font-scale));
+  font-weight:900;
+}
+.learnLessonHeroCode{
+  font-size:calc(54px * var(--ui-font-scale));
+  font-weight:950;
+  line-height:1;
+  margin:10px 0 8px;
+}
+.learnLessonHeroCard h2{
+  margin:0 0 6px;
+  font-size:calc(48px * var(--ui-font-scale));
+  line-height:1.12;
+}
+.learnLessonHeroCard p{
+  margin:0;
+  font-size:calc(30px * var(--ui-font-scale));
+  color:#5f6f93;
+  font-weight:750;
+}
+.learnLessonMetaRow{
+  display:flex;
+  justify-content:space-between;
+  margin:10px 0 8px;
+  color:#5f6f93;
+  font-size:calc(24px * var(--ui-font-scale));
+  font-weight:820;
+}
+.learnHeroStats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid #dce2f2;
+  margin-top:10px;
+}
+.learnHeroStats>div{
+  text-align:center;
+  padding:10px 6px;
+}
+.learnHeroStats strong{
+  display:block;
+  font-size:calc(37px * var(--ui-font-scale));
+  color:#051230;
+  line-height:1;
+}
+.learnHeroStats small{
+  display:block;
+  margin-top:5px;
+  font-size:calc(18px * var(--ui-font-scale));
+  color:#7a85a5;
+  font-weight:800;
+}
+.learnHeroActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+.learnHeroActions button{
+  min-height:44px;
+  border-radius:14px;
+}
+.learnOverviewPathCard{
+  padding:16px;
+}
+.learnOverviewPathCard h3{
+  margin:0 0 4px;
+  font-size:calc(44px * var(--ui-font-scale));
+}
+.learnOverviewPathCard>p{
+  margin:0 0 10px;
+  color:#5e6f92;
+  font-size:calc(30px * var(--ui-font-scale));
+  font-weight:760;
+}
+.learnOverviewPathRows{
+  display:grid;
+  gap:8px;
+}
+.learnOverviewPathRow{
+  border:none;
+  border-radius:18px;
+  background:#f4f6fd;
+  padding:12px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+}
+.learnOverviewPathRow strong{
+  display:block;
+  font-size:calc(38px * var(--ui-font-scale));
+}
+.learnOverviewPathRow small{
+  display:block;
+  margin-top:2px;
+  color:#67779a;
+  font-size:calc(26px * var(--ui-font-scale));
+  font-weight:760;
+}
+.learnOverviewPathRow em{
+  font-style:normal;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:2px solid #0d8a61;
+  color:#0d8a61;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+}
+.learnOverviewSuggestion,
+.learnOverviewStepHint,
+.learnOverviewGoal{
+  margin-top:10px;
+  font-size:calc(26px * var(--ui-font-scale));
+  color:#4c5f86;
+  font-weight:760;
+}
+.learnBackgroundStack,
+.learnDialogueStack,
+.learnExpressionStack{
+  display:grid;
+  gap:10px;
+}
+.learnSectionIntroCard{
+  padding:12px;
+  display:grid;
+  grid-template-columns:68px 1fr;
+  gap:10px;
+}
+.learnSectionIntroIcon{
+  width:68px;
+  height:68px;
+  border-radius:18px;
+  background:#eef4ff;
+  display:grid;
+  place-items:center;
+  font-size:calc(34px * var(--ui-font-scale));
+}
+.learnSectionIntroCard h2{
+  margin:0;
+  font-size:calc(52px * var(--ui-font-scale));
+}
+.learnSectionIntroCard p{
+  margin:2px 0 0;
+  font-size:calc(28px * var(--ui-font-scale));
+  color:#5f7092;
+  font-weight:760;
+}
+.learnInfoCard{
+  padding:14px;
+}
+.learnInfoCard small{
+  display:block;
+  color:#0b8860;
+  font-size:calc(14px * var(--ui-font-scale));
+  letter-spacing:.08em;
+  font-weight:920;
+}
+.learnInfoCard strong{
+  display:block;
+  margin-top:10px;
+  font-size:calc(48px * var(--ui-font-scale));
+  line-height:1.26;
+}
+.learnInfoGridCard{
+  padding:14px;
+  display:grid;
+  gap:8px;
+}
+.learnInfoGridCard strong{
+  font-size:calc(27px * var(--ui-font-scale));
+}
+.learnInfoGridCard p{
+  margin:4px 0 0;
+  font-size:calc(27px * var(--ui-font-scale));
+  color:#617392;
+  line-height:1.35;
+}
+.learnDialoguePlayerCard{
+  background:#030f3a;
+  color:#fff;
+  padding:14px;
+  position:relative;
+}
+.learnDialoguePlayerCard small{
+  color:#4df2bb;
+  font-size:calc(14px * var(--ui-font-scale));
+  font-weight:900;
+}
+.learnDialoguePlayerCard h2{
+  margin:8px 70px 0 0;
+  font-size:calc(50px * var(--ui-font-scale));
+  line-height:1.2;
+}
+.learnDialoguePlayerCard button{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:58px;
+  height:58px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  color:#030f3a;
+  font-size:calc(26px * var(--ui-font-scale));
+  font-weight:900;
+}
+.learnDialogueControlRow{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+.learnDialogueControlRow button,
+.learnDialogueModeTabs button{
+  min-height:38px;
+  border:none;
+  border-radius:999px;
+  background:#e8ebf6;
+  color:#4d5f84;
+  font-weight:860;
+}
+.learnDialogueControlRow button.active,
+.learnDialogueModeTabs button.active{
+  background:#bff1e0;
+  color:#0a6f51;
+}
+.learnDialogueModeTabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+.learnDialogueLineList{
+  display:grid;
+  gap:10px;
+}
+.learnDialogueLineCard{
+  background:#f8f9ff;
+  border:1px solid #dfe6f8;
+  border-radius:22px;
+  padding:12px;
+}
+.learnDialogueLineCard.activeLine{
+  background:#edf7f2;
+  border-color:#9ad0bb;
+}
+.learnDialogueLineCard strong{
+  display:block;
+  font-size:calc(44px * var(--ui-font-scale));
+  line-height:1.24;
+}
+.learnDialogueLineCard p{
+  margin:6px 0 0;
+  font-size:calc(29px * var(--ui-font-scale));
+  color:#607197;
+}
+.learnDialogueLineHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.learnDialogueLineHead span{
+  min-width:36px;
+  min-height:36px;
+  border-radius:999px;
+  background:#fff;
+  display:grid;
+  place-items:center;
+  color:#657493;
+  font-weight:900;
+}
+.learnDialogueLineHead button{
+  border:none;
+  background:transparent;
+  color:#7a88aa;
+  font-size:calc(22px * var(--ui-font-scale));
+}
+.learnLineActions{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.learnLineActions button{
+  min-height:34px;
+  border:none;
+  border-radius:12px;
+  background:#eceffa;
+  color:#516288;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:840;
+}
+.learnLineActions button.active{
+  background:#d9f1e7;
+  color:#116d50;
+}
+.learnRolePlayBlock{
+  background:#fff;
+  border:1px solid #dce2f2;
+  border-radius:22px;
+  padding:10px;
+}
+.learnRolePlayHead{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-bottom:10px;
+}
+.learnRolePlayHead select,
+.learnRolePlayHead button{
+  min-height:38px;
+  border-radius:12px;
+}
+.learnRevealHintButton{
+  margin-top:8px;
+  border:none;
+  min-height:34px;
+  border-radius:11px;
+  background:#e6f2ec;
+  color:#0e6f52;
+  font-weight:840;
+}
+.learnExpressionHeaderCard{
+  padding:14px;
+}
+.learnExpressionHeaderCard h2{
+  margin:0;
+  font-size:calc(52px * var(--ui-font-scale));
+}
+.learnExpressionHeaderCard p{
+  margin:8px 0 10px;
+  font-size:calc(31px * var(--ui-font-scale));
+  color:#617292;
+  line-height:1.32;
+}
+.learnExpressionFilterTabs{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+}
+.learnExpressionFilterTabs button{
+  min-height:38px;
+  border:none;
+  border-radius:14px;
+  background:#edf0fa;
+  color:#56688c;
+  font-size:calc(25px * var(--ui-font-scale));
+  font-weight:850;
+}
+.learnExpressionFilterTabs button.active{
+  background:#020d34;
+  color:#fff;
+}
+.learnExpressionInputList{
+  display:grid;
+  gap:10px;
+}
+.learnExpressionInputCard{
+  padding:12px;
+}
+.learnExpressionInputHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.learnExpressionInputHead .chips{
+  display:flex;
+  gap:6px;
+}
+.learnExpressionInputHead .chips span{
+  min-height:29px;
+  border-radius:999px;
+  padding:0 12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:880;
+  color:#2b567a;
+  background:#e8edf8;
+}
+.learnExpressionInputHead .chips span:first-child{
+  background:#bff1e0;
+  color:#116e53;
+}
+.learnPlayIcon{
+  width:36px;
+  height:36px;
+  border:none;
+  border-radius:50%;
+  background:#edf0fa;
+  color:#5d7094;
+}
+.learnPlayIcon.active{
+  background:#020d34;
+  color:#fff;
+}
+.learnExpressionInputCard strong{
+  display:block;
+  margin-top:8px;
+  font-size:calc(50px * var(--ui-font-scale));
+  line-height:1.2;
+}
+.learnExpressionInputCard p{
+  margin:6px 0 0;
+  color:#607197;
+  font-size:calc(31px * var(--ui-font-scale));
+}
+.learnExampleBox{
+  margin-top:10px;
+  padding:10px;
+  border-radius:16px;
+  background:#f4f6fd;
+}
+.learnExampleBox.alt{
+  background:#eef7f2;
+}
+.learnExampleBox small{
+  display:block;
+  color:#5a6b8f;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:850;
+}
+.learnExampleBox span{
+  display:block;
+  margin-top:4px;
+  font-size:calc(31px * var(--ui-font-scale));
+  line-height:1.28;
+  color:#2a3753;
+  font-weight:760;
+}
+.learnExpressionActions{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+}
+.learnExpressionActions button{
+  min-height:34px;
+  border:none;
+  border-radius:12px;
+  background:#edf0fa;
+  color:#56678c;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:860;
+}
+.learnExpressionActions button.active{
+  background:#d8f0e6;
+  color:#136d50;
+}
+@media(max-width:540px){
+  .learnInputBrand h1{font-size:calc(52px * var(--ui-font-scale))}
+  .learnTopIconButton{width:52px;height:52px}
+  .learnSubTabs button{min-height:44px;font-size:calc(30px * var(--ui-font-scale));padding:0 18px}
+  .learnLessonHeroCode{font-size:calc(46px * var(--ui-font-scale))}
+  .learnLessonHeroCard h2{font-size:calc(41px * var(--ui-font-scale))}
+  .learnLessonHeroCard p,.learnLessonMetaRow{font-size:calc(22px * var(--ui-font-scale))}
+  .learnHeroStats strong{font-size:calc(33px * var(--ui-font-scale))}
+  .learnHeroStats small{font-size:calc(16px * var(--ui-font-scale))}
+  .learnOverviewPathCard h3{font-size:calc(37px * var(--ui-font-scale))}
+  .learnOverviewPathCard>p,.learnOverviewSuggestion,.learnOverviewStepHint,.learnOverviewGoal{font-size:calc(22px * var(--ui-font-scale))}
+  .learnOverviewPathRow strong{font-size:calc(33px * var(--ui-font-scale))}
+  .learnOverviewPathRow small{font-size:calc(22px * var(--ui-font-scale))}
+  .learnSectionIntroCard h2{font-size:calc(44px * var(--ui-font-scale))}
+  .learnSectionIntroCard p{font-size:calc(22px * var(--ui-font-scale))}
+  .learnInfoCard strong{font-size:calc(39px * var(--ui-font-scale))}
+  .learnInfoGridCard strong,.learnInfoGridCard p{font-size:calc(22px * var(--ui-font-scale))}
+  .learnDialoguePlayerCard h2{font-size:calc(41px * var(--ui-font-scale))}
+  .learnDialogueLineCard strong{font-size:calc(37px * var(--ui-font-scale))}
+  .learnDialogueLineCard p{font-size:calc(23px * var(--ui-font-scale))}
+  .learnExpressionHeaderCard h2{font-size:calc(44px * var(--ui-font-scale))}
+  .learnExpressionHeaderCard p,.learnExpressionInputCard p{font-size:calc(24px * var(--ui-font-scale))}
+  .learnExpressionInputCard strong{font-size:calc(39px * var(--ui-font-scale))}
+  .learnExampleBox span{font-size:calc(24px * var(--ui-font-scale))}
+}
+@media(max-width:420px){
+  .learnInputBrand h1{font-size:calc(50px * var(--ui-font-scale))}
+  .learnTopIconButton{width:48px;height:48px;font-size:calc(24px * var(--ui-font-scale))}
+  .learnSubTabs button{font-size:calc(27px * var(--ui-font-scale));min-height:40px;padding:0 14px}
+  .learnLessonHeroCard h2{font-size:calc(36px * var(--ui-font-scale))}
+  .learnLessonHeroCard p,.learnLessonMetaRow{font-size:calc(20px * var(--ui-font-scale))}
+  .learnOverviewPathCard h3{font-size:calc(34px * var(--ui-font-scale))}
+  .learnOverviewPathRow strong{font-size:calc(30px * var(--ui-font-scale))}
+  .learnOverviewPathRow small{font-size:calc(20px * var(--ui-font-scale))}
+  .learnSectionIntroCard h2{font-size:calc(38px * var(--ui-font-scale))}
+  .learnInfoCard strong{font-size:calc(34px * var(--ui-font-scale))}
+  .learnDialoguePlayerCard h2{font-size:calc(34px * var(--ui-font-scale))}
+  .learnDialogueLineCard strong{font-size:calc(32px * var(--ui-font-scale))}
+  .learnExpressionHeaderCard h2{font-size:calc(39px * var(--ui-font-scale))}
+  .learnExpressionFilterTabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* V2.5.1 Learn legacy single-card flow alignment */
+.learnLegacyCard{
+  border-radius:24px;
+  background:#fff;
+  border:1px solid #dce2f2;
+}
+.learnLegacyCard .tag{
+  color:#516389;
+  font-size:calc(13px * var(--ui-font-scale));
+  font-weight:840;
+}
+.learnLegacyCard .studyModeSwitch button{
+  min-height:40px;
+  border-radius:12px;
+  background:#ecf0fb;
+  color:#56688c;
+}
+.learnLegacyCard .studyModeSwitch button.active{
+  background:#020d34;
+  color:#fff;
+}
+.learnLegacyCard .deepDisplaySwitch{
+  border-radius:12px;
+  border-color:#dae2f4;
+  background:#f6f8fe;
+}
+.learnLegacyCard .deepDisplaySwitch button{
+  min-height:32px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.learnLegacyCard .deepDisplaySwitch button.active{
+  background:#020d34;
+}
+.learnLegacyCard .deepMain{
+  background:#f7f9ff;
+  border-color:#dfe6f8;
+}
+.learnLegacyCard .deepMain.playing,
+.learnLegacyCard .deepRow.playing{
+  background:#edf7f2;
+  border-color:#9ecfbc;
+}
+.learnLegacyCard .recallPromptCard{
+  background:#f8f9ff;
+  border-color:#dfe6f8;
+}
+.learnLegacyCard .sectionTitleRow .sectionPlayButton{
+  border:none;
+  background:#edf0fa;
+  color:#56688c;
+}
+.learnLegacyCard .sectionTitleRow .sectionPlayButton.active{
+  background:#d7efe6;
+  color:#106d50;
+}
+.learnLegacyCard .rolePlayPanel{
+  border-radius:14px;
+  background:#f5f7fd;
+  border:1px solid #dfe6f8;
+  padding:8px;
+}
+
+/* V2.6.0 Remaining modules visual unification */
+.practicePage .moduleSubTabs,
+.reviewPage .moduleSubTabs,
+.libraryPage .moduleSubTabs{
+  position:sticky;
+  top:max(6px, env(safe-area-inset-top));
+  z-index:8;
+  background:#f3f4fb;
+  border-radius:18px;
+  padding:8px 0;
+}
+.practicePage .moduleSubTabs button,
+.reviewPage .moduleSubTabs button,
+.libraryPage .moduleSubTabs button{
+  min-height:36px;
+  border-radius:999px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .pageHeader,
+.reviewPage .pageHeader,
+.libraryPage .pageHeader{
+  margin:8px 0 10px;
+}
+.practicePage .pageHeader h1,
+.reviewPage .pageHeader h1,
+.libraryPage .pageHeader h1{
+  font-size:calc(24px * var(--ui-font-scale));
+}
+.practicePage .pageHeader p,
+.reviewPage .pageHeader p,
+.libraryPage .pageHeader p{
+  font-size:calc(13px * var(--ui-font-scale));
+  color:#5f7092;
+}
+.practicePage .v2Panel,
+.reviewPage .v2Panel,
+.libraryPage .v2Panel{
+  border-radius:18px;
+  border:1px solid #dce2f2;
+  box-shadow:0 4px 12px rgba(27,39,67,.08);
+  background:#fff;
+}
+.practicePage .moduleCaption{
+  margin:2px 0 8px;
+  padding:8px 10px;
+  border-radius:12px;
+  background:#edf2fb;
+  color:#59709a;
+}
+.practicePage .reactionCard,
+.practicePage .talkCard,
+.practicePage .expressionCard{
+  border:1px solid #dfe6f8;
+  background:#f8f9ff;
+}
+.practicePage .reactionCard strong,
+.practicePage .talkCard strong,
+.practicePage .expressionCard strong{
+  color:#071838;
+}
+.practicePage .modeSwitch button{
+  min-height:34px;
+  border-radius:999px;
+}
+.practicePage .sourceActions button,
+.practicePage .sourceActions select{
+  border-radius:12px;
+}
+.practiceStatusBar{
+  border-radius:14px;
+  background:#edf4ef;
+  border-color:#c8dccf;
+}
+.practiceStatusBar strong{font-size:calc(22px * var(--ui-font-scale))}
+.practiceStatusBar span{font-size:calc(12px * var(--ui-font-scale))}
+
+.outputOverviewCard .moduleCaption{
+  margin:4px 0 8px;
+  background:#edf3fb;
+  border-radius:12px;
+  padding:8px 10px;
+  color:#56709a;
+}
+.outputOverviewCard .infoGrid,
+.outputGuidedCard .talkCard,
+.outputRoleCard .dialogueCleanList,
+.outputWritingCard .talkCard{
+  margin-top:8px;
+}
+.outputOverviewCard textarea{
+  min-height:110px;
+}
+
+.reviewDashboard{
+  margin:8px 0 10px;
+}
+.reviewDashboard>div{
+  border:1px solid #dce2f2;
+  border-radius:14px;
+  background:#fff;
+}
+.reviewDashboard strong{
+  color:#173f66;
+}
+.reviewPanel .previewItem{
+  border:1px solid #dfe6f8;
+  border-radius:14px;
+  background:#f8f9ff;
+}
+.reviewPanel .previewItem strong{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+
+.libraryTopActionsV2{
+  gap:8px;
+}
+.libraryTopActionsV2 button{
+  min-height:40px;
+  border-radius:12px;
+}
+.continueShelfCardV2{
+  border:1px solid #dce2f2;
+  box-shadow:0 4px 12px rgba(27,39,67,.08);
+}
+.libraryPanel .courseShelfGrid{
+  gap:10px;
+}
+.libraryPanel .shelfCard{
+  border:1px solid #dfe6f8;
+  border-radius:16px;
+  background:#f8f9ff;
+}
+.libraryPanel .shelfCard h2{
+  font-size:calc(20px * var(--ui-font-scale));
+}
+.libraryPanel .shelfCard p{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.libraryPanel .libraryStatsGrid>div{
+  border-color:#dfe6f8;
+  background:#f8f9ff;
+}
+
+.settingsPageV2 .settingsTopBar{
+  border-radius:14px;
+  background:#071838;
+}
+.settingsPageV2 .settingBox{
+  border-radius:16px;
+  border:1px solid #dce2f2;
+  box-shadow:0 4px 10px rgba(27,39,67,.06);
+}
+.settingsPageV2 .settingBox h2{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.settingsPageV2 .settingPills button{
+  min-height:34px;
+  border-radius:999px;
+}
+.settingsPageV2 .voiceCard{
+  border-radius:14px;
+}
+@media(max-width:420px){
+  .practicePage .pageHeader h1,
+  .reviewPage .pageHeader h1,
+  .libraryPage .pageHeader h1{
+    font-size:calc(22px * var(--ui-font-scale));
+  }
+  .practicePage .moduleSubTabs button,
+  .reviewPage .moduleSubTabs button,
+  .libraryPage .moduleSubTabs button{
+    font-size:calc(11px * var(--ui-font-scale));
+    min-height:34px;
+    padding:0 9px;
+  }
+}
+
+/* V2.4.3 Practice density refresh (iPhone 375/393 content-first) */
+.page{
+  padding-left:max(8px, env(safe-area-inset-left));
+  padding-right:max(8px, env(safe-area-inset-right));
+}
+.practicePage .v2Panel{
+  padding:8px 6px;
+}
+.practicePage .compactPanel{
+  margin-bottom:8px;
+}
+.practicePage .dialogueCleanLine,
+.practicePage .shadowRow,
+.practicePage .reactionCard,
+.practicePage .talkCard,
+.practicePage .expressionCard{
+  padding:7px 6px;
+}
+.practicePage .dialogueCleanLine p,
+.practicePage .shadowRow strong,
+.practicePage .reactionCard strong,
+.practicePage .expressionCard strong{
+  line-height:1.3;
+  word-break:break-word;
+}
+.practicePage .dialogueCleanLine em,
+.practicePage .shadowRow p,
+.practicePage .reactionCard p,
+.practicePage .expressionCard p,
+.practicePage .talkCard p{
+  margin-top:3px;
+}
+.practicePage .spellingControlStack{
+  gap:6px;
+}
+.practicePage .spellingControlGroup{
+  gap:3px;
+}
+.practicePage .spellingControlGroup small{
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.practicePage .spellingSegmentRow{
+  gap:4px;
+}
+.practicePage .spellingSegmentRow button{
+  min-height:30px;
+  border-radius:10px;
+  font-size:calc(11px * var(--ui-font-scale));
+  padding:0 6px 0 14px;
+}
+.practicePage .spellingTagRow.lightweightTags{
+  gap:5px;
+}
+.practicePage .spellingTagRow.lightweightTags button{
+  min-height:26px;
+  border-radius:999px;
+  font-size:calc(11px * var(--ui-font-scale));
+  padding:0 9px;
+}
+.practicePage .spellingItemStrip{
+  margin:4px 0 6px;
+}
+.practicePage .spellingItemStrip button{
+  min-width:28px;
+  min-height:28px;
+}
+@media(max-width:420px){
+  .page{
+    padding-left:max(6px, env(safe-area-inset-left));
+    padding-right:max(6px, env(safe-area-inset-right));
+  }
+  .practicePage .v2Panel{
+    padding:7px 5px;
+  }
+  .practicePage .dialogueCleanLine,
+  .practicePage .shadowRow,
+  .practicePage .reactionCard,
+  .practicePage .talkCard,
+  .practicePage .expressionCard{
+    padding:6px 5px;
+  }
+}
+
+/* V2.6.1 Typography normalization (target ~125% of common iPhone app) */
+.learnInputBrand h1{
+  font-size:calc(38px * var(--ui-font-scale));
+}
+.learnSubTabs button{
+  min-height:40px;
+  font-size:calc(18px * var(--ui-font-scale));
+  padding:0 14px;
+}
+.learnLessonHeroCode{
+  font-size:calc(36px * var(--ui-font-scale));
+}
+.learnLessonHeroCard h2{
+  font-size:calc(32px * var(--ui-font-scale));
+  line-height:1.15;
+}
+.learnLessonHeroCard p,
+.learnLessonMetaRow{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnHeroStats strong{
+  font-size:calc(26px * var(--ui-font-scale));
+}
+.learnHeroStats small{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.learnOverviewPathCard h3{
+  font-size:calc(30px * var(--ui-font-scale));
+}
+.learnOverviewPathCard>p,
+.learnOverviewSuggestion,
+.learnOverviewStepHint,
+.learnOverviewGoal{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnOverviewPathRow strong{
+  font-size:calc(24px * var(--ui-font-scale));
+}
+.learnOverviewPathRow small{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.learnSectionIntroCard h2{
+  font-size:calc(32px * var(--ui-font-scale));
+}
+.learnSectionIntroCard p{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnInfoCard strong{
+  font-size:calc(30px * var(--ui-font-scale));
+}
+.learnInfoGridCard strong{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.learnInfoGridCard p{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.learnDialoguePlayerCard h2{
+  font-size:calc(30px * var(--ui-font-scale));
+}
+.learnDialogueLineCard strong{
+  font-size:calc(21px * var(--ui-font-scale));
+}
+.learnDialogueLineCard p{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnExpressionHeaderCard h2{
+  font-size:calc(32px * var(--ui-font-scale));
+}
+.learnExpressionHeaderCard p{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnExpressionFilterTabs button{
+  font-size:calc(14px * var(--ui-font-scale));
+}
+.learnExpressionInputCard strong{
+  font-size:calc(22px * var(--ui-font-scale));
+}
+.learnExpressionInputCard p{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.learnExampleBox span{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+
+.practicePage .moduleSubTabs button,
+.reviewPage .moduleSubTabs button,
+.libraryPage .moduleSubTabs button{
+  font-size:calc(12px * var(--ui-font-scale));
+  min-height:34px;
+}
+.practicePage .pageHeader h1,
+.reviewPage .pageHeader h1,
+.libraryPage .pageHeader h1{
+  font-size:calc(22px * var(--ui-font-scale));
+}
+.practicePage .pageHeader p,
+.reviewPage .pageHeader p,
+.libraryPage .pageHeader p{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.practicePage .v2Panel,
+.reviewPage .v2Panel,
+.libraryPage .v2Panel{
+  padding:8px;
+}
+.practicePage .sourceActions button,
+.practicePage .sourceActions select{
+  min-height:32px;
+  height:32px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .reactionCard strong,
+.practicePage .talkCard strong,
+.practicePage .expressionCard strong{
+  font-size:calc(18px * var(--ui-font-scale));
+  line-height:1.28;
+}
+.practicePage .reactionCard p,
+.practicePage .talkCard p,
+.practicePage .expressionCard p{
+  font-size:calc(14px * var(--ui-font-scale));
+  line-height:1.35;
+}
+.practicePage .expressionCard .miniExample span,
+.practicePage .miniDialogueLineRow span{
+  font-size:calc(14px * var(--ui-font-scale));
+}
+.practicePage .expressionCard .miniExample em,
+.practicePage .miniDialogueLineRow em{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .modeSwitch button{
+  min-height:32px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.outputOverviewCard .infoGrid p,
+.outputGuidedCard p,
+.outputRoleCard .dialogueCleanLine p,
+.outputWritingCard p{
+  font-size:calc(14px * var(--ui-font-scale));
+}
+.reviewPanel .previewItem strong{
+  font-size:calc(16px * var(--ui-font-scale));
+}
+.reviewPanel .previewItem p{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.libraryPanel .shelfCard h2{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.libraryPanel .shelfCard p{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.settingsPageV2 .settingBox h2{
+  font-size:calc(17px * var(--ui-font-scale));
+}
+.settingsPageV2 .voiceCard strong{
+  font-size:calc(14px * var(--ui-font-scale));
+}
+.settingsPageV2 .voiceCard small{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+@media(max-width:420px){
+  .learnInputBrand h1{font-size:calc(34px * var(--ui-font-scale))}
+  .learnSubTabs button{font-size:calc(16px * var(--ui-font-scale));min-height:38px}
+  .learnLessonHeroCode{font-size:calc(32px * var(--ui-font-scale))}
+  .learnLessonHeroCard h2{font-size:calc(28px * var(--ui-font-scale))}
+  .learnOverviewPathCard h3{font-size:calc(27px * var(--ui-font-scale))}
+  .learnOverviewPathRow strong{font-size:calc(21px * var(--ui-font-scale))}
+  .learnSectionIntroCard h2{font-size:calc(28px * var(--ui-font-scale))}
+  .learnInfoCard strong{font-size:calc(26px * var(--ui-font-scale))}
+  .learnDialoguePlayerCard h2{font-size:calc(26px * var(--ui-font-scale))}
+  .learnDialogueLineCard strong{font-size:calc(19px * var(--ui-font-scale))}
+  .learnExpressionHeaderCard h2{font-size:calc(28px * var(--ui-font-scale))}
+}
+
+/* V2.6.2 Practice + Output rhythm refinement with iPhone-like typography */
+.practicePage .pageHeader h1,
+.outputPage .pageHeader h1{
+  font-size:calc(20px * var(--ui-font-scale));
+  letter-spacing:-.01em;
+}
+.practicePage .pageHeader p,
+.outputPage .pageHeader p{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .moduleSubTabs button,
+.outputPage .moduleSubTabs button{
+  min-height:32px;
+  font-size:calc(11px * var(--ui-font-scale));
+  padding:0 10px;
+}
+.practicePage .v2Panel,
+.outputPage .v2Panel{
+  padding:8px;
+  margin:7px 0;
+  border-radius:16px;
+}
+.practicePage .compactPanel h2,
+.outputPage .compactPanel h2{
+  font-size:calc(18px * var(--ui-font-scale));
+  margin:0 0 4px;
+}
+.practicePage .moduleCaption,
+.outputPage .moduleCaption{
+  font-size:calc(12px * var(--ui-font-scale));
+  margin:2px 0 7px;
+}
+.practicePage .sourceActions button,
+.practicePage .sourceActions select,
+.outputPage .sourceActions button,
+.outputPage .sourceActions select{
+  min-height:32px;
+  height:32px;
+  font-size:calc(12px * var(--ui-font-scale));
+  border-radius:10px;
+}
+.practicePage .smallTextarea,
+.outputPage .smallTextarea{
+  min-height:96px;
+  font-size:calc(14px * var(--ui-font-scale));
+  line-height:1.35;
+}
+.practicePage .reactionCard strong,
+.practicePage .talkCard strong,
+.practicePage .expressionCard strong,
+.outputPage .talkCard strong,
+.outputPage .dialogueCleanLine p{
+  font-size:calc(17px * var(--ui-font-scale));
+  line-height:1.3;
+}
+.practicePage .reactionCard p,
+.practicePage .talkCard p,
+.practicePage .expressionCard p,
+.outputPage .talkCard p,
+.outputPage .dialogueCleanLine em{
+  font-size:calc(13px * var(--ui-font-scale));
+  line-height:1.34;
+}
+.practiceFlowRow,
+.outputFlowRow{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:6px;
+  margin:7px 0 8px;
+}
+.practiceFlowChip,
+.outputFlowChip{
+  border:1px solid #d7ded8;
+  border-radius:11px;
+  background:#f5f3ee;
+  color:#5b6762;
+  min-height:42px;
+  padding:6px 4px;
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  gap:1px;
+}
+.practiceFlowChip small,
+.outputFlowChip small{
+  font-size:calc(10px * var(--ui-font-scale));
+  line-height:1;
+  opacity:.78;
+}
+.practiceFlowChip span,
+.outputFlowChip span{
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:820;
+  line-height:1;
+}
+.practiceFlowChip.active,
+.outputFlowChip.active{
+  border-color:#bfd2c6;
+  background:#edf4ef;
+  color:#1f4a3b;
+}
+.practiceFlowChip.done{
+  border-color:#d2ddd6;
+  background:#f1f5f2;
+  color:#2f6a57;
+}
+.outputStepperHint{
+  margin:1px 0 8px;
+  color:#60706a;
+  font-size:calc(11px * var(--ui-font-scale));
+  font-weight:760;
+}
+.outputPage .talkTurn{
+  padding:8px;
+  border-radius:10px;
+}
+.outputPage .talkTurn strong{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.outputPage .dialogueCleanList{
+  margin-top:8px;
+  gap:7px;
+}
+.outputPage .dialogueCleanLine{
+  padding:9px 8px;
+  border-radius:12px;
+}
+.outputPage .infoGrid{
+  gap:7px;
+  margin-top:8px;
+}
+.outputPage .infoGrid strong{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.outputPage .infoGrid p{
+  font-size:calc(13px * var(--ui-font-scale));
+  margin-top:4px;
+}
+.learnInputBrand h1{
+  font-size:calc(34px * var(--ui-font-scale));
+}
+.learnSubTabs button{
+  font-size:calc(15px * var(--ui-font-scale));
+  min-height:36px;
+}
+.learnDialogueLineCard strong{
+  font-size:calc(18px * var(--ui-font-scale));
+}
+.learnExpressionInputCard strong{
+  font-size:calc(20px * var(--ui-font-scale));
+}
+@media(max-width:420px){
+  .practiceFlowRow,
+  .outputFlowRow{
+    gap:5px;
+  }
+  .practiceFlowChip span,
+  .outputFlowChip span{
+    font-size:calc(11px * var(--ui-font-scale));
+  }
+  .learnInputBrand h1{
+    font-size:calc(31px * var(--ui-font-scale));
+  }
+  .learnSubTabs button{
+    font-size:calc(14px * var(--ui-font-scale));
+    min-height:34px;
+  }
+}
+
+/* V2.6.3 Review/Library/Settings compact rhythm pass */
+.reviewPage .pageHeader h1,
+.libraryPage .pageHeader h1,
+.settingsPageV2 h1{
+  font-size:calc(20px * var(--ui-font-scale));
+  letter-spacing:-.01em;
+}
+.reviewPage .pageHeader p,
+.libraryPage .pageHeader p{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.reviewPage .moduleSubTabs button,
+.libraryPage .moduleSubTabs button{
+  min-height:32px;
+  font-size:calc(11px * var(--ui-font-scale));
+  padding:0 10px;
+}
+.reviewPage .v2Panel,
+.libraryPage .v2Panel,
+.settingsPageV2 .settingBox{
+  border-radius:16px;
+  padding:9px;
+}
+.reviewFlowRow{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  margin:6px 0 8px;
+}
+.reviewFlowChip{
+  border:1px solid #d7ded8;
+  border-radius:10px;
+  background:#f5f3ee;
+  color:#5b6762;
+  min-height:40px;
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  gap:1px;
+}
+.reviewFlowChip small{
+  font-size:calc(10px * var(--ui-font-scale));
+  line-height:1;
+  opacity:.78;
+}
+.reviewFlowChip span{
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:820;
+  line-height:1;
+}
+.reviewFlowChip.active{
+  border-color:#bfd2c6;
+  background:#edf4ef;
+  color:#1f4a3b;
+}
+.reviewPanel h2,
+.libraryPanel h2{
+  font-size:calc(18px * var(--ui-font-scale));
+  margin:0 0 6px;
+}
+.reviewPanel .previewItem strong{
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.reviewPanel .previewItem p{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.reviewPanel .previewItem small{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.libraryTopActionsV2{
+  gap:7px;
+  margin-bottom:7px;
+}
+.libraryTopActionsV2 .primary,
+.libraryTopActionsV2 .secondary{
+  min-height:38px;
+  border-radius:10px;
+  font-size:calc(13px * var(--ui-font-scale));
+  margin:0;
+}
+.libraryPage .search{
+  height:40px;
+  border-radius:10px;
+  font-size:calc(14px * var(--ui-font-scale));
+  margin:6px 0 8px;
+}
+.libraryPage .continueShelfCardV2{
+  border-radius:14px;
+  padding:10px;
+}
+.libraryPage .continueShelfCardV2 h2{
+  font-size:calc(18px * var(--ui-font-scale));
+  margin:4px 0;
+}
+.libraryPage .continueShelfCardV2 small{
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.libraryPage .shelfCard h2{
+  font-size:calc(17px * var(--ui-font-scale));
+}
+.libraryPage .shelfCard p{
+  font-size:calc(12px * var(--ui-font-scale));
+  line-height:1.34;
+}
+.libraryPage .coursePath{
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.libraryPage .sourceStats span{
+  font-size:calc(11px * var(--ui-font-scale));
+  padding:5px 8px;
+}
+.libraryPage .sourceActions button{
+  min-height:31px;
+  font-size:calc(12px * var(--ui-font-scale));
+  border-radius:10px;
+}
+.subtleButton{
+  background:#f1efea !important;
+  border:1px solid #e2ddd3 !important;
+  color:#5f6a65 !important;
+  font-weight:760 !important;
+}
+.settingsPageV2{
+  padding-bottom:110px;
+}
+.settingsPageV2 .settingsTopBar{
+  font-size:calc(14px * var(--ui-font-scale));
+  border-radius:12px;
+  padding:9px 10px;
+}
+.settingsPageV2 .settingBox{
+  margin:9px 0;
+}
+.settingsPageV2 .settingBox h2{
+  font-size:calc(17px * var(--ui-font-scale));
+  margin:0 0 5px;
+}
+.settingsPageV2 .settingBox p,
+.settingsPageV2 .settingBox label,
+.settingsPageV2 .settingBox small{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.settingsPageV2 .settingPills button{
+  min-height:32px;
+  font-size:calc(12px * var(--ui-font-scale));
+  border-radius:999px;
+}
+.settingsPageV2 .voiceRoleGroup{
+  margin-top:7px;
+}
+.settingsPageV2 .voiceRoleGroup h3{
+  font-size:calc(14px * var(--ui-font-scale));
+  margin:0 0 4px;
+}
+.settingsPageV2 .voiceCard{
+  border-radius:11px;
+  min-height:56px;
+}
+.settingsPageV2 .voiceCard strong{
+  font-size:calc(13px * var(--ui-font-scale));
+}
+.settingsPageV2 .voiceCard small{
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.settingsPageV2 .search{
+  height:40px;
+  border-radius:10px;
+  font-size:calc(14px * var(--ui-font-scale));
+  margin:6px 0 8px;
+}
+.settingsPageV2 .primary,
+.settingsPageV2 .secondary,
+.settingsPageV2 .danger{
+  min-height:40px;
+  border-radius:10px;
+  font-size:calc(13px * var(--ui-font-scale));
+  margin:7px 0;
+}
+@media(max-width:420px){
+  .reviewFlowRow{
+    gap:5px;
+  }
+  .reviewFlowChip span{
+    font-size:calc(11px * var(--ui-font-scale));
+  }
+  .libraryTopActionsV2 .primary,
+  .libraryTopActionsV2 .secondary{
+    font-size:calc(12px * var(--ui-font-scale));
+  }
+}
+
+/* V2.6.4 Remaining interaction polish: spelling toggle + settings IA + bottom nav density */
+.tabs{
+  min-height:70px;
+  grid-template-columns:repeat(5,1fr);
+  padding:7px 8px max(8px,env(safe-area-inset-bottom));
+}
+.tabs button{
+  min-height:46px;
+  font-size:calc(12px * var(--ui-font-scale));
+  border-radius:12px;
+}
+.globalSettingsButton{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  font-size:calc(15px * var(--ui-font-scale));
+}
+.practicePage .spellingFilterHeader{
+  margin-top:2px;
+}
+.practicePage .spellingFilterToggle{
+  min-height:26px;
+  padding:0 9px;
+  font-size:calc(11px * var(--ui-font-scale));
+}
+.practicePage .spellingTagRow{
+  margin-top:4px;
+}
+.practicePage .spellingFocusSummary{
+  margin-top:1px;
+}
+.settingsOverviewCard{
+  padding:10px;
+}
+.settingsOverviewCard h1{
+  font-size:calc(22px * var(--ui-font-scale));
+  margin:0 0 4px;
+}
+.settingsOverviewCard p{
+  margin:0 0 7px;
+  color:#5f6d66;
+}
+.settingsQuickChips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.settingsQuickChips span{
+  min-height:24px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid #d8e0db;
+  background:#f5f7f5;
+  font-size:calc(11px * var(--ui-font-scale));
+  color:#4f625b;
+  font-weight:760;
+}
+.settingsActionRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:6px;
+}
+.settingsFooterBox{
+  margin-top:8px;
+}
+.settingsFooterBox .hint{
+  margin:0 0 5px;
+}
+.settingsPageV2 .settingsActionRow .primary,
+.settingsPageV2 .settingsActionRow .secondary,
+.settingsPageV2 .settingsActionRow .danger{
+  width:100%;
+  margin:0;
+}
+@media(max-width:420px){
+  .tabs button{
+    font-size:calc(11px * var(--ui-font-scale));
+    min-height:44px;
+  }
+  .settingsActionRow{
+    grid-template-columns:1fr;
+  }
+}
+
+/* V2.6.5 Global font scale + touch usability upgrade */
+:root{
+  --ui-font-scale:1.15;
+}
+button,
+select,
+input,
+textarea{
+  -webkit-tap-highlight-color:transparent;
+}
+button{
+  transition:transform .14s ease, filter .14s ease, background-color .14s ease;
+}
+button:active{
+  transform:scale(.98);
+  filter:brightness(.98);
+}
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible{
+  outline:2px solid #2b6f5b;
+  outline-offset:1px;
+}
+.v2Panel,
+.sourceCard,
+.settingBox,
+.previewItem,
+.expressionCard,
+.reactionCard,
+.talkCard{
+  box-shadow:0 4px 14px rgba(22,34,52,.06);
+}
+.primary{
+  background:#184d43;
+}
+.secondary{
+  background:#eeece5;
+  color:#28322e;
+}
+.danger{
+  background:#f6dfdf;
+  color:#8c2222;
+}
+.emptyState{
+  border-radius:12px;
+  padding:10px;
+  background:#f4f6f4;
+  border:1px solid #dfe4df;
+  color:#5c6962;
+}
+
+/* V2.6.6 Action hierarchy normalization for mobile usability */
+.practicePage .sourceActions button,
+.outputPage .sourceActions button,
+.reviewPage .sourceActions button,
+.libraryPage .sourceActions button{
+  background:#f1efea;
+  border:1px solid #e3ded4;
+  color:#5e6964;
+  font-weight:760;
+}
+.practicePage .sourceActions button:first-child,
+.outputPage .sourceActions button:first-child,
+.reviewPage .sourceActions button:first-child,
+.libraryPage .sourceActions button:first-child{
+  background:#f1efea;
+  color:#5e6964;
+}
+.primaryAction{
+  background:#184d43 !important;
+  border-color:#184d43 !important;
+  color:#fff !important;
+  font-weight:820 !important;
+}
+.subtleAction{
+  background:#f1efea !important;
+  border-color:#e3ded4 !important;
+  color:#5e6964 !important;
+}
+.outputPage .moduleCaption,
+.practicePage .moduleCaption{
+  color:#5f6d66;
+}
+.outputPage .infoGrid div,
+.practicePage .reactionCard,
+.practicePage .talkCard,
+.practicePage .expressionCard{
+  background:#f9fbf9;
+}
+
+/* V2.7.0 Apple Books inspired visual system */
+:root{
+  --ab-bg:#f6f5f3;
+  --ab-paper:#fffdf9;
+  --ab-surface:#ffffff;
+  --ab-soft:#f2f2f7;
+  --ab-line:#d9d9de;
+  --ab-text:#1c1c1e;
+  --ab-sub:#636366;
+  --ab-accent:#ff9f0a;
+  --ab-accent-deep:#cc7a00;
+  --ab-accent-soft:#ffe8c2;
+  --ab-shadow:0 8px 24px rgba(32,33,36,.08);
+}
+body,
+.app{
+  background:linear-gradient(180deg,#f8f7f4 0%, #f3f2ef 100%);
+  color:var(--ab-text);
+}
+.screen{
+  background:transparent;
+}
+.page{
+  background:transparent;
+}
+.pageHeader span,
+.eyebrow{
+  color:#7a7a80;
+}
+.pageHeader h1,
+h1,h2,h3,
+.item strong,
+.previewItem strong{
+  color:var(--ab-text);
+}
+.pageHeader p,
+.muted,
+.item p,
+.previewItem p,
+.moduleCaption{
+  color:var(--ab-sub);
+}
+.v2Panel,
+.deepCard,
+.sourceCard,
+.settingBox,
+.learnLessonHeroCard,
+.learnOverviewPathCard,
+.learnInfoCard,
+.learnInfoGridCard,
+.learnSectionIntroCard,
+.learnExpressionHeaderCard,
+.learnExpressionInputCard,
+.talkCard,
+.reactionCard,
+.expressionCard,
+.previewItem{
+  background:var(--ab-surface);
+  border:1px solid var(--ab-line);
+  box-shadow:var(--ab-shadow);
+}
+.moduleSubTabs,
+.practicePage .moduleSubTabs,
+.reviewPage .moduleSubTabs,
+.libraryPage .moduleSubTabs,
+.moduleSubTabs.learnSubTabs{
+  background:rgba(242,242,247,.86);
+  border:1px solid #ececf2;
+  backdrop-filter:blur(18px);
+}
+.moduleSubTabs button,
+.learnSubTabs button{
+  background:#f5f4ef;
+  border:1px solid #dddcd4;
+  color:#57575c;
+}
+.moduleSubTabs button.active,
+.learnSubTabs button.active{
+  background:var(--ab-surface);
+  border-color:#d7d7dd;
+  color:#1f1f23;
+  box-shadow:0 2px 8px rgba(28,28,30,.12);
+}
+.tabs{
+  background:rgba(246,246,248,.9);
+  border-top:1px solid #d8d8dd;
+  backdrop-filter:blur(20px);
+}
+.tabs button{
+  color:#7a7a80;
+}
+.tabs button.active{
+  background:#ffffff;
+  color:#1f1f23;
+  box-shadow:0 3px 10px rgba(38,39,43,.1);
+}
+.globalSettingsButton,
+.learnTopIconButton.active{
+  background:var(--ab-accent);
+  color:#fff;
+  box-shadow:0 8px 18px rgba(255,159,10,.35);
+}
+.learnTopIconButton{
+  background:#efeff6;
+  color:#666883;
+}
+.learnLessonHeroHead span{
+  background:var(--ab-accent-soft);
+  border-color:#ffd89b;
+  color:#7d5200;
+}
+.progressBar{
+  background:#ececf0;
+}
+.progressBar span{
+  background:linear-gradient(90deg,#ffb340 0%, #ff9500 100%);
+}
+.primary,
+.primaryAction{
+  background:linear-gradient(180deg,#ffad2d 0%, #ff9500 100%) !important;
+  border-color:#ff9500 !important;
+  color:#fff !important;
+  box-shadow:0 8px 18px rgba(255,149,0,.28);
+}
+.secondary,
+.subtleAction{
+  background:#f3f2ed !important;
+  border-color:#dfddd4 !important;
+  color:#54545a !important;
+}
+.danger{
+  background:#fff1f1 !important;
+  border-color:#f2caca !important;
+  color:#9b2c2c !important;
+}
+.practiceFlowChip.active,
+.outputFlowChip.active,
+.reviewFlowChip.active,
+.spellingSegmentRow button.active,
+.spellingTagRow button.active{
+  background:var(--ab-accent-soft) !important;
+  border-color:#ffd398 !important;
+  color:#7d5200 !important;
+}
+.practiceFlowChip.done{
+  background:#fff5e5;
+  border-color:#ffe3b8;
+  color:#8b5f12;
+}
+.learnDialoguePlayerCard{
+  background:linear-gradient(160deg,#2b2c31 0%, #1d1e22 100%);
+  border-color:#2f3035;
+  color:#fff;
+}
+.learnDialoguePlayerCard small{
+  color:#ffd28a;
+}
+.learnDialoguePlayerCard button{
+  background:#fff;
+  color:#22242a;
+}
+.dialogueCleanLine span,
+.learnDialogueLineHead span{
+  background:#f2f2f7;
+  color:#4d4d55;
+}
+.emptyState{
+  background:#f7f7fa;
+  border-color:#e2e2e8;
+  color:#6a6a71;
+}
+
+/* V2.7.1 Apple-style reading rhythm polish */
+.learnInputBrand small{
+  color:#8b8b92;
+  letter-spacing:.08em;
+  font-weight:820;
+}
+.learnInputBrand h1,
+.pageHeader h1{
+  letter-spacing:-.02em;
+}
+.learnLessonHeroCard,
+.learnOverviewPathCard,
+.learnSectionIntroCard,
+.learnInfoCard,
+.learnInfoGridCard,
+.learnExpressionHeaderCard,
+.learnExpressionInputCard,
+.practicePage .v2Panel,
+.outputPage .v2Panel,
+.reviewPage .v2Panel,
+.libraryPage .v2Panel{
+  background:linear-gradient(180deg,#fffefc 0%, #fdfcf9 100%);
+}
+.learnOverviewPathRow,
+.outputFlowChip,
+.reviewFlowChip,
+.practiceFlowChip{
+  background:#f8f7f3;
+  border-color:#e2e1dc;
+}
+.helpfulList span,
+.libraryShelfChips span,
+.sourceStats span{
+  background:#f4f3ee;
+  border:1px solid #e1dfd7;
+  color:#58585e;
+}
+.smallTextarea,
+textarea,
+.search,
+input,
+select{
+  background:#fffefc;
+  border-color:#dcdce2;
+}
+.learnDialogueLineCard,
+.dialogueCleanLine,
+.previewItem,
+.spellingWorkCard{
+  background:#fffefb;
+}
+
+/* V2.7.2 Focused layout cleanup: demote low-frequency actions */
+.secondaryMenu{
+  margin:6px 0 8px;
+  border-radius:12px;
+  border:1px dashed #dddcd6;
+  background:#f7f6f2;
+  padding:0 8px;
+}
+.secondaryMenu summary{
+  list-style:none;
+  cursor:pointer;
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  color:#6a6a70;
+  font-size:calc(12px * var(--ui-font-scale));
+  font-weight:760;
+}
+.secondaryMenu summary::-webkit-details-marker{
+  display:none;
+}
+.secondaryMenuActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  padding:0 0 8px;
+}
+.secondaryMenuActions button{
+  min-height:32px;
+}
+.secondaryMenuActions select{
+  width:100%;
+  height:32px;
+  margin:0;
+  border-radius:10px;
+}
+.spellingJumpRow{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:0 0 8px;
+  scrollbar-width:none;
+}
+.spellingJumpRow::-webkit-scrollbar{
+  display:none;
+}
+.spellingJumpRow button{
+  min-width:30px;
+  min-height:30px;
+  border-radius:999px;
+  border:1px solid #dedcd3;
+  background:#f2f1ec;
+  color:#666a65;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.spellingJumpRow button.active{
+  background:#fff3de;
+  border-color:#ffd59d;
+  color:#7d5300;
+  font-weight:820;
+}
+.learnDialogueControlRow{
+  grid-template-columns:1fr;
+  margin-bottom:4px;
+}
+.learnDialogueControlRow button{
+  min-height:38px;
+}
+.learnLineActions{
+  grid-template-columns:1fr;
+}
+.learnExpressionActions{
+  grid-template-columns:1fr;
+}
+.practicePage .moduleCaption,
+.outputPage .moduleCaption{
+  margin:2px 0 6px;
+  font-size:calc(12px * var(--ui-font-scale));
+}
+.practicePage .sourceActions.twoActions,
+.outputPage .sourceActions.twoActions{
+  grid-template-columns:1fr 1fr;
+}
+.practicePage .sourceActions{
+  margin-top:6px;
+}
+@media(max-width:420px){
+  .secondaryMenuActions{
+    grid-template-columns:1fr;
+  }
+}
+
+/* V2.7.3 Minimal hierarchy tune */
+.compactLearnInfoGridCard{
+  margin:0 0 8px;
+  border-radius:14px;
+  box-shadow:none;
+  background:#fcfbf7;
+}
+.practicePage .v2Panel h2 + p{
+  margin-top:4px;
+}
+.reviewDashboard{
+  margin-top:12px;
+}
