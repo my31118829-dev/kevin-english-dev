@@ -1,5 +1,13 @@
 # Kevin Audio Memory App Project Handoff
 
+> 当前文件是早期 V2 方向的旧交接文档，已经过时。
+>
+> 新对话继续开发 Kevin English Learning System 时，请优先阅读：
+>
+> `DEVELOPMENT_HANDOFF_V3_9_4.md`
+>
+> 当前产品方向是 V3.9.4：MacBook + iPhone 17 Pro 双端 Audio First 英语课程训练播放器。
+
 ## 1. 当前项目状态
 
 当前项目已经从早期的“音频记忆工具”进入 V2.0 方向：`Topic Conversation Automation Trainer`，也就是“主题会话自动化训练系统”。
