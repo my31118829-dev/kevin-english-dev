@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3922'
-const SETTINGS_KEY = 'ke_dev_settings_v3922'
-const APP_VERSION = '3.9.22'
+const STORE_KEY = 'ke_dev_store_v3923'
+const SETTINGS_KEY = 'ke_dev_settings_v3923'
+const APP_VERSION = '3.9.23'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -2325,6 +2325,26 @@ function App() {
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset_sw') === '1') {
+      ;(async () => {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations()
+          await Promise.all(registrations.map(registration => registration.unregister()))
+          if ('caches' in window) {
+            const keys = await caches.keys()
+            await Promise.all(keys.map(key => caches.delete(key)))
+          }
+          params.delete('reset_sw')
+          params.set('v', APP_VERSION.replace(/\./g, ''))
+          const query = params.toString()
+          window.location.replace(`${window.location.pathname}${query ? `?${query}` : ''}`)
+        } catch {
+          window.location.replace(`${window.location.pathname}?v=${APP_VERSION.replace(/\./g, '')}`)
+        }
+      })()
+      return
+    }
     if (import.meta.env.PROD) {
       navigator.serviceWorker.register('/sw.js').catch(() => {})
       return
