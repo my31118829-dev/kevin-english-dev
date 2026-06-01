@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3921'
-const SETTINGS_KEY = 'ke_dev_settings_v3921'
-const APP_VERSION = '3.9.21'
+const STORE_KEY = 'ke_dev_store_v3922'
+const SETTINGS_KEY = 'ke_dev_settings_v3922'
+const APP_VERSION = '3.9.22'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -28,13 +28,10 @@ const AUDIO_MODES = {
   generated: 'Generated Audio'
 }
 
-const PHONE_ENTER_MAX_WIDTH = 760
-const PHONE_EXIT_MIN_WIDTH = 820
+const PHONE_MAX_WIDTH = 760
 
-function resolvePhoneViewByWidth(width, previous) {
-  const currentWidth = Number(width || 0)
-  if (previous) return currentWidth < PHONE_EXIT_MIN_WIDTH
-  return currentWidth <= PHONE_ENTER_MAX_WIDTH
+function resolvePhoneViewByWidth(width) {
+  return Number(width || 0) <= PHONE_MAX_WIDTH
 }
 
 const NAV_ITEMS = [
@@ -2244,7 +2241,7 @@ function App() {
   const [store, setStore] = useState(() => normalizeStore(loadUserStore(activeUserId)))
   const [settings, setSettings] = useState(() => normalizeSettings(load(SETTINGS_KEY, {})))
   const [tab, setTab] = useState('today')
-  const [isPhoneView, setIsPhoneView] = useState(() => typeof window !== 'undefined' ? resolvePhoneViewByWidth(window.innerWidth, false) : false)
+  const [isPhoneView, setIsPhoneView] = useState(() => typeof window !== 'undefined' ? resolvePhoneViewByWidth(window.innerWidth) : false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [libraryMode, setLibraryMode] = useState('list')
   const [librarySubtab, setLibrarySubtab] = useState('courses')
@@ -2337,7 +2334,7 @@ function App() {
     }).catch(() => {})
   }, [])
   useEffect(() => {
-    const syncPhoneView = () => setIsPhoneView(prev => resolvePhoneViewByWidth(window.innerWidth, prev))
+    const syncPhoneView = () => setIsPhoneView(resolvePhoneViewByWidth(window.innerWidth))
     syncPhoneView()
     window.addEventListener('resize', syncPhoneView, { passive: true })
     return () => window.removeEventListener('resize', syncPhoneView)
