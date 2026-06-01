@@ -2,11 +2,21 @@ import express from 'express'
 import { createServer as createViteServer } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import os from 'os'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const isProd = process.argv.includes('--prod')
 const app = express()
+
+function localNetworkUrl(port) {
+  const interfaces = os.networkInterfaces()
+  for (const addresses of Object.values(interfaces)) {
+    const match = addresses?.find(address => address.family === 'IPv4' && !address.internal)
+    if (match?.address) return `http://${match.address}:${port}/`
+  }
+  return ''
+}
 
 app.use(express.json({ limit: '50mb' }))
 
@@ -117,11 +127,13 @@ if (isProd) {
 }
 
 const port = Number(process.env.PORT || 5182)
-const host = process.env.HOST || '127.0.0.1'
+const host = process.env.HOST || '0.0.0.0'
 app.listen(port, host, () => {
+  const networkUrl = localNetworkUrl(port)
   console.log('')
-  console.log('  Kevin English Learning System V3.9.5')
-  console.log(`  Local:   http://${host}:${port}/`)
-  console.log('  Tip: set HOST=0.0.0.0 if you need phone testing on the same Wi-Fi.')
+  console.log('  Kevin English Learning System V3.9.21')
+  console.log(`  Local:   http://127.0.0.1:${port}/`)
+  if (networkUrl) console.log(`  Phone:   ${networkUrl}`)
+  console.log('  Tip: open the Phone URL on the same Wi-Fi.')
   console.log('')
 })

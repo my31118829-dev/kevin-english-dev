@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v395'
-const SETTINGS_KEY = 'ke_dev_settings_v395'
-const APP_VERSION = '3.9.5'
+const STORE_KEY = 'ke_dev_store_v3921'
+const SETTINGS_KEY = 'ke_dev_settings_v3921'
+const APP_VERSION = '3.9.21'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -28,13 +28,21 @@ const AUDIO_MODES = {
   generated: 'Generated Audio'
 }
 
+const PHONE_ENTER_MAX_WIDTH = 760
+const PHONE_EXIT_MIN_WIDTH = 820
+
+function resolvePhoneViewByWidth(width, previous) {
+  const currentWidth = Number(width || 0)
+  if (previous) return currentWidth < PHONE_EXIT_MIN_WIDTH
+  return currentWidth <= PHONE_ENTER_MAX_WIDTH
+}
+
 const NAV_ITEMS = [
-  { id: 'today', hideOnMobile: false },
-  { id: 'library', hideOnMobile: true },
-  { id: 'learn', hideOnMobile: false },
-  { id: 'practice', hideOnMobile: false },
-  { id: 'output', hideOnMobile: false },
-  { id: 'review', hideOnMobile: false }
+  { id: 'today', labelKey: 'nav.today', hintKey: 'navHint.today', phoneLabelKey: 'nav.today', phoneHintKey: 'navHint.phone.today', showOnPhone: true, showOnMac: true },
+  { id: 'learn', labelKey: 'nav.study', hintKey: 'navHint.study', phoneLabelKey: 'nav.listen', phoneHintKey: 'navHint.phone.listen', showOnPhone: true, showOnMac: true },
+  { id: 'output', labelKey: 'nav.speak', hintKey: 'navHint.speak', phoneLabelKey: 'nav.speak', phoneHintKey: 'navHint.phone.speak', showOnPhone: true, showOnMac: true },
+  { id: 'review', labelKey: 'nav.review', hintKey: 'navHint.review', phoneLabelKey: 'nav.review', phoneHintKey: 'navHint.phone.review', showOnPhone: true, showOnMac: true },
+  { id: 'library', labelKey: 'nav.library', hintKey: 'navHint.library', showOnPhone: false, showOnMac: false }
 ]
 
 const UI_TEXT = {
@@ -42,20 +50,32 @@ const UI_TEXT = {
     'nav.today': 'Today',
     'nav.library': 'Library',
     'nav.learn': 'Learn',
-    'nav.practice': 'Practice',
-    'nav.output': 'Output',
+    'nav.listen': 'Listen',
+    'nav.study': 'Study',
+    'nav.drills': 'Drills',
+    'nav.output': 'Speak',
+    'nav.speak': 'Speak',
     'nav.review': 'Review',
     'navHint.today': 'Daily',
     'navHint.library': 'Content',
     'navHint.learn': 'Input',
+    'navHint.study': 'Deep session',
     'navHint.practice': 'Practice',
+    'navHint.drills': 'Focused reps',
     'navHint.output': 'Output',
+    'navHint.speak': 'Speaking',
     'navHint.review': 'Review',
+    'navHint.phone.today': 'Start',
+    'navHint.phone.listen': 'Train',
+    'navHint.phone.speak': 'Talk',
+    'navHint.phone.review': 'Recall',
     'title.today': 'Today',
     'title.library': 'Library',
     'title.learn': 'Learn Input',
-    'title.practice': 'Practice Internalization',
-    'title.output': 'Output Speaking',
+    'title.study': 'Study Workspace',
+    'title.listen': 'Listen',
+    'title.output': 'Speak',
+    'title.speak': 'Speak',
     'title.review': 'Review Memory',
     'settings': 'Settings',
     'account': 'Account',
@@ -75,11 +95,11 @@ const UI_TEXT = {
     'courses': 'Courses',
     'dueReview': 'Due Review',
     'lines': 'Lines',
-    'todayPractice': 'Today Practice',
-    'quickResponse': 'Quick Response',
-    'practiceSuggested': '{count} suggested practice items from the current course.',
-    'noPracticeQueued': 'No practice queued yet.',
-    'startPractice': 'Start Practice',
+    'todayPractice': 'Today Speaking',
+    'quickResponse': 'Quick Speak',
+    'practiceSuggested': '{count} suggested speaking prompts from the current course.',
+    'noPracticeQueued': 'No speaking prompts queued yet.',
+    'startPractice': 'Start Speak',
     'todayReview': 'Today Review',
     'reviewMemory': 'Review Memory',
     'reviewReady': '{count} chunks, useful sentences, and weak items are ready today.',
@@ -88,11 +108,18 @@ const UI_TEXT = {
     'manageContent': 'Manage course content',
     'manageContentHint': 'Courses, packs, and import tools.',
     'macbook': 'MacBook',
-    'macbookUse': 'Import, organize, type, edit',
-    'macbookHint': 'Best for import, editing, and typing.',
+    'macbookUse': 'Deep study, speaking, review, content work',
+    'macbookHint': 'Best for focused sessions and full-course learning.',
     'iphone': 'iPhone 17 Pro',
-    'iphoneUse': 'Listen, shadow, react, review',
-    'iphoneHint': 'Best for listening, quick response, output, and review.',
+    'iphoneUse': 'Listen, speak, review in spare moments',
+    'iphoneHint': 'Best for 5-15 minute daily training.',
+    'dailyTrainer': 'Daily Trainer',
+    'dailyTrainerHint': 'A lightweight flow for spare moments.',
+    'studyWorkspace': 'Study Workspace',
+    'studyWorkspaceHint': 'A deeper MacBook workspace for focused learning.',
+    'listenAction': 'Listen',
+    'speakAction': 'Speak',
+    'reviewAction': 'Review',
     'courseLibrary': 'Course Library',
     'courseLibraryHint': 'Textbook courses, expansion packs, and topic packs.',
     'addContent': 'Add Content',
@@ -120,6 +147,10 @@ const UI_TEXT = {
     'listen': 'Listen',
     'background': 'Background',
     'languagePreview': 'Language Preview',
+    'studyTools': 'Tools',
+    'showTools': 'Show tools',
+    'hideTools': 'Hide tools',
+    'advancedToolsHint': 'Language preview, background notes, and line editor',
     'play': 'Play',
     'playShort': 'Play',
     'listenAll': 'Listen All',
@@ -137,8 +168,17 @@ const UI_TEXT = {
     'meaningUnits': 'Meaning Units',
     'currentLine': 'Current Line',
     'repeatCount': 'Repeat',
-    'pauseControl': 'Pause',
-    'manualPause': 'Manual',
+    'smartPause': 'Smart Pause',
+    'autoPause': 'Auto',
+    'smartPauseHint': 'Short 1.5s · Medium 3s · Long 4.5s',
+    'smartPauseStatus': '{seconds}s pause for this line',
+    'lineTapLoopHint': 'Tap line = auto repeat 3x',
+    'playbackSpeed': 'Speed',
+    'focusMode': 'Focus Listening',
+    'focusHint': 'Tap a sentence to hear it and shadow it with automatic repeats.',
+    'focusChunks': 'Core Chunks',
+    'transcript': 'Transcript',
+    'followAlong': 'Follow Along',
     'cnOnly': 'CN only',
     'resetOriginal': 'Reset to Original',
     'resetOriginalUnavailable': 'Original baseline is not saved for this line yet.',
@@ -168,10 +208,20 @@ const UI_TEXT = {
     'replacement': 'Replacement',
     'guidedSpeaking': 'Guided Speaking',
     'rolePlay': 'Role-play',
-    'retell': 'Retell',
+    'retell': 'Free Talk',
+    'guidedHint': 'Use support chunks and complete short answers first.',
+    'rolePlayHint': 'Listen to partner lines and respond in your role.',
+    'retellHint': 'Stay in scenario and speak freely with level limits.',
+    'freeTalkLevel': 'Free Talk Level',
+    'levelA2': 'A2',
+    'levelB1': 'B1',
+    'levelB2': 'B2',
     'chunks': 'Chunks',
     'usefulSentences': 'Useful Sentences',
     'weakStuck': 'Weak / Stuck',
+    'reviewQueue': 'Review Queue',
+    'showQueue': 'Show Queue',
+    'hideQueue': 'Hide Queue',
     'showAnswer': 'Show Answer',
     'again': 'Again',
     'good': 'Good',
@@ -184,7 +234,6 @@ const UI_TEXT = {
     'unaligned': 'unaligned',
     'unalignedWarning': '{count} unaligned subtitle lines need timestamp check',
     'noLanguageItems': 'No language items yet. Import a richer Text Pack or process textbook audio later.',
-    'noPracticeItems': 'No practice items yet.',
     'noOutputTasks': 'No output tasks yet.',
     'noReviewToday': 'No review due today. New content will appear later, not immediately after import.',
     'noReviewSection': 'No cards in this review section yet.',
@@ -210,6 +259,7 @@ const UI_TEXT = {
     'todayDone': 'Today Done',
     'practiceDone': 'Practice',
     'outputDone': 'Output',
+    'speakTasks': 'Speak tasks',
     'reviewDone': 'Review',
     'close': 'Close',
     'uiLanguage': 'Interface Language',
@@ -227,9 +277,6 @@ const UI_TEXT = {
     'normal': 'Normal',
     'comfortable': 'Comfortable',
     'large': 'Large',
-    'nextStep': 'Next Step',
-    'practiceQuick': 'Practice quick response',
-    'tryOutput': 'Try output speaking',
     'continueLearn': 'Continue Learn',
     'go': 'Go',
     'systemRule': 'System Rule',
@@ -253,8 +300,7 @@ const UI_TEXT = {
     'copyVoicePrompt': 'Copy ChatGPT Voice Prompt',
     'missingFields': 'Missing Fields',
     'warnings': 'Warnings',
-    'typeEnglishAnswer': 'Type the English answer...',
-    'retellPlaceholder': 'Write or speak your retell here...',
+    'retellPlaceholder': 'Speak freely in this scenario...',
     'answerPlaceholder': 'Type your answer here...',
     'accountSettings': 'Accounts',
     'accountName': 'Name',
@@ -274,28 +320,38 @@ const UI_TEXT = {
     'markStuck': 'Mark Stuck',
     'addedWeak': 'Added to Weak / Stuck review.',
     'addedStuck': 'Output prompt added to Weak / Stuck review.',
-    'typingWrongAdded': 'Answer checked. Wrong typing was added to Weak / Stuck review.',
-    'typingCorrect': 'Correct.',
     'weakPriority': '{count} weak or stuck items need attention.'
   },
   zh: {
     'nav.today': '今日',
     'nav.library': '内容库',
     'nav.learn': '输入',
-    'nav.practice': '内化',
-    'nav.output': '输出',
+    'nav.listen': '听',
+    'nav.study': '学习',
+    'nav.drills': '练习',
+    'nav.output': '开口',
+    'nav.speak': '说',
     'nav.review': '复习',
     'navHint.today': '学习首页',
     'navHint.library': '课程管理',
     'navHint.learn': '听懂预习',
+    'navHint.study': '深度学习',
     'navHint.practice': '练成反应',
+    'navHint.drills': '专项练习',
     'navHint.output': '说出使用',
+    'navHint.speak': '开口训练',
     'navHint.review': '长期记住',
+    'navHint.phone.today': '开始',
+    'navHint.phone.listen': '跟读',
+    'navHint.phone.speak': '开口',
+    'navHint.phone.review': '回忆',
     'title.today': '今日',
     'title.library': '内容库',
     'title.learn': '输入理解',
-    'title.practice': '内化训练',
-    'title.output': '输出使用',
+    'title.study': '深度学习工作台',
+    'title.listen': '听与跟读',
+    'title.output': '开口训练',
+    'title.speak': '开口训练',
     'title.review': '长期复习',
     'settings': '设置',
     'account': '账户',
@@ -315,11 +371,11 @@ const UI_TEXT = {
     'courses': '课程',
     'dueReview': '今日复习',
     'lines': '句',
-    'todayPractice': '今日练习',
-    'quickResponse': '快反',
-    'practiceSuggested': '当前课程建议练习 {count} 项。',
-    'noPracticeQueued': '暂无练习任务。',
-    'startPractice': '开始练习',
+    'todayPractice': '今日开口',
+    'quickResponse': '快速开口',
+    'practiceSuggested': '当前课程建议开口 {count} 项。',
+    'noPracticeQueued': '暂无开口任务。',
+    'startPractice': '开始开口',
     'todayReview': '今日复习',
     'reviewMemory': '复习记忆',
     'reviewReady': '今天有 {count} 个语块、实用句和易错内容需要复习。',
@@ -328,11 +384,18 @@ const UI_TEXT = {
     'manageContent': '管理课程内容',
     'manageContentHint': '课程、训练包和导入工具。',
     'macbook': 'MacBook',
-    'macbookUse': '导入、整理、打字、编辑',
-    'macbookHint': '适合导入、编辑和打字。',
+    'macbookUse': '深度学习、开口、复习、内容工作',
+    'macbookHint': '适合长时间专注学习和完整课程训练。',
     'iphone': 'iPhone 17 Pro',
-    'iphoneUse': '听、跟读、快反、复习',
-    'iphoneHint': '适合听、快反、输出和复习。',
+    'iphoneUse': '碎片时间听、说、复习',
+    'iphoneHint': '适合 5-15 分钟每日训练。',
+    'dailyTrainer': '每日训练器',
+    'dailyTrainerHint': '适合碎片时间快速进入训练。',
+    'studyWorkspace': '深度学习工作台',
+    'studyWorkspaceHint': '适合 MacBook 上长时间专注学习。',
+    'listenAction': '听',
+    'speakAction': '说',
+    'reviewAction': '复习',
     'courseLibrary': '课程内容库',
     'courseLibraryHint': '教材课程、拓展训练包、自由主题包。',
     'addContent': '添加内容',
@@ -360,6 +423,10 @@ const UI_TEXT = {
     'listen': '听与跟读',
     'background': '背景理解',
     'languagePreview': '语言预习',
+    'studyTools': '工具',
+    'showTools': '展开工具',
+    'hideTools': '收起工具',
+    'advancedToolsHint': '语块预览、背景说明与句子微调',
     'play': '播放',
     'playShort': '播',
     'listenAll': '全部听',
@@ -377,8 +444,17 @@ const UI_TEXT = {
     'meaningUnits': '意义块',
     'currentLine': '当前句',
     'repeatCount': '重复',
-    'pauseControl': '停顿',
-    'manualPause': '手动',
+    'smartPause': '智能停顿',
+    'autoPause': '自动',
+    'smartPauseHint': '短句 1.5 秒 · 中句 3 秒 · 长句 4.5 秒',
+    'smartPauseStatus': '当前句停顿 {seconds} 秒',
+    'lineTapLoopHint': '点句子 = 自动重复 3 次',
+    'playbackSpeed': '速度',
+    'focusMode': '单屏精听',
+    'focusHint': '点句子即可单句聆听并自动重复跟读。',
+    'focusChunks': '核心语块',
+    'transcript': '字幕列表',
+    'followAlong': '跟读聚焦',
     'cnOnly': '仅中文',
     'resetOriginal': '恢复原始',
     'resetOriginalUnavailable': '这句暂时没有可恢复的原始版本。',
@@ -408,10 +484,20 @@ const UI_TEXT = {
     'replacement': '替换练习',
     'guidedSpeaking': '半控制表达',
     'rolePlay': '角色扮演',
-    'retell': '复述',
+    'retell': '自由对话',
+    'guidedHint': '先用语块提示完成简短回答。',
+    'rolePlayHint': '先听对方台词，再用你的角色开口。',
+    'retellHint': '限定在当前场景内自由开口。',
+    'freeTalkLevel': '自由对话难度',
+    'levelA2': 'A2',
+    'levelB1': 'B1',
+    'levelB2': 'B2',
     'chunks': '语块',
     'usefulSentences': '实用句子',
     'weakStuck': '易错 / 卡壳',
+    'reviewQueue': '复习队列',
+    'showQueue': '展开队列',
+    'hideQueue': '收起队列',
     'showAnswer': '显示答案',
     'again': '再来',
     'good': '记住了',
@@ -424,7 +510,6 @@ const UI_TEXT = {
     'unaligned': '未对齐',
     'unalignedWarning': '{count} 条字幕需要检查时间轴',
     'noLanguageItems': '暂无语言点。可以导入更完整的文字包，或稍后处理教材音频。',
-    'noPracticeItems': '暂无练习内容。',
     'noOutputTasks': '暂无输出任务。',
     'noReviewToday': '今天暂无到期复习。新内容会在之后进入复习队列。',
     'noReviewSection': '这个复习模块暂无卡片。',
@@ -450,6 +535,7 @@ const UI_TEXT = {
     'todayDone': '今日完成',
     'practiceDone': '练习',
     'outputDone': '输出',
+    'speakTasks': '开口任务',
     'reviewDone': '复习',
     'close': '关闭',
     'uiLanguage': '界面语言',
@@ -467,9 +553,6 @@ const UI_TEXT = {
     'normal': '普通',
     'comfortable': '舒适',
     'large': '大字',
-    'nextStep': '下一步',
-    'practiceQuick': '练快反',
-    'tryOutput': '尝试输出',
     'continueLearn': '继续输入',
     'go': '前往',
     'systemRule': '系统规则',
@@ -493,8 +576,7 @@ const UI_TEXT = {
     'copyVoicePrompt': '复制 ChatGPT Voice 提示',
     'missingFields': '缺少字段',
     'warnings': '提醒',
-    'typeEnglishAnswer': '输入英文答案...',
-    'retellPlaceholder': '在这里写或说出你的复述...',
+    'retellPlaceholder': '围绕当前场景自由开口...',
     'answerPlaceholder': '在这里输入你的回答...',
     'accountSettings': '账户',
     'accountName': '名字',
@@ -514,8 +596,6 @@ const UI_TEXT = {
     'markStuck': '标记卡壳',
     'addedWeak': '已加入易错 / 卡壳复习。',
     'addedStuck': '输出卡壳已加入复习。',
-    'typingWrongAdded': '已检查。错误答案已加入易错 / 卡壳复习。',
-    'typingCorrect': '答对了。',
     'weakPriority': '{count} 个易错 / 卡壳内容需要优先处理。'
   }
 }
@@ -554,32 +634,79 @@ function dailyExampleTemplates(text, type) {
     ].filter(Boolean)
   }
   return [
-    `I usually use "${value}" in daily conversation.`,
-    `This is useful when I talk with local people.`,
-    `I can say "${value}" at home or outside.`
+    `I hear "${value}" in daily conversation.`,
+    `I can use "${value}" when I talk to local people.`,
+    `I can practise "${value}" at home with my family.`
   ]
 }
 
+function normalizeExampleItem(example, fallbackOrigin = 'daily') {
+  return {
+    en: String(example?.en || '').trim(),
+    cn: String(example?.cn || '').trim(),
+    origin: example?.origin || fallbackOrigin
+  }
+}
+
+function findSourceTranscriptLine(item, transcriptLines = []) {
+  const source = String(item.sourceSentence || '').trim().toLowerCase()
+  const expression = String(item.en || '').trim().toLowerCase()
+  if (source) {
+    const exact = transcriptLines.find(line => String(line?.en || '').trim().toLowerCase() === source)
+    if (exact) return exact
+  }
+  if (expression) {
+    return transcriptLines.find(line => String(line?.en || '').toLowerCase().includes(expression)) || null
+  }
+  return null
+}
+
+function pickDailyExamples(candidates = [], count = 2, blockedKeys = new Set()) {
+  const picked = []
+  for (const candidate of candidates) {
+    if (picked.length >= count) break
+    const normalized = normalizeExampleItem(candidate, 'daily')
+    if (!normalized.en) continue
+    const key = normalized.en.toLowerCase()
+    if (blockedKeys.has(key)) continue
+    blockedKeys.add(key)
+    picked.push({ ...normalized, origin: 'daily' })
+  }
+  return picked
+}
+
 function enrichLanguageItem(item, transcriptLines = []) {
-  const sourceLine = String(item.sourceSentence || '').trim()
-    || transcriptLines.find(line => item.en && String(line.en || '').toLowerCase().includes(String(item.en).toLowerCase()))?.en
-    || ''
+  const sourceLineObj = findSourceTranscriptLine(item, transcriptLines)
+  const sourceLine = String(item.sourceSentence || '').trim() || String(sourceLineObj?.en || '')
+  const sourceCn = String(sourceLineObj?.cn || '').trim()
+  const originalExample = sourceLine
+    ? normalizeExampleItem({ en: sourceLine, cn: sourceCn, origin: 'original' }, 'original')
+    : null
+
   if (item.type === 'keyword' || item.type === 'chunk') {
-    const examples = compactExamples([
-      sourceLine ? { en: sourceLine, cn: item.cn || '', origin: 'original' } : null,
+    const blocked = new Set()
+    const dailyPool = compactExamples([
       ...(item.examples || []).map(example => ({ ...example, origin: example.origin || 'daily' })),
       ...dailyExampleTemplates(item.en, item.type).map(en => ({ en, cn: '', origin: 'daily' }))
-    ].filter(Boolean)).slice(0, 3)
+    ])
+    if (originalExample?.en) blocked.add(originalExample.en.toLowerCase())
+    const dailyExamples = pickDailyExamples(dailyPool, 2, blocked)
+    const examples = compactExamples([originalExample, ...dailyExamples].filter(Boolean)).slice(0, 3)
     return { ...item, sourceSentence: sourceLine, examples, autoSentences: item.autoSentences || [] }
   }
+
   if (item.type === 'pattern') {
-    const autoSentences = compactExamples([
-      sourceLine ? { en: sourceLine, cn: item.cn || '', origin: 'original' } : null,
+    const blocked = new Set()
+    const dailyPool = compactExamples([
       ...(item.autoSentences || item.examples || []).map(example => ({ ...example, origin: example.origin || 'daily' })),
       ...dailyExampleTemplates(item.en, 'pattern').map(en => ({ en, cn: '', origin: 'daily' }))
-    ].filter(Boolean)).slice(0, 4)
+    ])
+    if (originalExample?.en) blocked.add(originalExample.en.toLowerCase())
+    const dailyExamples = pickDailyExamples(dailyPool, 3, blocked)
+    const autoSentences = compactExamples([originalExample, ...dailyExamples].filter(Boolean)).slice(0, 4)
     return { ...item, sourceSentence: sourceLine, examples: item.examples || [], autoSentences }
   }
+
   return { ...item, examples: item.examples || [], autoSentences: item.autoSentences || [] }
 }
 
@@ -1005,8 +1132,8 @@ const defaultSettings = {
     'Person 3': 'fable'
   },
   displayMode: 'both',
-  pauseSeconds: 2,
-  lineRepeatCount: 1,
+  pauseSeconds: 'auto',
+  playbackSpeed: 1,
   fontScale: 'comfortable',
   uiLanguage: 'en'
 }
@@ -1037,13 +1164,15 @@ function normalizeUserProfiles(rawProfiles) {
 
 function normalizeSettings(rawSettings) {
   const saved = rawSettings && typeof rawSettings === 'object' ? rawSettings : {}
-  const pauseSeconds = saved.pauseSeconds === 'manual' ? 'manual' : ([1, 2, 3, 5].includes(Number(saved.pauseSeconds)) ? Number(saved.pauseSeconds) : defaultSettings.pauseSeconds)
-  const lineRepeatCount = [1, 3, 5].includes(Number(saved.lineRepeatCount)) ? Number(saved.lineRepeatCount) : defaultSettings.lineRepeatCount
+  const pauseSeconds = saved.pauseSeconds === 'auto'
+    ? saved.pauseSeconds
+    : ([1.5, 3, 4.5].includes(Number(saved.pauseSeconds)) ? Number(saved.pauseSeconds) : defaultSettings.pauseSeconds)
+  const playbackSpeed = [0.75, 1, 1.25].includes(Number(saved.playbackSpeed)) ? Number(saved.playbackSpeed) : defaultSettings.playbackSpeed
   return {
     ...defaultSettings,
     ...saved,
     pauseSeconds,
-    lineRepeatCount,
+    playbackSpeed,
     speakerVoices: {
       ...defaultSettings.speakerVoices,
       ...(saved.speakerVoices && typeof saved.speakerVoices === 'object' ? saved.speakerVoices : {})
@@ -1066,6 +1195,10 @@ function save(key, value) {
   } catch (error) {
     console.warn('Local save failed. Large audio is stored outside localStorage.', error)
   }
+}
+
+function escapeRegExp(value = '') {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function loadUserStore(userId) {
@@ -2111,13 +2244,16 @@ function App() {
   const [store, setStore] = useState(() => normalizeStore(loadUserStore(activeUserId)))
   const [settings, setSettings] = useState(() => normalizeSettings(load(SETTINGS_KEY, {})))
   const [tab, setTab] = useState('today')
+  const [isPhoneView, setIsPhoneView] = useState(() => typeof window !== 'undefined' ? resolvePhoneViewByWidth(window.innerWidth, false) : false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [libraryMode, setLibraryMode] = useState('list')
   const [librarySubtab, setLibrarySubtab] = useState('courses')
   const [learnSubtab, setLearnSubtab] = useState('audio')
-  const [practiceMode, setPracticeMode] = useState('quick')
+  const [showStudyTools, setShowStudyTools] = useState(false)
   const [outputMode, setOutputMode] = useState('guided')
+  const [freeTalkLevel, setFreeTalkLevel] = useState('A2')
   const [reviewMode, setReviewMode] = useState('today')
+  const [reviewQueueExpanded, setReviewQueueExpanded] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [answerShown, setAnswerShown] = useState(false)
   const [typed, setTyped] = useState('')
@@ -2140,12 +2276,6 @@ function App() {
   )
   const dueReview = useMemo(() => store.reviewQueue.filter(item => item.nextReviewAt <= Date.now()), [store.reviewQueue])
   const textPreview = useMemo(() => parseImportText(textPack), [textPack])
-  const practicePool = useMemo(() => {
-    if (!activeCourse) return []
-    if (practiceMode === 'quick') return activeCourse.practiceItems.filter(item => item.type === 'quickResponse')
-    if (practiceMode === 'typing') return activeCourse.practiceItems.filter(item => item.type === 'typing')
-    return activeCourse.practiceItems.filter(item => item.type === 'replacement')
-  }, [activeCourse, practiceMode])
   const outputPool = useMemo(() => {
     if (!activeCourse) return []
     const type = outputMode === 'guided' ? 'guidedSpeaking' : outputMode
@@ -2198,8 +2328,40 @@ function App() {
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
+    if (import.meta.env.PROD) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+      return
+    }
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => registration.unregister())
+    }).catch(() => {})
   }, [])
+  useEffect(() => {
+    const syncPhoneView = () => setIsPhoneView(prev => resolvePhoneViewByWidth(window.innerWidth, prev))
+    syncPhoneView()
+    window.addEventListener('resize', syncPhoneView, { passive: true })
+    return () => window.removeEventListener('resize', syncPhoneView)
+  }, [])
+  useEffect(() => {
+    if (tab !== 'learn' && showStudyTools) setShowStudyTools(false)
+  }, [tab, showStudyTools])
+  useEffect(() => {
+    if (!isPhoneView) return
+    if (showStudyTools) setShowStudyTools(false)
+    if (learnSubtab !== 'audio') setLearnSubtab('audio')
+  }, [isPhoneView, showStudyTools, learnSubtab])
+  useEffect(() => {
+    if (!isPhoneView || tab !== 'review' || reviewMode !== 'today') {
+      if (reviewQueueExpanded) setReviewQueueExpanded(false)
+    }
+  }, [isPhoneView, tab, reviewMode, reviewQueueExpanded])
+  useEffect(() => {
+    const lineIds = new Set((activeCourse?.transcriptLines || []).map(line => line.id))
+    if (!lineIds.has(editingLineId)) setEditingLineId(activeCourse?.transcriptLines?.[0]?.id || '')
+    if (understandLineId && !lineIds.has(understandLineId)) setUnderstandLineId('')
+    if (lineMoreId && !lineIds.has(lineMoreId)) setLineMoreId('')
+    if (splitLineId && !lineIds.has(splitLineId)) setSplitLineId('')
+  }, [activeCourse, editingLineId, understandLineId, lineMoreId, splitLineId])
 
   function updateStore(next) {
     setStore(prev => typeof next === 'function' ? next(prev) : next)
@@ -2272,6 +2434,7 @@ function App() {
     stopAudio()
     const audio = new Audio(url)
     audioRef.current = audio
+    audio.playbackRate = Number(settings.playbackSpeed) || 1
     if (typeof startTime === 'number') audio.currentTime = startTime
     if (typeof endTime === 'number') {
       audio.ontimeupdate = () => {
@@ -2342,9 +2505,34 @@ function App() {
     }
   }
 
-  function pauseDurationMs() {
-    if (settings.pauseSeconds === 'manual') return 0
-    return (Number(settings.pauseSeconds) || 2) * 1000
+  function lineWordCount(line) {
+    return String(line?.en || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .length
+  }
+
+  function autoPauseSecondsForLine(line) {
+    const text = String(line?.en || '').trim()
+    if (!text) return 1.5
+    const words = lineWordCount(line)
+    const chars = text.replace(/\s+/g, '').length
+    const hasClausePunctuation = /[,;:]/.test(text)
+    const hasStrongBreak = /[!?]/.test(text)
+    const duration = typeof line?.startTime === 'number' && typeof line?.endTime === 'number'
+      ? Math.max(0, line.endTime - line.startTime)
+      : 0
+    const secPerWord = words > 0 && duration > 0 ? duration / words : 0
+
+    if (duration >= 5.2 || words >= 13 || chars >= 72 || (secPerWord > 0.62 && words >= 8) || hasStrongBreak) return 4.5
+    if (duration >= 2.6 || words >= 7 || chars >= 38 || hasClausePunctuation || (secPerWord > 0.46 && words >= 5)) return 3
+    return 1.5
+  }
+
+  function pauseDurationMsForLine(line = null) {
+    if (settings.pauseSeconds === 'auto') return autoPauseSecondsForLine(line) * 1000
+    return (Number(settings.pauseSeconds) || 3) * 1000
   }
 
   async function playLine(line) {
@@ -2370,12 +2558,13 @@ function App() {
 
   async function playList(lines, options = {}) {
     for (const line of lines) {
+      const pauseAfterLine = pauseDurationMsForLine(line)
       if (options.skipSpeaker && line.speaker?.toLowerCase() === options.skipSpeaker.toLowerCase()) {
-        await new Promise(resolve => setTimeout(resolve, pauseDurationMs()))
+        await new Promise(resolve => setTimeout(resolve, pauseAfterLine))
         continue
       }
       await playText(line.en, line.speaker)
-      await new Promise(resolve => setTimeout(resolve, pauseDurationMs()))
+      await new Promise(resolve => setTimeout(resolve, pauseAfterLine))
     }
   }
 
@@ -2397,6 +2586,7 @@ function App() {
       stopAudio()
       const audio = new Audio(url)
       audioRef.current = audio
+      audio.playbackRate = Number(settings.playbackSpeed) || 1
       for (const line of playableLines) {
         await new Promise((resolve, reject) => {
           audio.currentTime = line.startTime
@@ -2410,7 +2600,7 @@ function App() {
           audio.onended = resolve
           audio.play().catch(reject)
         })
-        await new Promise(resolve => setTimeout(resolve, pauseDurationMs()))
+        await new Promise(resolve => setTimeout(resolve, pauseDurationMsForLine(line)))
       }
       setMessage('')
     } catch (error) {
@@ -2450,13 +2640,31 @@ function App() {
     }
   }
 
+  function setPlaybackSpeed(speed) {
+    setSettings(prev => ({ ...prev, playbackSpeed: speed }))
+    if (audioRef.current) audioRef.current.playbackRate = speed
+  }
+
+  function resolveVisibleTab(nextTab) {
+    if (nextTab === 'practice') return 'output'
+    return nextTab
+  }
+
+  function maybeResetViewportForTabSwitch() {
+    if (!isPhoneView) return
+    window.scrollTo(0, 0)
+  }
+
   function selectCourse(courseId, nextTab = 'learn') {
     stopAudio()
+    maybeResetViewportForTabSwitch()
+    const routedTab = resolveVisibleTab(nextTab)
     updateStore(prev => ({ ...prev, activeCourseId: courseId }))
     setActiveIndex(0)
     setAnswerShown(false)
     setTyped('')
-    setTab(nextTab)
+    if (routedTab === 'output') setOutputMode('guided')
+    setTab(routedTab)
   }
 
   function openCourseStage(courseId, stage = 'learn') {
@@ -2781,32 +2989,6 @@ function App() {
     })
   }
 
-  function markPracticeWeak(item, status = 'weak') {
-    const answerEn = item.answerEn || item.base || ''
-    if (!answerEn) return
-    upsertWeakReviewItem({
-      promptCn: item.promptCn || item.base || 'Practice this again.',
-      answerEn,
-      source: 'Practice',
-      status
-    })
-    recordStudy('practice', { activityKind: 'weak', minProgress: 55 })
-    setMessage(t(status === 'stuck' ? 'addedStuck' : 'addedWeak'))
-  }
-
-  function checkPracticeAnswer(item) {
-    setAnswerShown(true)
-    if (practiceMode !== 'typing') return
-    const expected = String(item.answerEn || '').trim().toLowerCase()
-    const actual = typed.trim().toLowerCase()
-    if (!actual || actual === expected) {
-      setMessage(actual ? t('typingCorrect') : '')
-      return
-    }
-    markPracticeWeak(item, 'weak')
-    setMessage(t('typingWrongAdded'))
-  }
-
   function markOutputStuck(item) {
     let promptCn = item.prompt || item.scenario || t('weakStuck')
     let answerEn = item.sample || ''
@@ -2823,13 +3005,6 @@ function App() {
     })
     recordStudy('output', { activityKind: 'weak', minProgress: 80 })
     setMessage(t('addedStuck'))
-  }
-
-  function nextPracticeItem() {
-    recordStudy('practice', { activityKind: 'practice', minProgress: 55 })
-    setActiveIndex((activeIndex + 1) % practicePool.length)
-    setTyped('')
-    setAnswerShown(false)
   }
 
   function nextOutputItem() {
@@ -2925,15 +3100,16 @@ function App() {
     stopAudio()
     const audio = new Audio(url)
     audioRef.current = audio
+    audio.playbackRate = Number(settings.playbackSpeed) || 1
     if (typeof startTime === 'number') audio.currentTime = startTime
     const waiting = waitForAudio(audio, endTime)
     await audio.play()
     await waiting
   }
 
-  async function playLineRepeated(line, repeatCount = settings.lineRepeatCount || 1) {
+  async function playLineRepeated(line, repeatCount = 3) {
     const count = Math.max(1, Number(repeatCount) || 1)
-    const pause = settings.pauseSeconds === 'manual' ? 0 : (Number(settings.pauseSeconds) || 2) * 1000
+    const pause = pauseDurationMsForLine(line)
     try {
       if (activeCourse.audioMode === 'original' && !activeCourse.uploadedAudioUrl) {
         setMessage('Original audio is required for this textbook course. Upload the textbook audio in Audio Import; the app will not replace it with TTS.')
@@ -3095,16 +3271,63 @@ function App() {
   }
   const stageLabel = stage => t(`stage.${stage || 'learn'}`)
   const resumeStage = activeCourse?.lastStage || 'learn'
+  const visibleNavItems = NAV_ITEMS.filter(item => isPhoneView ? item.showOnPhone : item.showOnMac)
+  const pageTitleKey = tab === 'learn'
+    ? (isPhoneView ? 'title.listen' : 'title.study')
+    : tab === 'output'
+      ? (isPhoneView ? 'title.speak' : 'title.output')
+      : `title.${tab}`
+  const platformModeTitle = isPhoneView ? t('dailyTrainer') : t('studyWorkspace')
+  const platformModeHint = isPhoneView ? t('iphoneHint') : t('macbookHint')
 
-  const currentPractice = practicePool[activeIndex] || practicePool[0]
+  function goToTab(nextTab) {
+    const routedTab = resolveVisibleTab(nextTab)
+    if (routedTab === tab) return
+    stopAudio()
+    maybeResetViewportForTabSwitch()
+    setTab(routedTab)
+    if (routedTab === 'library') {
+      setLibraryMode('list')
+      setLibrarySubtab('courses')
+    }
+    if (routedTab === 'learn') setLearnSubtab('audio')
+    if (routedTab === 'output') setOutputMode('guided')
+    if (answerShown) setAnswerShown(false)
+    if (typed) setTyped('')
+  }
+
   const currentOutput = outputPool[activeIndex] || outputPool[0]
   const currentReview = reviewPool[activeIndex] || reviewPool[0]
   const currentAudioLineIndex = activeCourse?.transcriptLines?.length ? Math.min(activeIndex, activeCourse.transcriptLines.length - 1) : 0
   const currentAudioLine = activeCourse?.transcriptLines?.[currentAudioLineIndex] || activeCourse?.transcriptLines?.[0] || null
   const understandLine = activeCourse?.transcriptLines?.find(line => line.id === understandLineId) || currentAudioLine
   const understandData = understandLineId ? buildUnderstandUnits(understandLine) : null
+  const currentFocusData = currentAudioLine ? buildUnderstandUnits(currentAudioLine) : null
+  const currentLinePauseSeconds = currentAudioLine ? autoPauseSecondsForLine(currentAudioLine) : 3
+  function lineHighlightPhrases(line) {
+    if (!line) return []
+    const sourceLine = String(line.en || '').trim().toLowerCase()
+    const manualChunks = (activeCourse?.languageItems || [])
+      .filter(item => item.type === 'chunk')
+      .filter(item => String(item.sourceSentence || '').trim().toLowerCase() === sourceLine || sourceLine.includes(String(item.en || '').trim().toLowerCase()))
+      .map(item => String(item.en || '').trim())
+    const autoChunks = buildUnderstandUnits(line).chunks.map(item => item.en)
+    return [...new Set([...manualChunks, ...autoChunks].filter(Boolean))].sort((a, b) => b.length - a.length)
+  }
 
-  return <div className={`appShell font-${settings.fontScale}`}>
+  function renderHighlightedLine(line) {
+    const text = String(line?.en || '')
+    const phrases = lineHighlightPhrases(line)
+    if (!phrases.length) return text
+    const escaped = phrases.map(escapeRegExp).join('|')
+    const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
+    return parts.map((part, index) => {
+      const matched = phrases.some(phrase => phrase.toLowerCase() === part.toLowerCase())
+      return matched ? <mark key={`${part}-${index}`}>{part}</mark> : <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>
+    })
+  }
+
+  return <div className={`appShell platform-${isPhoneView ? 'phone' : 'mac'} font-${settings.fontScale}`}>
     <aside className="sidebar">
       <div className="brand">
         <div className="brandMark">K</div>
@@ -3120,9 +3343,9 @@ function App() {
         </div>
       </div>
       <nav className="sideNav">
-        {NAV_ITEMS.map(item => <button key={item.id} className={`${tab === item.id ? 'active' : ''} ${item.hideOnMobile ? 'mobileHiddenNav' : ''}`} onClick={() => { stopAudio(); setTab(item.id); setLibraryMode('list'); if (item.id === 'library') setLibrarySubtab('courses'); setAnswerShown(false); setTyped('') }}>
-          <span>{t(`nav.${item.id}`)}</span>
-          <small>{t(`navHint.${item.id}`)}</small>
+        {visibleNavItems.map(item => <button type="button" key={item.id} className={tab === item.id ? 'active' : ''} onClick={() => goToTab(item.id)}>
+          <span>{t(isPhoneView ? (item.phoneLabelKey || item.labelKey) : item.labelKey)}</span>
+          {isPhoneView && <small>{t(item.phoneHintKey || item.hintKey)}</small>}
         </button>)}
       </nav>
       {activeCourse && <div className="currentCourseMini">
@@ -3136,10 +3359,14 @@ function App() {
     <main className="mainArea">
       <header className="topBar">
         <div>
-          <span className="eyebrow">{tab === 'library' ? t('libraryImport') : activeCourse ? activeCourse.category : 'English Learning System'}</span>
-          <h1>{t(`title.${tab}`)}</h1>
+          <span className="eyebrow">{platformModeTitle} · {tab === 'library' ? t('libraryImport') : activeCourse ? activeCourse.category : 'English Learning System'}</span>
+          <h1>{t(pageTitleKey)}</h1>
+          <p className="platformHint">{platformModeHint}</p>
         </div>
-        <button className="settingsButton" onClick={() => setSettingsOpen(true)}>{t('settings')}</button>
+        <div className="topBarActions">
+          {!isPhoneView && tab !== 'library' && <button className="secondary compact" onClick={() => goToTab('library')}>{t('openLibrary')}</button>}
+          <button className="settingsButton" onClick={() => setSettingsOpen(true)}>{t('settings')}</button>
+        </div>
       </header>
 
       {message && <div className="messageBar">{message}</div>}
@@ -3154,7 +3381,21 @@ function App() {
           </div>}
           <div className="actionRow">
             <button className="primary" onClick={() => openCourseStage(activeCourse.id, resumeStage)} disabled={!activeCourse}>{t('resumeStage', { stage: stageLabel(resumeStage) })}</button>
-            <button className="secondary" onClick={() => setTab('library')}>{t('openLibrary')}</button>
+            <button className="secondary" onClick={() => goToTab('library')}>{t('openLibrary')}</button>
+          </div>
+          <div className="sessionFlow">
+            <button onClick={() => openCourseStage(activeCourse.id, 'learn')} disabled={!activeCourse}>
+              <strong>{t('listenAction')}</strong>
+              <span>{activeCourse?.transcriptLines?.length || 0} {t('lines')}</span>
+            </button>
+            <button onClick={() => openCourseStage(activeCourse.id, 'output')} disabled={!activeCourse}>
+              <strong>{t('speakAction')}</strong>
+              <span>{activeCourse?.outputTasks?.length || 0} {t('speakTasks')}</span>
+            </button>
+            <button onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); openCourseStage(activeCourse.id, 'review') }} disabled={!activeCourse}>
+              <strong>{t('reviewAction')}</strong>
+              <span>{dueReview.length} {t('dueReview')}</span>
+            </button>
           </div>
         </div>
         <div className="summaryGrid">
@@ -3173,19 +3414,19 @@ function App() {
             <span>{t('todayPractice')}</span>
             <strong>{todayPractice[0]?.promptCn || todayPractice[0]?.base || t('quickResponse')}</strong>
             <p>{todayPractice.length ? t('practiceSuggested', { count: todayPractice.length }) : t('noPracticeQueued')}</p>
-            <button className="secondary compact" onClick={() => setTab('practice')}>{t('startPractice')}</button>
+            <button className="secondary compact" onClick={() => goToTab('output')}>{t('startPractice')}</button>
           </article>
           <article>
             <span>{t('todayReview')}</span>
             <strong>{weakReview[0]?.promptCn || dueReview[0]?.promptCn || t('reviewMemory')}</strong>
             <p>{weakReview.length ? t('weakPriority', { count: weakReview.length }) : t('reviewReady', { count: dueReview.length })}</p>
-            <button className="secondary compact" onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); setTab('review') }}>{t('startReview')}</button>
+            <button className="secondary compact" onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); goToTab('review') }}>{t('startReview')}</button>
           </article>
           <article>
             <span>{t('libraryImport')}</span>
             <strong>{t('manageContent')}</strong>
             <p>{t('manageContentHint')}</p>
-            <button className="secondary compact" onClick={() => { setTab('library'); setLibraryMode('list'); setLibrarySubtab('courses') }}>{t('openLibrary')}</button>
+            <button className="secondary compact" onClick={() => { goToTab('library'); setLibrarySubtab('courses') }}>{t('openLibrary')}</button>
           </article>
         </div>
         <div className="courseStrip">
@@ -3221,7 +3462,7 @@ function App() {
                   course={course}
                   linkedTitle={course.linkedCourseTitle || store.courses.find(row => row.id === course.linkedCourseId)?.title || ''}
                   onLearn={() => selectCourse(course.id, 'learn')}
-                  onPractice={() => selectCourse(course.id, 'practice')}
+                  onPractice={() => selectCourse(course.id, 'output')}
                   t={t}
                   sourceLabel={sourceLabel}
                   audioLabel={audioLabel}
@@ -3301,9 +3542,23 @@ function App() {
 
       {tab === 'learn' && activeCourse && <section>
         <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
-        <div className="subTabs">
-          {['audio', 'notes', 'language', 'editor'].map(id => <button key={id} className={learnSubtab === id ? 'active' : ''} onClick={() => setLearnSubtab(id)}>{id === 'audio' ? t('listen') : id === 'language' ? t('languagePreview') : id === 'editor' ? t('lineEditor') : t('background')}</button>)}
+        <div className="subTabs learnTabsPrimary">
+          <button className={learnSubtab === 'audio' ? 'active' : ''} onClick={() => setLearnSubtab('audio')}>{t('listen')}</button>
+          {!isPhoneView && <button className={showStudyTools || learnSubtab === 'notes' || learnSubtab === 'editor' ? 'active' : ''} onClick={() => {
+            const nextOpen = !showStudyTools
+            setShowStudyTools(nextOpen)
+            if (nextOpen && !(learnSubtab === 'notes' || learnSubtab === 'editor' || learnSubtab === 'language')) setLearnSubtab('language')
+            if (!nextOpen && (learnSubtab === 'notes' || learnSubtab === 'editor' || learnSubtab === 'language')) setLearnSubtab('audio')
+          }}>
+            {showStudyTools ? t('hideTools') : t('showTools')}
+          </button>}
         </div>
+        {!isPhoneView && showStudyTools && <div className="subTabs subTabsMinor">
+          <button className={learnSubtab === 'language' ? 'active' : ''} onClick={() => setLearnSubtab('language')}>{t('languagePreview')}</button>
+          <button className={learnSubtab === 'notes' ? 'active' : ''} onClick={() => setLearnSubtab('notes')}>{t('background')}</button>
+          <button className={learnSubtab === 'editor' ? 'active' : ''} onClick={() => setLearnSubtab('editor')}>{t('lineEditor')}</button>
+          <small>{t('advancedToolsHint')}</small>
+        </div>}
         {learnSubtab === 'audio' && <div className="learnPlayer">
           <div className="playerCard">
             <button className="playCircle" onClick={() => playCourseMain(activeCourse)}>{t('play')}</button>
@@ -3314,20 +3569,53 @@ function App() {
             </div>
             <button className="secondary compact" onClick={() => playCourseTranscript(activeCourse)}>{t('listenAll')}</button>
           </div>
-          {currentAudioLine && <div className="listenToolPanel">
-            <div>
-              <span>{t('currentLine')} {sentenceDisplayNumber(currentAudioLineIndex)}</span>
-              <strong>{currentAudioLine.en}</strong>
-              {currentAudioLine.cn && <small>{currentAudioLine.cn}</small>}
+          {currentAudioLine && <div className="focusPlayer">
+            <div className="focusPlayerMeta">
+              <div>
+                <span>{t('focusMode')}</span>
+                <strong>{t('currentLine')} {sentenceDisplayNumber(currentAudioLineIndex)}</strong>
+              </div>
+              <p>{t('focusHint')}</p>
             </div>
-            <div className="listenToolControls">
-              <button className="secondary compact" onClick={() => setUnderstandLineId(currentAudioLine.id)}>{t('understand')}</button>
+            <div className="focusPlayerMain">
+              <button className="focusPlayButton" onClick={() => playLine(currentAudioLine)} aria-label={t('playLine')}>{t('play')}</button>
+              <div className="focusTranscriptBlock">
+                {currentAudioLine.speaker && <em className="speakerPill">{currentAudioLine.speaker}</em>}
+                <button className="focusLineButton" onClick={() => playLineRepeated(currentAudioLine)}>
+                  <span>{renderHighlightedLine(currentAudioLine)}</span>
+                  {currentAudioLine.cn && <small>{currentAudioLine.cn}</small>}
+                </button>
+                {!!currentFocusData?.chunks?.length && <div className="focusChunkRow">
+                  <label>{t('focusChunks')}</label>
+                  <div>
+                    {currentFocusData.chunks.map(item => <button key={item.id} onClick={() => playText(item.en)}>{item.en}</button>)}
+                  </div>
+                </div>}
+              </div>
+            </div>
+            <div className={`focusNavRow ${isPhoneView ? 'phone' : ''}`}>
+              <button className="secondary compact" disabled={currentAudioLineIndex <= 0} onClick={() => setActiveIndex(currentAudioLineIndex - 1)}>{t('prevLine')}</button>
+              {!isPhoneView && <button className="secondary compact" onClick={() => setUnderstandLineId(currentAudioLine.id)}>{t('understand')}</button>}
+              <button className="secondary compact" disabled={currentAudioLineIndex >= (activeCourse.transcriptLines?.length || 1) - 1} onClick={() => setActiveIndex(currentAudioLineIndex + 1)}>{t('nextLine')}</button>
+            </div>
+            {isPhoneView && <button className="focusUnderLink" onClick={() => setUnderstandLineId(currentAudioLine.id)}>{t('understand')}</button>}
+          </div>}
+          {currentAudioLine && <div className="listenToolPanel">
+            <div className="toolCluster">
               <span>{t('repeatCount')}</span>
-              {[1, 3, 5].map(count => <button key={count} className={settings.lineRepeatCount === count ? 'active' : ''} onClick={() => setSettings({ ...settings, lineRepeatCount: count })}>{count}x</button>)}
-              <span>{t('pauseControl')}</span>
-              {[1, 2, 3, 5].map(seconds => <button key={seconds} className={Number(settings.pauseSeconds) === seconds ? 'active' : ''} onClick={() => setSettings({ ...settings, pauseSeconds: seconds })}>{seconds}s</button>)}
-              <button className={settings.pauseSeconds === 'manual' ? 'active' : ''} onClick={() => setSettings({ ...settings, pauseSeconds: 'manual' })}>{t('manualPause')}</button>
-              <button className="primary compact" onClick={() => playLineRepeated(currentAudioLine)}>{t('playLine')}</button>
+              <strong>3x</strong>
+              <small>{t('lineTapLoopHint')}</small>
+            </div>
+            <div className="toolCluster">
+              <span>{t('playbackSpeed')}</span>
+              <div className="listenToolControls">
+                {[0.75, 1, 1.25].map(speed => <button key={speed} className={settings.playbackSpeed === speed ? 'active' : ''} onClick={() => setPlaybackSpeed(speed)}>{speed}x</button>)}
+              </div>
+            </div>
+            <div className="toolCluster pauseCluster">
+              <span>{t('smartPause')}</span>
+              <strong>{settings.pauseSeconds === 'auto' ? t('smartPauseStatus', { seconds: currentLinePauseSeconds }) : `${settings.pauseSeconds}s`}</strong>
+              <small>{t('smartPauseHint')}</small>
             </div>
           </div>}
           {understandData && <div className="understandPanel">
@@ -3353,12 +3641,20 @@ function App() {
               </section>
             </div>
           </div>}
-          <DisplaySwitch settings={settings} setSettings={setSettings} />
+          <div className="audioToolsFooter">
+            <DisplaySwitch settings={settings} setSettings={setSettings} />
+          </div>
           <div className="sentenceList">
+            <div className="sentenceListHeader">
+              <div>
+                <span>{t('transcript')}</span>
+                <strong>{t('followAlong')}</strong>
+              </div>
+            </div>
             {activeCourse.transcriptLines.map((line, index) => <React.Fragment key={line.id}>
               <div className={`sentenceRow ${line.aligned ? '' : 'needCheck'} ${currentAudioLine?.id === line.id ? 'activeLine' : ''}`}>
                 <span className="lineNumber">{sentenceDisplayNumber(index)}</span>
-                <button className="sentenceText sentencePlay" onClick={() => { setActiveIndex(index); playLine(line) }}>{displayLine(line)}</button>
+                <button className="sentenceText sentencePlay" onClick={() => { setActiveIndex(index); playLineRepeated(line) }}>{displayLine(line)}</button>
                 <div className="lineActions">
                   {!line.aligned && <em>{t('unaligned')}</em>}
                   <button className="starButton" title={t('saveReview')} aria-label={t('saveReview')} onClick={() => addTextToReview({ en: line.en, cn: line.cn, type: 'usefulSentence', source: 'Transcript' })}>⭐</button>
@@ -3394,7 +3690,7 @@ function App() {
                     </div>
                   </div>
                   <div className="controlActionGrid">
-                    <button className="primary" onClick={() => playLineRepeated(line)}>{t('playLine')}</button>
+                    <button className="primary" onClick={() => playLine(line)}>{t('playLine')}</button>
                     <button className="secondary" onClick={() => setMessage(t('timingSaved'))}>{t('saveTiming')}</button>
                   </div>
                 </section>
@@ -3520,16 +3816,6 @@ function App() {
         {learnSubtab === 'notes' && <BackgroundPanel course={activeCourse} t={t} />}
       </section>}
 
-      {tab === 'practice' && activeCourse && <section>
-        <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
-        <div className="subTabs">
-          <button className={practiceMode === 'quick' ? 'active' : ''} onClick={() => { setPracticeMode('quick'); setActiveIndex(0); setAnswerShown(false) }}>{t('quickResponse')}</button>
-          <button className={practiceMode === 'typing' ? 'active' : ''} onClick={() => { setPracticeMode('typing'); setActiveIndex(0); setAnswerShown(false) }}>{t('typing')}</button>
-          <button className={practiceMode === 'replacement' ? 'active' : ''} onClick={() => { setPracticeMode('replacement'); setActiveIndex(0); setAnswerShown(false) }}>{t('replacement')}</button>
-        </div>
-        {currentPractice ? <PracticeCard item={currentPractice} mode={practiceMode} answerShown={answerShown} typed={typed} setTyped={setTyped} setAnswerShown={setAnswerShown} playText={playText} onCheck={() => checkPracticeAnswer(currentPractice)} onSaveReview={() => addTextToReview({ en: currentPractice.answerEn || currentPractice.base, cn: currentPractice.promptCn, type: 'usefulSentence', source: 'Practice' })} onMarkWeak={() => markPracticeWeak(currentPractice)} onNext={nextPracticeItem} t={t} /> : <Empty text={t('noPracticeItems')} />}
-      </section>}
-
       {tab === 'output' && activeCourse && <section>
         <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
         <div className="subTabs">
@@ -3537,7 +3823,16 @@ function App() {
           <button className={outputMode === 'rolePlay' ? 'active' : ''} onClick={() => { setOutputMode('rolePlay'); setActiveIndex(0) }}>{t('rolePlay')}</button>
           <button className={outputMode === 'retell' ? 'active' : ''} onClick={() => { setOutputMode('retell'); setActiveIndex(0) }}>{t('retell')}</button>
         </div>
-        {currentOutput ? <OutputCard item={currentOutput} playText={playText} playList={playOutputLines} onSaveReview={payload => addTextToReview({ ...payload, source: payload.source || 'Output' })} onMarkStuck={() => markOutputStuck(currentOutput)} onNext={nextOutputItem} t={t} /> : <Empty text={t('noOutputTasks')} />}
+        <p className="modeHint">{outputMode === 'guided' ? t('guidedHint') : outputMode === 'rolePlay' ? t('rolePlayHint') : t('retellHint')}</p>
+        {outputMode === 'retell' && <div className="speakConstraintBar">
+          <span>{t('freeTalkLevel')}</span>
+          <button className={freeTalkLevel === 'A2' ? 'active' : ''} onClick={() => setFreeTalkLevel('A2')}>{t('levelA2')}</button>
+          <button className={freeTalkLevel === 'B1' ? 'active' : ''} onClick={() => setFreeTalkLevel('B1')}>{t('levelB1')}</button>
+          <button className={freeTalkLevel === 'B2' ? 'active' : ''} onClick={() => setFreeTalkLevel('B2')}>{t('levelB2')}</button>
+          <span>{freeTalkLevel === 'A2' ? (uiLanguage === 'zh' ? '每轮 1 句，最多 10 词' : '1 sentence, up to 10 words') : freeTalkLevel === 'B1' ? (uiLanguage === 'zh' ? '每轮 1-2 句，最多 15 词' : '1-2 sentences, up to 15 words') : (uiLanguage === 'zh' ? '每轮 2 句，允许更自然表达' : '2 sentences, more natural range')}</span>
+          <span>{uiLanguage === 'zh' ? '仅限当前主题' : 'Stay in current topic'}</span>
+        </div>}
+        {currentOutput ? <OutputCard item={currentOutput} isPhoneView={isPhoneView} freeTalkLevel={freeTalkLevel} playText={playText} playList={playOutputLines} onSaveReview={payload => addTextToReview({ ...payload, source: payload.source || 'Output' })} onMarkStuck={() => markOutputStuck(currentOutput)} onNext={nextOutputItem} t={t} /> : <Empty text={t('noOutputTasks')} />}
       </section>}
 
       {tab === 'review' && <section>
@@ -3546,9 +3841,9 @@ function App() {
         </div>
         <div className="subTabs">
           <button className={reviewMode === 'today' ? 'active' : ''} onClick={() => { setReviewMode('today'); setActiveIndex(0); setAnswerShown(false) }}>{t('todayReview')}</button>
-          <button className={reviewMode === 'chunks' ? 'active' : ''} onClick={() => { setReviewMode('chunks'); setActiveIndex(0); setAnswerShown(false) }}>{t('chunks')}</button>
-          <button className={reviewMode === 'sentences' ? 'active' : ''} onClick={() => { setReviewMode('sentences'); setActiveIndex(0); setAnswerShown(false) }}>{t('usefulSentences')}</button>
           <button className={reviewMode === 'weak' ? 'active' : ''} onClick={() => { setReviewMode('weak'); setActiveIndex(0); setAnswerShown(false) }}>{t('weakStuck')}</button>
+          {!isPhoneView && <button className={reviewMode === 'chunks' ? 'active' : ''} onClick={() => { setReviewMode('chunks'); setActiveIndex(0); setAnswerShown(false) }}>{t('chunks')}</button>}
+          {!isPhoneView && <button className={reviewMode === 'sentences' ? 'active' : ''} onClick={() => { setReviewMode('sentences'); setActiveIndex(0); setAnswerShown(false) }}>{t('usefulSentences')}</button>}
         </div>
         <div className="reviewCard">
           <span>{reviewMode === 'today' ? t('todayReview') : reviewMode === 'chunks' ? t('chunks') : reviewMode === 'sentences' ? t('usefulSentences') : t('weakStuck')}</span>
@@ -3562,24 +3857,14 @@ function App() {
             </div>
           </> : <Empty text={reviewMode === 'today' ? t('noReviewToday') : t('noReviewSection')} />}
         </div>
-        <div className="queueList">
+        {(reviewMode !== 'today' || !isPhoneView || reviewQueueExpanded) && <div className="queueList">
           {reviewPool.slice(0, 12).map(item => <button key={item.id} onClick={() => playText(item.answerEn)}><strong>{item.answerEn}</strong><span>{reviewLabel(reviewBucketLabel(item))} · {dateLabel(item.nextReviewAt)} · {item.status}</span></button>)}
-        </div>
+        </div>}
+        {reviewMode === 'today' && isPhoneView && <button className="secondary compact" onClick={() => setReviewQueueExpanded(value => !value)}>
+          {reviewQueueExpanded ? t('hideQueue') : t('showQueue')}
+        </button>}
       </section>}
     </main>
-
-    <aside className="rightPanel">
-      <div className="sideCard">
-        <span>{t('nextStep')}</span>
-        <strong>{tab === 'learn' ? t('practiceQuick') : tab === 'practice' ? t('tryOutput') : t('continueLearn')}</strong>
-        <button onClick={() => setTab(tab === 'learn' ? 'practice' : tab === 'practice' ? 'output' : 'learn')}>{t('go')}</button>
-      </div>
-      <div className="sideCard">
-        <span>{t('nav.review')}</span>
-        <strong>{t('reviewReady', { count: dueReview.length })}</strong>
-        <button onClick={() => setTab('review')}>{t('nav.review')}</button>
-      </div>
-    </aside>
 
     {settingsOpen && <div className="drawerBackdrop" onClick={() => setSettingsOpen(false)}>
       <div className="settingsDrawer" onClick={e => e.stopPropagation()}>
@@ -3612,7 +3897,8 @@ function App() {
           {speakerVoiceNames.map(speaker => <label key={speaker}>{t('voiceFor', { speaker })}<select value={settings.speakerVoices?.[speaker] || settings.voice} onChange={e => setSpeakerVoice(speaker, e.target.value)}>{VOICE_OPTIONS.map(v => <option key={v}>{v}</option>)}</select></label>)}
         </div>
         <label>{t('languageDisplay')}<select value={settings.displayMode} onChange={e => setSettings({ ...settings, displayMode: e.target.value })}><option value="both">EN + CN</option><option value="en">EN</option><option value="cn">CN</option><option value="hide">Hide English</option></select></label>
-        <label>{t('pauseSeconds')}<select value={settings.pauseSeconds} onChange={e => setSettings({ ...settings, pauseSeconds: e.target.value === 'manual' ? 'manual' : Number(e.target.value) })}><option value={1}>1 second</option><option value={2}>2 seconds</option><option value={3}>3 seconds</option><option value={5}>5 seconds</option><option value="manual">{t('manualPause')}</option></select></label>
+        <label>{t('playbackSpeed')}<select value={settings.playbackSpeed} onChange={e => setPlaybackSpeed(Number(e.target.value))}><option value={0.75}>0.75x</option><option value={1}>1.0x</option><option value={1.25}>1.25x</option></select></label>
+        <label>{t('pauseSeconds')}<select value={settings.pauseSeconds} onChange={e => setSettings({ ...settings, pauseSeconds: e.target.value === 'auto' ? e.target.value : Number(e.target.value) })}><option value="auto">{t('autoPause')}</option><option value={1.5}>1.5 seconds</option><option value={3}>3 seconds</option><option value={4.5}>4.5 seconds</option></select></label>
         <label>{t('displayScale')}<select value={settings.fontScale} onChange={e => setSettings({ ...settings, fontScale: e.target.value })}><option value="normal">{t('normal')}</option><option value="comfortable">{t('comfortable')}</option><option value="large">{t('large')}</option></select></label>
       </div>
     </div>}
@@ -3698,8 +3984,7 @@ function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
     </div>
     <div className="routeGrid">
       <div><strong>{report.learnItems}</strong><span>{t('nav.learn')}</span></div>
-      <div><strong>{report.practiceItems}</strong><span>{t('nav.practice')}</span></div>
-      <div><strong>{report.outputItems}</strong><span>{t('nav.output')}</span></div>
+      <div><strong>{(Number(report.practiceItems) || 0) + (Number(report.outputItems) || 0)}</strong><span>{t('speakTasks')}</span></div>
       <div><strong>{report.reviewItems}</strong><span>{t('nav.review')}</span></div>
     </div>
     <div className="coursePreviewList">
@@ -3713,28 +3998,13 @@ function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
   </div>
 }
 
-function PracticeCard({ item, mode, answerShown, typed, setTyped, setAnswerShown, playText, onCheck, onSaveReview, onMarkWeak, onNext, t }) {
-  const expected = item.answerEn || ''
-  const isCorrect = typed.trim().toLowerCase() === expected.trim().toLowerCase()
-  return <div className="practiceCard">
-    <span>{mode === 'quick' ? t('quickResponse') : mode === 'typing' ? t('typing') : t('replacement')}</span>
-    <h2>{mode === 'replacement' ? item.base : item.promptCn}</h2>
-    {item.hint && <p>{item.hint}</p>}
-    {mode === 'typing' && <input value={typed} onChange={e => setTyped(e.target.value)} placeholder={t('typeEnglishAnswer')} />}
-    {mode === 'replacement' && <div className="answerBox">{t('replacement')}: {item.replacement}</div>}
-    {answerShown && <button className={`answerBox playableAnswer ${mode === 'typing' && typed ? (isCorrect ? 'correct' : 'wrong') : ''}`} onClick={() => playText(expected)}>{expected}</button>}
-    <div className="actionRow">
-      <button className="secondary" onClick={() => playText(expected)}>{t('play')}</button>
-      <button className="secondary" onClick={mode === 'typing' ? onCheck : () => setAnswerShown(true)}>{mode === 'typing' ? t('check') : t('showAnswer')}</button>
-      <button className="secondary" onClick={onSaveReview}>{t('saveReview')}</button>
-      <button className="secondary weakAction" onClick={onMarkWeak}>{t('markWeak')}</button>
-      <button className="primary" onClick={onNext}>{t('next')}</button>
-    </div>
-  </div>
-}
-
-function OutputCard({ item, playText, playList, onSaveReview, onMarkStuck, onNext, t }) {
+function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, onSaveReview, onMarkStuck, onNext, t }) {
   const [userRole, setUserRole] = useState(item.userRole || 'Kevin')
+  const [showScript, setShowScript] = useState(!isPhoneView)
+  useEffect(() => {
+    setShowScript(!isPhoneView)
+  }, [item.id, isPhoneView])
+
   if (item.type === 'rolePlay') {
     return <div className="practiceCard">
       <span>{t('rolePlay')}</span>
@@ -3742,8 +4012,11 @@ function OutputCard({ item, playText, playList, onSaveReview, onMarkStuck, onNex
       <select value={userRole} onChange={e => setUserRole(e.target.value)}>
         {[...new Set(item.lines.map(line => line.speaker).filter(Boolean))].map(role => <option key={role}>{role}</option>)}
       </select>
-      <button className="primary" onClick={() => playList(item.lines, { skipSpeaker: userRole })}>{t('rolePlay')}</button>
-      <div className="sentenceList compactList">
+      <div className="actionRow">
+        <button className="primary" onClick={() => playList(item.lines, { skipSpeaker: userRole })}>{t('rolePlay')}</button>
+        <button className="secondary" onClick={() => setShowScript(value => !value)}>{showScript ? t('hide') : t('transcript')}</button>
+      </div>
+      {showScript && <div className="sentenceList compactList">
         {item.lines.map((line, index) => <div className="sentenceRow" key={index}>
           <span className="speaker">{line.speaker}</span>
           <button className="sentenceText sentencePlay" onClick={() => playText(line.en, line.speaker)}><span>{line.en}</span>{line.cn && <small>{line.cn}</small>}</button>
@@ -3751,7 +4024,7 @@ function OutputCard({ item, playText, playList, onSaveReview, onMarkStuck, onNex
             <button title={t('saveReview')} onClick={() => onSaveReview({ en: line.en, cn: line.cn, type: 'usefulSentence' })}>⭐</button>
           </div>
         </div>)}
-      </div>
+      </div>}
       <div className="actionRow">
         <button className="secondary weakAction" onClick={onMarkStuck}>{t('markStuck')}</button>
         <button className="primary" onClick={onNext}>{t('next')}</button>
@@ -3763,6 +4036,11 @@ function OutputCard({ item, playText, playList, onSaveReview, onMarkStuck, onNex
       <span>{t('retell')}</span>
       <h2>{item.prompt}</h2>
       <div className="chipRow">{(item.keywords || []).map(k => <span key={k}>{k}</span>)}</div>
+      <div className="speakConstraintBar">
+        <span>{freeTalkLevel || 'A2'}</span>
+        <span>{freeTalkLevel === 'A2' ? (t('retell').includes('自由') ? '每轮 1 句' : '1 sentence per turn') : freeTalkLevel === 'B1' ? (t('retell').includes('自由') ? '每轮 1-2 句' : '1-2 sentences per turn') : (t('retell').includes('自由') ? '每轮 2 句' : '2 sentences per turn')}</span>
+        <span>{t('retell').includes('自由') ? '只聊当前场景' : 'Keep the same scenario'}</span>
+      </div>
       <textarea placeholder={t('retellPlaceholder')} />
       <div className="actionRow">
         <button className="secondary" onClick={() => playText(item.sample)}>{t('play')}</button>

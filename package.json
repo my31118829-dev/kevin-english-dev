@@ -1,12 +1,13 @@
 {
   "name": "kevin-english-dev",
   "private": true,
-  "version": "3.9.5",
+  "version": "3.9.21",
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",
-    "build": "npm run check:repo && vite build",
+    "build": "npm run check:repo && npm run check:version && vite build",
     "check:repo": "node scripts/check-tracked-node-modules.mjs",
+    "check:version": "node scripts/check-version-sync.mjs",
     "preview": "node server.mjs --prod"
   },
   "dependencies": {

@@ -1,8 +1,8 @@
-# Kevin English Dev (V3.9.5)
+# Kevin English Dev (V3.9.21)
 
 Dev = experimental development version.
 
-This repository is the main development line on top of V3.9.5.
+This repository is the main development line on top of V3.9.21.
 
 ## Scope
 - New features and flow upgrades
@@ -20,6 +20,12 @@ npm install
 npm run dev
 ```
 Default: http://localhost:5182/
+
+For iPhone testing, keep the MacBook and iPhone on the same Wi-Fi and open the `Phone` URL printed by the dev server. Example:
+
+```text
+http://192.168.0.231:5182/
+```
 
 ## Deploy (Vercel)
 - Framework: Vite
