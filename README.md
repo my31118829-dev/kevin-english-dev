@@ -1,8 +1,8 @@
-# Kevin English Dev (V3.9.51)
+# Kevin English Dev (V3.9.52)
 
 Dev = experimental development version.
 
-This repository is the main development line on top of V3.9.51.
+This repository is the main development line on top of V3.9.52.
 
 ## Scope
 - New features and flow upgrades

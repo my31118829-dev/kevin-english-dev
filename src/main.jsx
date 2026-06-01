@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3951'
-const SETTINGS_KEY = 'ke_dev_settings_v3951'
-const TAB_KEY = 'ke_dev_tab_v3951'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3951'
-const APP_VERSION = '3.9.51'
+const STORE_KEY = 'ke_dev_store_v3952'
+const SETTINGS_KEY = 'ke_dev_settings_v3952'
+const TAB_KEY = 'ke_dev_tab_v3952'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3952'
+const APP_VERSION = '3.9.52'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -4524,10 +4524,13 @@ function App() {
         step: '2 / 4',
         title: t('practiceTaskTitle'),
         body: t('practiceTaskBody'),
-        primary: t('checkAnswer'),
+        primary: answerShown
+          ? activeIndex >= practicePool.length - 1 ? t('completeAndSpeak') : t('nextPracticeTask')
+          : t('checkAnswer'),
         secondary: t('completeAndSpeak'),
-        onPrimary: () => setAnswerShown(true),
-        onSecondary: finishPracticeAndOpenSpeak
+        onPrimary: answerShown ? nextPracticeItem : () => setAnswerShown(true),
+        onSecondary: finishPracticeAndOpenSpeak,
+        secondaryDisabled: !answerShown
       },
       speak: {
         step: isPhoneView ? '2 / 3' : '3 / 4',
@@ -4555,7 +4558,7 @@ function App() {
       <p>{config.body}</p>
       <div className="taskHeroActions">
         <button className="primary" data-testid={`task-${kind}-primary`} onClick={config.onPrimary} disabled={kind === 'review' && !currentReview}>{config.primary}</button>
-        <button className="secondary" data-testid={`task-${kind}-next`} onClick={config.onSecondary}>{config.secondary}</button>
+        <button className="secondary" data-testid={`task-${kind}-next`} onClick={config.onSecondary} disabled={!!config.secondaryDisabled}>{config.secondary}</button>
       </div>
     </div>
   }
@@ -5545,6 +5548,8 @@ function tokenOverlapScore(typedText, expectedText) {
 function evaluatePracticeAnswer(typed, expected) {
   const normalizedTyped = normalizeAnswerText(typed)
   const normalizedExpected = normalizeAnswerText(expected)
+  const typedTokens = normalizedTyped.split(' ').filter(Boolean)
+  const expectedTokens = normalizedExpected.split(' ').filter(Boolean)
   if (!normalizedTyped) {
     return { state: 'empty', tone: '', titleKey: 'practiceResultEmpty', bodyKey: 'practiceResultEmptyBody' }
   }
@@ -5557,7 +5562,10 @@ function evaluatePracticeAnswer(typed, expected) {
   const distance = levenshteinDistance(normalizedTyped, normalizedExpected)
   const similarity = 1 - (distance / Math.max(normalizedExpected.length, normalizedTyped.length, 1))
   const overlap = tokenOverlapScore(normalizedTyped, normalizedExpected)
-  if (similarity >= 0.82 || overlap >= 0.7 || normalizedExpected.includes(normalizedTyped) || normalizedTyped.includes(normalizedExpected)) {
+  const typedCoverage = normalizedTyped.length / Math.max(normalizedExpected.length, 1)
+  const enoughPhrase = typedTokens.length >= Math.min(3, Math.max(2, expectedTokens.length - 1)) && typedCoverage >= 0.45
+  const phraseContains = enoughPhrase && (normalizedExpected.includes(normalizedTyped) || normalizedTyped.includes(normalizedExpected))
+  if (similarity >= 0.82 || (overlap >= 0.7 && typedCoverage >= 0.55) || phraseContains) {
     return { state: 'close', tone: 'correct', titleKey: 'practiceResultClose', bodyKey: 'practiceResultCloseBody' }
   }
   return { state: 'retry', tone: 'wrong', titleKey: 'practiceResultRetry', bodyKey: 'practiceResultRetryBody' }
@@ -5574,6 +5582,7 @@ function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAns
       ? t('replacement')
       : t('quickResponse')
   const result = evaluatePracticeAnswer(typed, expected)
+  const canMoveNext = answerShown || !expected
 
   return <div className={`practiceCard controlledPracticeCard practice-${item.type}`}>
     <div className="practiceMetaRow">
@@ -5597,9 +5606,9 @@ function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAns
     </div>}
     <div className="actionRow">
       <button className="secondary" onClick={() => playText(expected)}>{t('play')}</button>
-      <button className="secondary" onClick={() => setAnswerShown(true)}>{t('checkAnswer')}</button>
+      <button className="secondary" onClick={() => setAnswerShown(true)} disabled={answerShown}>{t('checkAnswer')}</button>
       <button className="secondary" onClick={() => onSaveReview?.({ en: expected, cn: prompt, type: item.type === 'replacement' ? 'pattern' : 'usefulSentence' })}>{t('saveReview')}</button>
-      <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
+      <button className="primary" onClick={canMoveNext ? onNext : () => setAnswerShown(true)}>{canMoveNext ? (nextLabel || t('next')) : t('checkAnswer')}</button>
     </div>
   </div>
 }
