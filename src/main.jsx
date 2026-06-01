@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3950'
-const SETTINGS_KEY = 'ke_dev_settings_v3950'
-const TAB_KEY = 'ke_dev_tab_v3950'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3950'
-const APP_VERSION = '3.9.50'
+const STORE_KEY = 'ke_dev_store_v3951'
+const SETTINGS_KEY = 'ke_dev_settings_v3951'
+const TAB_KEY = 'ke_dev_tab_v3951'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3951'
+const APP_VERSION = '3.9.51'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -286,6 +286,10 @@ const UI_TEXT = {
     'todayHeroBody': 'Start with the current course. The app will guide you through the next step.',
     'todayMissionTitle': 'Your next learning loop',
     'todayMissionBody': 'One course, three simple actions. Finish the loop first; explore tools later.',
+    'todayPrimaryAction': 'Continue: {step}',
+    'todayRemainingSteps': '{count} steps left today',
+    'showSecondaryPanels': 'Show details',
+    'hideSecondaryPanels': 'Hide details',
     'todayCompleteTitle': 'Today loop complete',
     'todayCompleteBody': 'Nice. You listened, spoke, and reviewed. Start a fresh loop when you are ready.',
     'todayCompleteBadge': 'Complete',
@@ -358,6 +362,15 @@ const UI_TEXT = {
     'noPracticeTasks': 'No practice tasks yet.',
     'practiceMatched': 'Looks close. Say it once out loud.',
     'practiceTryAgain': 'Not quite yet. Compare the model answer and try again.',
+    'practiceResultPerfect': 'Correct',
+    'practiceResultPerfectBody': 'Great. Your answer matches the model sentence.',
+    'practiceResultClose': 'Close',
+    'practiceResultCloseBody': 'You are close. Adjust the key words, then say it again.',
+    'practiceResultRetry': 'Need another try',
+    'practiceResultRetryBody': 'Read the model answer once and try one more time.',
+    'practiceResultEmpty': 'Type or say your answer first',
+    'practiceResultEmptyBody': 'Enter a sentence, then tap Check Answer.',
+    'practiceProgressLabel': 'Practice progress',
     'yourAnswer': 'Your answer',
     'nextListenLine': 'Next Line',
     'speakRoundTitle': 'Speaking round',
@@ -740,6 +753,10 @@ const UI_TEXT = {
     'todayHeroBody': '从当前课程开始，按顺序完成一个小闭环，不需要先理解所有功能。',
     'todayMissionTitle': '下一轮学习任务',
     'todayMissionBody': '一门课程，三个动作。先完成闭环，再看其他工具。',
+    'todayPrimaryAction': '继续：{step}',
+    'todayRemainingSteps': '今天还剩 {count} 步',
+    'showSecondaryPanels': '显示辅助信息',
+    'hideSecondaryPanels': '收起辅助信息',
     'todayCompleteTitle': '今日闭环已完成',
     'todayCompleteBody': '很好。你已经完成听、说、复习，可以结束今天，也可以开始下一轮。',
     'todayCompleteBadge': '已完成',
@@ -812,6 +829,15 @@ const UI_TEXT = {
     'noPracticeTasks': '暂无内化练习。',
     'practiceMatched': '基本接近。现在大声说一遍。',
     'practiceTryAgain': '还不太像。对照参考答案再来一次。',
+    'practiceResultPerfect': '正确',
+    'practiceResultPerfectBody': '很好，你的答案和参考句一致。',
+    'practiceResultClose': '接近',
+    'practiceResultCloseBody': '你已经很接近了，微调关键词再说一遍。',
+    'practiceResultRetry': '需要再练',
+    'practiceResultRetryBody': '先看一遍参考答案，再尝试一次。',
+    'practiceResultEmpty': '先输入或说出答案',
+    'practiceResultEmptyBody': '先写一句，再点“检查答案”。',
+    'practiceProgressLabel': '练习进度',
     'yourAnswer': '你的答案',
     'nextListenLine': '下一句',
     'speakRoundTitle': '本轮开口',
@@ -2758,6 +2784,7 @@ function App() {
   const [freeTalkLevel, setFreeTalkLevel] = useState('A2')
   const [reviewMode, setReviewMode] = useState('today')
   const [reviewQueueExpanded, setReviewQueueExpanded] = useState(false)
+  const [showTodayDetails, setShowTodayDetails] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [answerShown, setAnswerShown] = useState(false)
   const [typed, setTyped] = useState('')
@@ -4365,6 +4392,9 @@ function App() {
       }
     ]
     const currentStep = loopComplete ? missionSteps[0] : missionSteps.find(step => step.id === resumeStage) || (isPhoneView && resumeStage === 'practice' ? missionSteps.find(step => step.id === 'output') : missionSteps[0])
+    const missionStageIds = isPhoneView ? ['learn', 'output', 'review'] : ['learn', 'practice', 'output', 'review']
+    const remainingCount = loopComplete ? 0 : macFlowSteps.filter(step => missionStageIds.includes(step.id) && step.state !== 'done').length
+    const currentStepTitle = currentStep?.title || t('continueCurrentStep')
     const statusLabel = state => {
       if (state === 'done') return t('missionDone')
       if (state === 'current') return t('missionCurrent')
@@ -4395,20 +4425,9 @@ function App() {
             </button>)}
           </div>
           <button className="primary phoneMainAction" data-testid="continue-current-step" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>
-            {loopComplete ? t('nextLoop') : t('continueCurrentStep')}
+            {loopComplete ? t('nextLoop') : t('todayPrimaryAction', { step: currentStepTitle })}
           </button>
-        </section>
-        <section className="phoneActionCards">
-          <button className="phoneActionCard talk" onClick={() => openOutputMode('retell')}>
-            <strong>Free Talk</strong>
-            <span>{t('mobileQuickSpeak')}</span>
-            <b>{t('open')} →</b>
-          </button>
-          <button className="phoneActionCard review" onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); goToTab('review') }}>
-            <strong>{dueReview.length || activeCourse.reviewItems?.length || 0} {t('dueReview')}</strong>
-            <span>{t('mobileQuickReview')}</span>
-            <b>{t('startReview')} →</b>
-          </button>
+          <p className="phoneMainHint">{t('todayRemainingSteps', { count: remainingCount })}</p>
         </section>
       </div>
     }
@@ -4432,7 +4451,7 @@ function App() {
           <strong>{activeCourse.title}</strong>
           <span>{sourceLabel(activeCourse.sourceType)} · {audioLabel(activeCourse.audioMode)} · {activeCourse.level}</span>
         </div>
-        <button className="primary compact" data-testid="continue-current-step" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>{loopComplete ? t('nextLoop') : t('continueCurrentStep')}</button>
+        <button className="primary compact" data-testid="continue-current-step" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>{loopComplete ? t('nextLoop') : t('todayPrimaryAction', { step: currentStepTitle })}</button>
       </div>
       <div className="missionSteps">
         {missionSteps.map(step => {
@@ -4456,6 +4475,12 @@ function App() {
         <strong>{todayActivity.output}</strong><em>{t('outputDone')}</em>
         <strong>{todayActivity.review}</strong><em>{t('reviewDone')}</em>
       </div>
+      {!isPhoneView && <div className="missionTools">
+        <small>{t('todayRemainingSteps', { count: remainingCount })}</small>
+        <button className="secondary compact" onClick={() => setShowTodayDetails(value => !value)}>
+          {showTodayDetails ? t('hideSecondaryPanels') : t('showSecondaryPanels')}
+        </button>
+      </div>}
     </div>
   }
 
@@ -4669,9 +4694,9 @@ function App() {
           <p>{t('mobileGoal')}</p>
         </div>}
         {renderTodayMission()}
-        {renderMacCommandCenter()}
-        {renderMacStudyQueue()}
-        <div className="heroPanel">
+        {!isPhoneView && showTodayDetails && renderMacCommandCenter()}
+        {!isPhoneView && showTodayDetails && renderMacStudyQueue()}
+        {(!isPhoneView ? showTodayDetails : true) && <div className="heroPanel">
           <span>{t('continueLearning')}</span>
           <h2>{activeCourse?.title || t('chooseCourse')}</h2>
           <p>{activeCourse?.goal || t('firstCourseHint')}</p>
@@ -4702,19 +4727,19 @@ function App() {
           </div>
           {renderMobileStageRail()}
           {renderMacFlowPanel()}
-        </div>
-        <div className="summaryGrid">
+        </div>}
+        {(!isPhoneView ? showTodayDetails : true) && <div className="summaryGrid">
           <div><strong>{store.courses.length}</strong><span>{t('courses')}</span></div>
           <div><strong>{dueReview.length}</strong><span>{t('dueReview')}</span></div>
           <div><strong>{normalizeActivity(store.activity).streakDays}</strong><span>{t('studyStreak')} · {t('days')}</span></div>
-        </div>
-        <div className="activityStrip">
+        </div>}
+        {(!isPhoneView ? showTodayDetails : true) && <div className="activityStrip">
           <span>{t('todayDone')}</span>
           <strong>{todayActivity.practice}</strong><em>{t('practiceDone')}</em>
           <strong>{todayActivity.output}</strong><em>{t('outputDone')}</em>
           <strong>{todayActivity.review}</strong><em>{t('reviewDone')}</em>
-        </div>
-        <div className={`todayGrid ${isPhoneView ? 'phoneQuickGrid' : ''}`}>
+        </div>}
+        {(!isPhoneView ? showTodayDetails : true) && <div className={`todayGrid ${isPhoneView ? 'phoneQuickGrid' : ''}`}>
           <article>
             <span>{t('todayPractice')}</span>
             <strong>{todayPractice[0]?.promptCn || todayPractice[0]?.base || t('quickResponse')}</strong>
@@ -4733,8 +4758,8 @@ function App() {
             <p>{t('manageContentHint')}</p>
             <button className="secondary compact" onClick={() => { goToTab('library'); setLibrarySubtab('courses') }}>{t('openLibrary')}</button>
           </article>}
-        </div>
-        {!isPhoneView && <div className="recentCoursesPanel">
+        </div>}
+        {!isPhoneView && showTodayDetails && <div className="recentCoursesPanel">
           <div className="sectionTitleLine">
             <span>{t('recentCoursesTitle')}</span>
             <strong>{store.courses.length} {t('courses')}</strong>
@@ -5198,6 +5223,8 @@ function App() {
         {renderPracticeRoundPanel()}
         {currentPractice ? <PracticeCard
           item={currentPractice}
+          index={Math.min(activeIndex + 1, Math.max(practicePool.length, 1))}
+          total={Math.max(practicePool.length, 1)}
           typed={typed}
           setTyped={setTyped}
           answerShown={answerShown}
@@ -5475,15 +5502,69 @@ function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
   </div>
 }
 
-function PracticeCard({ item, typed, setTyped, answerShown, setAnswerShown, playText, onSaveReview, onNext, nextLabel, t }) {
-  const expected = String(item.answerEn || '').trim()
+function normalizeAnswerText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^\w\s']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function levenshteinDistance(a, b) {
+  const left = String(a || '')
+  const right = String(b || '')
+  if (!left) return right.length
+  if (!right) return left.length
+  const matrix = Array.from({ length: left.length + 1 }, () => Array(right.length + 1).fill(0))
+  for (let i = 0; i <= left.length; i += 1) matrix[i][0] = i
+  for (let j = 0; j <= right.length; j += 1) matrix[0][j] = j
+  for (let i = 1; i <= left.length; i += 1) {
+    for (let j = 1; j <= right.length; j += 1) {
+      const cost = left[i - 1] === right[j - 1] ? 0 : 1
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      )
+    }
+  }
+  return matrix[left.length][right.length]
+}
+
+function tokenOverlapScore(typedText, expectedText) {
+  const typedTokens = new Set(String(typedText || '').split(' ').filter(Boolean))
+  const expectedTokens = new Set(String(expectedText || '').split(' ').filter(Boolean))
+  if (!typedTokens.size || !expectedTokens.size) return 0
+  let matchCount = 0
+  expectedTokens.forEach(token => {
+    if (typedTokens.has(token)) matchCount += 1
+  })
+  return matchCount / expectedTokens.size
+}
+
+function evaluatePracticeAnswer(typed, expected) {
   const normalizedTyped = normalizeAnswerText(typed)
   const normalizedExpected = normalizeAnswerText(expected)
-  const isClose = !!normalizedTyped && !!normalizedExpected && (
-    normalizedTyped === normalizedExpected ||
-    normalizedExpected.includes(normalizedTyped) ||
-    normalizedTyped.includes(normalizedExpected)
-  )
+  if (!normalizedTyped) {
+    return { state: 'empty', tone: '', titleKey: 'practiceResultEmpty', bodyKey: 'practiceResultEmptyBody' }
+  }
+  if (!normalizedExpected) {
+    return { state: 'perfect', tone: 'correct', titleKey: 'practiceResultPerfect', bodyKey: 'practiceResultPerfectBody' }
+  }
+  if (normalizedTyped === normalizedExpected) {
+    return { state: 'perfect', tone: 'correct', titleKey: 'practiceResultPerfect', bodyKey: 'practiceResultPerfectBody' }
+  }
+  const distance = levenshteinDistance(normalizedTyped, normalizedExpected)
+  const similarity = 1 - (distance / Math.max(normalizedExpected.length, normalizedTyped.length, 1))
+  const overlap = tokenOverlapScore(normalizedTyped, normalizedExpected)
+  if (similarity >= 0.82 || overlap >= 0.7 || normalizedExpected.includes(normalizedTyped) || normalizedTyped.includes(normalizedExpected)) {
+    return { state: 'close', tone: 'correct', titleKey: 'practiceResultClose', bodyKey: 'practiceResultCloseBody' }
+  }
+  return { state: 'retry', tone: 'wrong', titleKey: 'practiceResultRetry', bodyKey: 'practiceResultRetryBody' }
+}
+
+function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAnswerShown, playText, onSaveReview, onNext, nextLabel, t }) {
+  const expected = String(item.answerEn || '').trim()
   const prompt = item.type === 'replacement'
     ? item.replacement || item.promptCn || item.base
     : item.promptCn || item.hint || item.base || expected
@@ -5492,9 +5573,13 @@ function PracticeCard({ item, typed, setTyped, answerShown, setAnswerShown, play
     : item.type === 'replacement'
       ? t('replacement')
       : t('quickResponse')
+  const result = evaluatePracticeAnswer(typed, expected)
 
   return <div className={`practiceCard controlledPracticeCard practice-${item.type}`}>
-    <span>{supportLabel}</span>
+    <div className="practiceMetaRow">
+      <span>{supportLabel}</span>
+      <small>{t('practiceProgressLabel')}: {index}/{total}</small>
+    </div>
     <h2>{prompt}</h2>
     {item.type === 'replacement' && <div className="practiceSupportGrid">
       <div><small>{t('originalLine')}</small><strong>{item.base}</strong></div>
@@ -5505,8 +5590,9 @@ function PracticeCard({ item, typed, setTyped, answerShown, setAnswerShown, play
       <span>{t('yourAnswer')}</span>
       <textarea value={typed} onChange={event => setTyped(event.target.value)} placeholder={expected || t('answerPlaceholder')} />
     </label>
-    {answerShown && <div className={`answerBox ${isClose ? 'correct' : normalizedTyped ? 'wrong' : ''}`}>
-      <small>{isClose ? t('practiceMatched') : t('practiceTryAgain')}</small>
+    {answerShown && <div className={`answerBox ${result.tone}`}>
+      <small>{t(result.titleKey)}</small>
+      <p>{t(result.bodyKey)}</p>
       <button className="playableAnswer" onClick={() => playText(expected)}>{expected}</button>
     </div>}
     <div className="actionRow">
@@ -5516,14 +5602,6 @@ function PracticeCard({ item, typed, setTyped, answerShown, setAnswerShown, play
       <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
     </div>
   </div>
-}
-
-function normalizeAnswerText(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/[^\w\s']/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
 }
 
 function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, requestFreeTalkReply, getPauseSeconds, onSaveReview, onMarkStuck, onNext, nextLabel, t }) {

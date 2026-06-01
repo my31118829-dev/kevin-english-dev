@@ -612,6 +612,21 @@ p{
   font-weight:760;
 }
 
+.missionTools{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  border-top:1px dashed #e6dece;
+  padding-top:12px;
+}
+
+.missionTools small{
+  color:#7a7468;
+  font-size:12px;
+  font-weight:700;
+}
+
 .phoneTodayStack{
   display:none;
 }
@@ -723,6 +738,14 @@ p{
   min-height:64px;
   border-radius:20px;
   font-size:20px;
+}
+
+.phoneMainHint{
+  margin:0;
+  color:#7a7468;
+  font-size:13px;
+  font-weight:700;
+  text-align:center;
 }
 
 .phoneActionCards{
@@ -3363,8 +3386,21 @@ textarea{
   border-color:#eadfce;
 }
 
-.controlledPracticeCard>span{
+.practiceMetaRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.practiceMetaRow>span{
   color:#6b5b35;
+}
+
+.practiceMetaRow>small{
+  color:#7a7468;
+  font-size:12px;
+  font-weight:760;
 }
 
 .practiceSupportGrid{
@@ -3418,6 +3454,14 @@ textarea{
 
 .controlledPracticeCard .answerBox{
   margin:0;
+}
+
+.controlledPracticeCard .answerBox p{
+  margin:2px 0 10px;
+  color:inherit;
+  font-size:14px;
+  line-height:1.4;
+  font-weight:640;
 }
 
 .controlledPracticeCard .answerBox .playableAnswer{
