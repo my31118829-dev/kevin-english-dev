@@ -1,5 +1,5 @@
-const APP_CACHE = 'ke-dev-app-v3923'
-const RUNTIME_CACHE = 'ke-dev-runtime-v3923'
+const APP_CACHE = 'ke-dev-app-v3924'
+const RUNTIME_CACHE = 'ke-dev-runtime-v3924'
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', event => {
