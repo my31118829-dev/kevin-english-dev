@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3924'
-const SETTINGS_KEY = 'ke_dev_settings_v3924'
-const APP_VERSION = '3.9.24'
+const STORE_KEY = 'ke_dev_store_v3950'
+const SETTINGS_KEY = 'ke_dev_settings_v3950'
+const TAB_KEY = 'ke_dev_tab_v3950'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3950'
+const APP_VERSION = '3.9.50'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -37,10 +39,19 @@ function resolvePhoneViewByWidth(width) {
 const NAV_ITEMS = [
   { id: 'today', labelKey: 'nav.today', hintKey: 'navHint.today', phoneLabelKey: 'nav.today', phoneHintKey: 'navHint.phone.today', showOnPhone: true, showOnMac: true },
   { id: 'learn', labelKey: 'nav.study', hintKey: 'navHint.study', phoneLabelKey: 'nav.listen', phoneHintKey: 'navHint.phone.listen', showOnPhone: true, showOnMac: true },
+  { id: 'practice', labelKey: 'nav.practice', hintKey: 'navHint.practice', showOnPhone: false, showOnMac: true },
   { id: 'output', labelKey: 'nav.speak', hintKey: 'navHint.speak', phoneLabelKey: 'nav.speak', phoneHintKey: 'navHint.phone.speak', showOnPhone: true, showOnMac: true },
   { id: 'review', labelKey: 'nav.review', hintKey: 'navHint.review', phoneLabelKey: 'nav.review', phoneHintKey: 'navHint.phone.review', showOnPhone: true, showOnMac: true },
-  { id: 'library', labelKey: 'nav.library', hintKey: 'navHint.library', showOnPhone: false, showOnMac: false }
+  { id: 'library', labelKey: 'nav.library', hintKey: 'navHint.library', showOnPhone: false, showOnMac: true }
 ]
+
+function isValidTabId(tabId) {
+  return NAV_ITEMS.some(item => item.id === tabId)
+}
+
+function normalizeOutputMode(mode) {
+  return ['guided', 'rolePlay', 'retell'].includes(mode) ? mode : 'guided'
+}
 
 const UI_TEXT = {
   en: {
@@ -49,6 +60,7 @@ const UI_TEXT = {
     'nav.learn': 'Learn',
     'nav.listen': 'Listen',
     'nav.study': 'Study',
+    'nav.practice': 'Practice',
     'nav.drills': 'Drills',
     'nav.output': 'Speak',
     'nav.speak': 'Speak',
@@ -71,6 +83,7 @@ const UI_TEXT = {
     'title.learn': 'Learn Input',
     'title.study': 'Study Workspace',
     'title.listen': 'Listen',
+    'title.practice': 'Practice',
     'title.output': 'Speak',
     'title.speak': 'Speak',
     'title.review': 'Review Memory',
@@ -96,7 +109,7 @@ const UI_TEXT = {
     'quickResponse': 'Quick Speak',
     'practiceSuggested': '{count} suggested speaking prompts from the current course.',
     'noPracticeQueued': 'No speaking prompts queued yet.',
-    'startPractice': 'Start Speak',
+    'startPractice': 'Start Practice',
     'todayReview': 'Today Review',
     'reviewMemory': 'Review Memory',
     'reviewReady': '{count} chunks, useful sentences, and weak items are ready today.',
@@ -115,6 +128,7 @@ const UI_TEXT = {
     'studyWorkspace': 'Study Workspace',
     'studyWorkspaceHint': 'A deeper MacBook workspace for focused learning.',
     'listenAction': 'Listen',
+    'practiceAction': 'Practice',
     'speakAction': 'Speak',
     'reviewAction': 'Review',
     'courseLibrary': 'Course Library',
@@ -221,9 +235,11 @@ const UI_TEXT = {
     'hideQueue': 'Hide Queue',
     'showAnswer': 'Show Answer',
     'again': 'Again',
+    'hard': 'Hard',
     'good': 'Good',
     'check': 'Check',
     'next': 'Next',
+    'hide': 'Hide',
     'open': 'Open',
     'continue': 'Continue',
     'progress': 'progress',
@@ -258,6 +274,114 @@ const UI_TEXT = {
     'outputDone': 'Output',
     'speakTasks': 'Speak tasks',
     'reviewDone': 'Review',
+    'mobileGreeting': 'Good to see you, {name}',
+    'mobileGoal': 'Listen first, speak next, review before you forget.',
+    'mobileStageHint.listen': 'Listen + shadow',
+    'mobileStageHint.speak': 'Guided + role-play',
+    'mobileStageHint.review': 'Chunks + sentences',
+    'mobileQuickSpeak': 'Start a short speaking round',
+    'mobileQuickReview': 'Review due chunks',
+    'todayHeroKicker': 'Today loop',
+    'todayHeroTitle': 'Listen, speak, review. One small loop.',
+    'todayHeroBody': 'Start with the current course. The app will guide you through the next step.',
+    'todayMissionTitle': 'Your next learning loop',
+    'todayMissionBody': 'One course, three simple actions. Finish the loop first; explore tools later.',
+    'todayCompleteTitle': 'Today loop complete',
+    'todayCompleteBody': 'Nice. You listened, spoke, and reviewed. Start a fresh loop when you are ready.',
+    'todayCompleteBadge': 'Complete',
+    'nextLoop': 'Start Next Loop',
+    'todayMissionStats': 'Today',
+    'missionReady': 'Ready',
+    'missionCurrent': 'Now',
+    'missionDone': 'Done',
+    'missionNext': 'Next',
+    'missionCourseEmpty': 'No course yet',
+    'missionCourseEmptyBody': 'Import on Mac first, then iPhone becomes your daily trainer.',
+    'enterStep': 'Open',
+    'importOnMac': 'Import on Mac',
+    'continueCurrentStep': 'Continue Current Step',
+    'importedOpenListen': 'Imported. Starting from Listen.',
+    'listenDoneMessage': 'Listening loop done. Now speak with the same course.',
+    'listenDonePracticeMessage': 'Listening loop done. Now turn the sentences into your own reflexes.',
+    'practiceDoneMessage': 'Practice done. Now speak with the same course.',
+    'outputDoneMessage': 'Speaking loop done. Review what matters now.',
+    'finishListen': 'Finish Listen',
+    'finishPractice': 'Finish Practice',
+    'finishSpeaking': 'Finish Speaking',
+    'completeAndSpeak': 'Complete and Speak',
+    'nextPracticeTask': 'Next Practice Task',
+    'completeAndReview': 'Complete and Review',
+    'nextSpeakingTask': 'Next Speaking Task',
+    'noReviewAfterSpeak': 'No review due yet. Save useful sentences or stuck answers while speaking.',
+    'reviewSessionDone': 'Review loop done. Back to Today.',
+    'macCommandTitle': 'Mac Study Desk',
+    'macCommandBody': 'Use Mac for the full course: import, inspect content, and push one course through the loop.',
+    'recommendedNext': 'Recommended next',
+    'studyQueueTitle': 'Study queue',
+    'studyQueueBody': 'One course should always have a clear next step.',
+    'queueCurrent': 'Current course',
+    'queueCurrentBody': 'Pick up where you stopped and continue the loop.',
+    'queueReview': 'Due review',
+    'queueReviewBody': 'Clear weak items before they pile up.',
+    'queueImport': 'Import route',
+    'queueImportBody': 'Add a textbook audio file or a generated pack.',
+    'queueOpenCurrent': 'Open current step',
+    'queueGoReview': 'Go to review',
+    'queueOpenLibrary': 'Open Library',
+    'contentHealth': 'Content health',
+    'contentHealthBody': '{lines} lines · {tasks} speaking tasks · {reviews} review cards',
+    'reviewPressure': 'Review pressure',
+    'courseProgress': 'Course progress',
+    'openCurrentStep': 'Open Current Step',
+    'manageLibrary': 'Manage Library',
+    'clearReviewFirst': 'Clear Review First',
+    'recentCoursesTitle': 'Recent courses',
+    'reviewEmptyTitle': 'Nothing due right now',
+    'reviewEmptyBody': 'Keep the loop moving: listen again, speak once, or return to Today.',
+    'backToToday': 'Back to Today',
+    'reviewRoundTitle': 'Review round',
+    'reviewRoundBody': '{remaining} cards left in this section. Finish the round, then return to Today.',
+    'reviewRoundDoneSoon': 'Last card in this section.',
+    'reviewFocusTitle': 'Recall first',
+    'reviewFocusBody': 'Look at the Chinese, say the English in your head, then reveal the answer.',
+    'listenRoundTitle': 'Listening round',
+    'listenRoundBody': 'Line {current} of {total}. Listen, shadow, then go to the next line.',
+    'listenRoundLast': 'Last listening line. Finish it, then speak.',
+    'practiceRoundTitle': 'Practice round',
+    'practiceRoundBody': 'Task {current} of {total}. Make the sentence fast before you start speaking.',
+    'practiceRoundLast': 'Last practice task. Finish it, then speak.',
+    'practiceTaskTitle': 'Make it automatic',
+    'practiceTaskBody': 'Type, replace, and quick-answer with the same language before open speaking.',
+    'practicePrompt': 'Prompt',
+    'practiceAnswer': 'Model Answer',
+    'checkAnswer': 'Check Answer',
+    'noPracticeTasks': 'No practice tasks yet.',
+    'practiceMatched': 'Looks close. Say it once out loud.',
+    'practiceTryAgain': 'Not quite yet. Compare the model answer and try again.',
+    'yourAnswer': 'Your answer',
+    'nextListenLine': 'Next Line',
+    'speakRoundTitle': 'Speaking round',
+    'speakRoundBody': 'Task {current} of {total}. Finish the round, then review useful sentences.',
+    'speakRoundLast': 'Last speaking task. Complete it, then review.',
+    'currentMode': 'Current mode',
+    'startListeningNow': 'Start Listening',
+    'startSpeakingNow': 'Start Speaking',
+    'learningPathTitle': 'Your path',
+    'pathListenTitle': 'Listen',
+    'pathListenBody': 'Hear one line, shadow it, then move on.',
+    'pathSpeakTitle': 'Speak',
+    'pathSpeakBody': 'Use prompts, role-play, or Free Talk.',
+    'pathReviewTitle': 'Review',
+    'pathReviewBody': 'Recall chunks and useful sentences.',
+    'pageTask': 'What to do here',
+    'listenTaskTitle': 'Listen first',
+    'listenTaskBody': 'Tap Play. Listen to one sentence, repeat it aloud, then go to the next sentence.',
+    'speakTaskTitle': 'Now say it',
+    'speakTaskBody': 'Choose one mode. Use short answers first, then role-play or Free Talk.',
+    'reviewTaskTitle': 'Remember it',
+    'reviewTaskBody': 'Look at the prompt, recall the English, then rate the card.',
+    'mainAction': 'Main action',
+    'secondaryAction': 'Next step',
     'close': 'Close',
     'uiLanguage': 'Interface Language',
     'uiEnglish': 'English',
@@ -298,6 +422,17 @@ const UI_TEXT = {
     'missingFields': 'Missing Fields',
     'warnings': 'Warnings',
     'retellPlaceholder': 'Speak freely in this scenario...',
+    'freeTalkStart': 'Start AI Talk',
+    'freeTalkSend': 'Send',
+    'freeTalkYou': 'You',
+    'freeTalkAi': 'AI Partner',
+    'freeTalkInput': 'Type what you would say...',
+    'freeTalkThinking': 'AI is listening...',
+    'freeTalkOpening': 'What would you say first?',
+    'freeTalkHint': 'Hint',
+    'freeTalkFeedback': 'Feedback',
+    'freeTalkFallback': 'Local fallback is on. Add an OpenAI key for smarter replies.',
+    'saveSuggested': 'Save Suggested Sentence',
     'answerPlaceholder': 'Type your answer here...',
     'accountSettings': 'Accounts',
     'accountName': 'Name',
@@ -317,7 +452,61 @@ const UI_TEXT = {
     'markStuck': 'Mark Stuck',
     'addedWeak': 'Added to Weak / Stuck review.',
     'addedStuck': 'Output prompt added to Weak / Stuck review.',
-    'weakPriority': '{count} weak or stuck items need attention.'
+    'weakPriority': '{count} weak or stuck items need attention.',
+    'macFlowTitle': 'Full Course Flow',
+    'macFlowHint': 'Keep one course moving through listening, speaking, and review.',
+    'flowStep.listen': 'Listen',
+    'flowStep.practice': 'Practice',
+    'flowStep.speak': 'Speak',
+    'flowStep.review': 'Review',
+    'flowState.done': 'Done',
+    'flowState.current': 'Current',
+    'flowState.next': 'Next',
+    'flowState.ready': 'Ready',
+    'continueToSpeak': 'Continue to Speak',
+    'continueToReview': 'Continue to Review',
+    'rewriteTitle': 'Textbook AI Rewrite',
+    'rewriteHint': 'Keep the textbook original audio separate, then save a Kevin Melbourne version as Generated Audio.',
+    'originalVersion': 'Original Textbook',
+    'kevinVersion': 'Kevin Melbourne Version',
+    'useKevinVersion': 'Use This Version',
+    'openKevinVersion': 'Open Kevin Version',
+    'generatingRewrite': 'Generating...',
+    'rewriteSaved': 'Kevin generated version saved. Opening Role-play now.',
+    'rewriteFallback': 'AI rewrite is unavailable, so a local Kevin version was saved instead.',
+    'rewriteOnlyTextbook': 'Only textbook original-audio courses use this rewrite step.',
+    'recordingOff': 'Recording Off',
+    'recordingOn': 'Recording On',
+    'yourTurn': 'Your turn',
+    'partnerTurn': 'Partner line',
+    'startRolePlay': 'Start Role-play',
+    'pauseAuto': 'Auto pause {seconds}s',
+    'thinkFirst': 'Recall the English before showing the answer.',
+    'cardProgress': 'Card {current} of {total}',
+    'sourceLabel': 'Source',
+    'nextDue': 'Next due',
+    'libraryFlowTitle': 'Import Flow',
+    'libraryFlowHint': 'Import once, then the app opens the course directly for listening and speaking.',
+    'importGuideAudioTitle': 'Original textbook audio',
+    'importGuideAudioBody': 'Keep the uploaded MP3 as the source audio. The app only adds subtitles, speaking tasks, and review cards.',
+    'importGuideTextTitle': 'Generated content pack',
+    'importGuideTextBody': 'Paste a ChatGPT pack or topic pack. The app treats it as generated audio content and prepares speaking practice directly.',
+    'originalAudioRule': 'Original audio stays original',
+    'generatedAudioRule': 'Generated packs use TTS',
+    'importCreatesListen': 'Listen page',
+    'importCreatesSpeak': 'Speaking tasks',
+    'importCreatesReview': 'Review queue',
+    'importAfterSave': 'After saving, the app opens Listen automatically.',
+    'importSuccessTitle': 'Course ready',
+    'importSuccessBody': 'Start with listening. The same course already has speaking and review work waiting behind it.',
+    'startFirstLine': 'Start first line',
+    'importConfirmTitle': 'Import check',
+    'importConfirmHint': 'Confirm the route before adding it to your course list.',
+    'importRouteListen': 'Opens in Listen',
+    'importRouteSpeak': 'Speak tasks ready',
+    'importRouteReview': 'Review cards queued',
+    'confirmImport': 'Confirm Import',
+    'savedReviewInline': 'Saved to Review'
   },
   zh: {
     'nav.today': '今日',
@@ -325,6 +514,7 @@ const UI_TEXT = {
     'nav.learn': '输入',
     'nav.listen': '听',
     'nav.study': '学习',
+    'nav.practice': '内化',
     'nav.drills': '练习',
     'nav.output': '开口',
     'nav.speak': '说',
@@ -347,6 +537,7 @@ const UI_TEXT = {
     'title.learn': '输入理解',
     'title.study': '深度学习工作台',
     'title.listen': '听与跟读',
+    'title.practice': '内化练习',
     'title.output': '开口训练',
     'title.speak': '开口训练',
     'title.review': '长期复习',
@@ -372,7 +563,7 @@ const UI_TEXT = {
     'quickResponse': '快速开口',
     'practiceSuggested': '当前课程建议开口 {count} 项。',
     'noPracticeQueued': '暂无开口任务。',
-    'startPractice': '开始开口',
+    'startPractice': '开始练习',
     'todayReview': '今日复习',
     'reviewMemory': '复习记忆',
     'reviewReady': '今天有 {count} 个语块、实用句和易错内容需要复习。',
@@ -391,6 +582,7 @@ const UI_TEXT = {
     'studyWorkspace': '深度学习工作台',
     'studyWorkspaceHint': '适合 MacBook 上长时间专注学习。',
     'listenAction': '听',
+    'practiceAction': '练',
     'speakAction': '说',
     'reviewAction': '复习',
     'courseLibrary': '课程内容库',
@@ -434,7 +626,7 @@ const UI_TEXT = {
     'addPractice': '加入练习',
     'addReview': '加入复习',
     'saveReview': '收藏复习',
-    'saveShort': '收',
+    'saveShort': '收藏',
     'starShort': '☆',
     'toolShort': '工具',
     'understand': '助解',
@@ -497,9 +689,11 @@ const UI_TEXT = {
     'hideQueue': '收起队列',
     'showAnswer': '显示答案',
     'again': '再来',
+    'hard': '有点难',
     'good': '记住了',
     'check': '检查',
     'next': '下一个',
+    'hide': '收起',
     'open': '打开',
     'continue': '继续',
     'progress': '进度',
@@ -534,6 +728,114 @@ const UI_TEXT = {
     'outputDone': '输出',
     'speakTasks': '开口任务',
     'reviewDone': '复习',
+    'mobileGreeting': '{name}，今天继续一点点',
+    'mobileGoal': '先听懂，再开口，最后复习记住。',
+    'mobileStageHint.listen': '精听 + 跟读',
+    'mobileStageHint.speak': '提示 + 角色扮演',
+    'mobileStageHint.review': '语块 + 句子',
+    'mobileQuickSpeak': '开始一轮短开口',
+    'mobileQuickReview': '复习到期语块',
+    'todayHeroKicker': '今日闭环',
+    'todayHeroTitle': '先听懂，再开口，最后复习。',
+    'todayHeroBody': '从当前课程开始，按顺序完成一个小闭环，不需要先理解所有功能。',
+    'todayMissionTitle': '下一轮学习任务',
+    'todayMissionBody': '一门课程，三个动作。先完成闭环，再看其他工具。',
+    'todayCompleteTitle': '今日闭环已完成',
+    'todayCompleteBody': '很好。你已经完成听、说、复习，可以结束今天，也可以开始下一轮。',
+    'todayCompleteBadge': '已完成',
+    'nextLoop': '开始下一轮',
+    'todayMissionStats': '今日',
+    'missionReady': '可开始',
+    'missionCurrent': '现在做',
+    'missionDone': '已完成',
+    'missionNext': '下一步',
+    'missionCourseEmpty': '还没有课程',
+    'missionCourseEmptyBody': '先在 Mac 导入课程，手机就只负责每天听、说、复习。',
+    'enterStep': '进入',
+    'importOnMac': '去 Mac 导入',
+    'continueCurrentStep': '继续当前步骤',
+    'importedOpenListen': '已导入，现在从听开始。',
+    'listenDoneMessage': '听力这一轮完成，现在用同一门课开口。',
+    'listenDonePracticeMessage': '听力这一轮完成，现在先把句子练成反应。',
+    'practiceDoneMessage': '内化练习完成，现在用同一门课开口。',
+    'outputDoneMessage': '开口这一轮完成，现在复习真正要记住的内容。',
+    'finishListen': '完成听',
+    'finishPractice': '完成练习',
+    'finishSpeaking': '完成开口',
+    'completeAndSpeak': '完成并去说',
+    'nextPracticeTask': '下一个练习',
+    'completeAndReview': '完成并复习',
+    'nextSpeakingTask': '下一个开口任务',
+    'noReviewAfterSpeak': '暂时没有到期复习。开口时保存好句或卡壳内容后，这里会出现。',
+    'reviewSessionDone': '复习闭环完成，回到今日页。',
+    'macCommandTitle': 'Mac 学习工作台',
+    'macCommandBody': 'Mac 负责完整课程：导入、检查内容，并把一门课推进完整闭环。',
+    'recommendedNext': '推荐下一步',
+    'studyQueueTitle': '学习队列',
+    'studyQueueBody': '一门课应该始终有明确的下一步。',
+    'queueCurrent': '当前课程',
+    'queueCurrentBody': '从上次停下的地方继续学习闭环。',
+    'queueReview': '到期复习',
+    'queueReviewBody': '先处理弱项，避免越积越多。',
+    'queueImport': '导入路径',
+    'queueImportBody': '新增教材音频或生成内容包。',
+    'queueOpenCurrent': '打开当前步骤',
+    'queueGoReview': '去复习',
+    'queueOpenLibrary': '打开内容库',
+    'contentHealth': '内容状态',
+    'contentHealthBody': '{lines} 句 · {tasks} 个开口任务 · {reviews} 张复习卡',
+    'reviewPressure': '复习压力',
+    'courseProgress': '课程进度',
+    'openCurrentStep': '打开当前步骤',
+    'manageLibrary': '管理课程库',
+    'clearReviewFirst': '先清复习',
+    'recentCoursesTitle': '最近课程',
+    'reviewEmptyTitle': '现在没有要复习的内容',
+    'reviewEmptyBody': '继续保持闭环：可以回到今日、再听一轮，或者去开口。',
+    'backToToday': '回到今日',
+    'reviewRoundTitle': '本轮复习',
+    'reviewRoundBody': '这个模块还剩 {remaining} 张。完成本轮后会回到今日页。',
+    'reviewRoundDoneSoon': '这是这个模块的最后一张。',
+    'reviewFocusTitle': '先回忆',
+    'reviewFocusBody': '看中文，先在脑子里说出英文，再显示答案。',
+    'listenRoundTitle': '本轮听力',
+    'listenRoundBody': '第 {current} / {total} 句。听一句，跟读一句，再到下一句。',
+    'listenRoundLast': '这是最后一句，完成后进入开口。',
+    'practiceRoundTitle': '本轮内化',
+    'practiceRoundBody': '第 {current} / {total} 个任务。先练快，再开口。',
+    'practiceRoundLast': '这是最后一个内化任务，完成后进入开口。',
+    'practiceTaskTitle': '把句子练成反应',
+    'practiceTaskBody': '先快速回答、打字、替换，再进入真正开口。',
+    'practicePrompt': '提示',
+    'practiceAnswer': '参考答案',
+    'checkAnswer': '检查答案',
+    'noPracticeTasks': '暂无内化练习。',
+    'practiceMatched': '基本接近。现在大声说一遍。',
+    'practiceTryAgain': '还不太像。对照参考答案再来一次。',
+    'yourAnswer': '你的答案',
+    'nextListenLine': '下一句',
+    'speakRoundTitle': '本轮开口',
+    'speakRoundBody': '第 {current} / {total} 个任务。完成本轮后进入复习。',
+    'speakRoundLast': '这是最后一个开口任务，完成后进入复习。',
+    'currentMode': '当前模式',
+    'startListeningNow': '开始听',
+    'startSpeakingNow': '开始说',
+    'learningPathTitle': '学习路线',
+    'pathListenTitle': '听',
+    'pathListenBody': '听一句，跟读一句，再进入下一句。',
+    'pathSpeakTitle': '说',
+    'pathSpeakBody': '先按提示回答，再角色扮演或自由对话。',
+    'pathReviewTitle': '复习',
+    'pathReviewBody': '先回忆英文，再看答案并评分。',
+    'pageTask': '这一页做什么',
+    'listenTaskTitle': '先听懂',
+    'listenTaskBody': '点播放，听一句，跟着说一句，然后点下一句。',
+    'speakTaskTitle': '现在开口',
+    'speakTaskBody': '选择一种模式。先短回答，再进入角色扮演或自由对话。',
+    'reviewTaskTitle': '把它记住',
+    'reviewTaskBody': '看提示，先回忆英文，再显示答案并评分。',
+    'mainAction': '主要操作',
+    'secondaryAction': '下一步',
     'close': '关闭',
     'uiLanguage': '界面语言',
     'uiEnglish': '英文',
@@ -574,6 +876,17 @@ const UI_TEXT = {
     'missingFields': '缺少字段',
     'warnings': '提醒',
     'retellPlaceholder': '围绕当前场景自由开口...',
+    'freeTalkStart': '开始 AI 对话',
+    'freeTalkSend': '发送',
+    'freeTalkYou': '你',
+    'freeTalkAi': 'AI 搭档',
+    'freeTalkInput': '输入你想说的话...',
+    'freeTalkThinking': 'AI 正在听...',
+    'freeTalkOpening': 'What would you say first?',
+    'freeTalkHint': '提示',
+    'freeTalkFeedback': '反馈',
+    'freeTalkFallback': '当前使用本地兜底回复。设置 OpenAI Key 后会更智能。',
+    'saveSuggested': '保存建议句',
     'answerPlaceholder': '在这里输入你的回答...',
     'accountSettings': '账户',
     'accountName': '名字',
@@ -593,7 +906,61 @@ const UI_TEXT = {
     'markStuck': '标记卡壳',
     'addedWeak': '已加入易错 / 卡壳复习。',
     'addedStuck': '输出卡壳已加入复习。',
-    'weakPriority': '{count} 个易错 / 卡壳内容需要优先处理。'
+    'weakPriority': '{count} 个易错 / 卡壳内容需要优先处理。',
+    'macFlowTitle': '完整课程流程',
+    'macFlowHint': '让一门课程连续走完：听懂、开口、复习。',
+    'flowStep.listen': '听',
+    'flowStep.practice': '练',
+    'flowStep.speak': '说',
+    'flowStep.review': '复习',
+    'flowState.done': '已完成',
+    'flowState.current': '当前',
+    'flowState.next': '下一步',
+    'flowState.ready': '可开始',
+    'continueToSpeak': '继续去说',
+    'continueToReview': '继续去复习',
+    'rewriteTitle': '教材音频 AI 改写',
+    'rewriteHint': '教材原音频独立保留，Kevin 墨尔本版另存为生成音频。',
+    'originalVersion': '教材原版',
+    'kevinVersion': 'Kevin 墨尔本版',
+    'useKevinVersion': '使用这个版本',
+    'openKevinVersion': '打开 Kevin 版',
+    'generatingRewrite': '生成中...',
+    'rewriteSaved': 'Kevin 生成版已保存，正在进入角色扮演。',
+    'rewriteFallback': 'AI 改写暂时不可用，已用本地 Kevin 版本保存。',
+    'rewriteOnlyTextbook': '只有教材原音频课程需要走这个改写步骤。',
+    'recordingOff': '录音关闭',
+    'recordingOn': '录音开启',
+    'yourTurn': '轮到你说',
+    'partnerTurn': '对方台词',
+    'startRolePlay': '开始角色扮演',
+    'pauseAuto': '自动停顿 {seconds} 秒',
+    'thinkFirst': '先根据中文回忆英文，再显示答案。',
+    'cardProgress': '第 {current} / {total} 张',
+    'sourceLabel': '来源',
+    'nextDue': '下次复习',
+    'libraryFlowTitle': '导入流程',
+    'libraryFlowHint': '导入后直接进入课程，开始听和说，不回到复杂管理页。',
+    'importGuideAudioTitle': '教材原音频',
+    'importGuideAudioBody': '上传的 MP3 保持为原音频。系统只生成字幕、开口任务和复习卡，不用 TTS 替换原音频。',
+    'importGuideTextTitle': '生成内容包',
+    'importGuideTextBody': '粘贴 ChatGPT 内容包或主题包。系统按生成音频内容处理，并直接准备开口练习。',
+    'originalAudioRule': '原音频保持原音频',
+    'generatedAudioRule': '生成内容使用 TTS',
+    'importCreatesListen': '听力页',
+    'importCreatesSpeak': '开口任务',
+    'importCreatesReview': '复习队列',
+    'importAfterSave': '保存后会自动进入听力页。',
+    'importSuccessTitle': '课程已准备好',
+    'importSuccessBody': '先从听开始。同一门课的开口任务和复习内容已经在后面排好。',
+    'startFirstLine': '开始第一句',
+    'importConfirmTitle': '导入前确认',
+    'importConfirmHint': '先确认内容路线，再加入课程列表。',
+    'importRouteListen': '导入后进入听',
+    'importRouteSpeak': '开口任务已生成',
+    'importRouteReview': '复习卡已排队',
+    'confirmImport': '确认导入',
+    'savedReviewInline': '已保存到复习'
   }
 }
 
@@ -1132,7 +1499,7 @@ const defaultSettings = {
   pauseSeconds: 'auto',
   playbackSpeed: 1,
   fontScale: 'comfortable',
-  uiLanguage: 'en'
+  uiLanguage: 'zh'
 }
 
 function uid(prefix = 'id') {
@@ -2153,6 +2520,135 @@ function buildTrainingFromTranscript(courseId, title, lines = []) {
   return { audioType, languageItems, practiceItems, outputTasks, reviewItems }
 }
 
+function melbourneRewriteText(text = '') {
+  const replacements = [
+    [/\b(Great Britain|Britain|the UK|UK)\b/gi, 'Melbourne'],
+    [/\bBritish\b/gi, 'Australian'],
+    [/\bBBC\b/g, 'local library'],
+    [/\bpubs?\b/gi, 'local cafes'],
+    [/\bIndian food\b/gi, 'multicultural food'],
+    [/\bgardens\b/gi, 'parks and gardens'],
+    [/\bin the UK\b/gi, 'in Melbourne'],
+    [/\blive in Melbourne\b/gi, 'live in Melbourne']
+  ]
+  let next = String(text || '').trim()
+  replacements.forEach(([pattern, value]) => {
+    next = next.replace(pattern, value)
+  })
+  next = next.replace(/\s+/g, ' ').trim()
+  if (/^people from all over the world/i.test(next) && !/Melbourne/i.test(next)) {
+    next = next.replace(/\.$/, '') + ' in Melbourne.'
+  }
+  if (/^English is international/i.test(next)) return 'English is important in Melbourne, but sometimes it is difficult for me.'
+  if (/^I wear what I want/i.test(next)) return 'I can live my own life here. I feel more relaxed in Melbourne.'
+  return next
+}
+
+function normalizeRewriteDialogue(dialogue = [], userName = 'Kevin') {
+  return (Array.isArray(dialogue) ? dialogue : [])
+    .map((line, index) => ({
+      id: uid('line'),
+      speaker: String(line?.speaker || (index % 2 ? userName : 'Neighbour')).trim(),
+      en: String(line?.en || '').trim(),
+      cn: String(line?.cn || '').trim(),
+      aligned: true,
+      order: index + 1
+    }))
+    .filter(line => line.en)
+}
+
+function normalizeRewritePairs(pairs = [], fallbackPairs = []) {
+  const fallbackByOriginal = new Map(fallbackPairs.map(pair => [String(pair.original || '').trim().toLowerCase(), pair]))
+  return (Array.isArray(pairs) ? pairs : [])
+    .map(pair => {
+      const original = String(pair?.original || '').trim()
+      const fallback = fallbackByOriginal.get(original.toLowerCase()) || fallbackPairs.find(row => row.originalLineId === pair?.originalLineId) || {}
+      return {
+        originalLineId: String(pair?.originalLineId || fallback.originalLineId || ''),
+        original: original || fallback.original || '',
+        originalCn: String(pair?.originalCn || fallback.originalCn || '').trim(),
+        rewritten: String(pair?.rewritten || fallback.rewritten || '').trim(),
+        rewrittenCn: String(pair?.rewrittenCn || fallback.rewrittenCn || '').trim()
+      }
+    })
+    .filter(pair => pair.original && pair.rewritten)
+}
+
+function buildKevinRewriteDraft(course) {
+  const originalLines = (course?.transcriptLines || []).filter(line => line.en).slice(0, 8)
+  const pairs = originalLines.map(line => ({
+    originalLineId: line.id,
+    original: line.en,
+    originalCn: line.cn || '',
+    rewritten: melbourneRewriteText(line.en),
+    rewrittenCn: line.cn || ''
+  })).filter(pair => pair.rewritten)
+  const dialogue = []
+  pairs.forEach((pair, index) => {
+    if (index === 0) {
+      dialogue.push({ id: uid('line'), speaker: 'Neighbour', en: 'What do you like about living in Melbourne?', cn: '你喜欢住在墨尔本的什么？', aligned: true, order: dialogue.length + 1 })
+    } else if (index % 2 === 0) {
+      dialogue.push({ id: uid('line'), speaker: 'Neighbour', en: index === 2 ? 'Why do you like it?' : 'What else is important for you?', cn: index === 2 ? '你为什么喜欢它？' : '还有什么对你重要？', aligned: true, order: dialogue.length + 1 })
+    }
+    dialogue.push({
+      id: uid('line'),
+      speaker: 'Kevin',
+      en: pair.rewritten,
+      cn: pair.rewrittenCn,
+      aligned: true,
+      order: dialogue.length + 1
+    })
+  })
+  if (!dialogue.some(line => line.speaker === 'Neighbour')) {
+    dialogue.unshift({ id: uid('line'), speaker: 'Neighbour', en: 'Can you tell me about life in Melbourne?', cn: '你能说说墨尔本生活吗？', aligned: true, order: 1 })
+  }
+  return { pairs, dialogue: dialogue.map((line, index) => ({ ...line, order: index + 1 })) }
+}
+
+function buildKevinRewriteCourse(course, draftOverride = null) {
+  const id = uid('rewrite')
+  const fallbackDraft = buildKevinRewriteDraft(course)
+  const aiDialogue = normalizeRewriteDialogue(draftOverride?.dialogue || [], 'Kevin')
+  const draft = {
+    pairs: normalizeRewritePairs(draftOverride?.pairs || [], fallbackDraft.pairs).length ? normalizeRewritePairs(draftOverride?.pairs || [], fallbackDraft.pairs) : fallbackDraft.pairs,
+    dialogue: aiDialogue.length ? aiDialogue : fallbackDraft.dialogue
+  }
+  const title = `${course.title} - Kevin Melbourne Version`
+  const generated = buildTrainingFromTranscript(id, title, draft.dialogue)
+  return {
+    id,
+    packType: 'AI_REWRITE_PACK',
+    title,
+    sourceType: 'realLifeExpansion',
+    audioMode: 'generated',
+    importMethod: 'textPackImport',
+    category: 'Kevin Melbourne Rewrite',
+    level: course.level || 'A2',
+    linkedCourseId: course.id,
+    linkedCourseTitle: course.title,
+    status: 'Ready',
+    progress: 0,
+    goal: 'Practise the textbook language in Kevin real Melbourne life.',
+    scenario: 'Kevin talks about daily life in Melbourne using the textbook language.',
+    tags: ['Melbourne', 'AI rewrite', 'generated audio'],
+    background: {
+      en: 'Textbook audio rewritten into Kevin real-life Melbourne speaking practice.',
+      cn: '把教材原音频改写成 Kevin 在墨尔本真实生活中能说的话。'
+    },
+    uploadedAudioUrl: '',
+    generatedTtsAudioUrl: null,
+    transcriptLines: draft.dialogue,
+    languageItems: generated.languageItems,
+    practiceItems: generated.practiceItems,
+    outputTasks: generated.outputTasks,
+    reviewItems: generated.reviewItems,
+    rewritePairs: draft.pairs,
+    stage6Prompt: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+}
+
 function reviewInterval(level) {
   if (level <= 0) return 1
   if (level === 1) return 3
@@ -2240,14 +2736,25 @@ function App() {
   })
   const [store, setStore] = useState(() => normalizeStore(loadUserStore(activeUserId)))
   const [settings, setSettings] = useState(() => normalizeSettings(load(SETTINGS_KEY, {})))
-  const [tab, setTab] = useState('today')
+  const [tab, setTab] = useState(() => {
+    const requestedTab = typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('tab')
+      : ''
+    const savedTab = requestedTab || load(TAB_KEY, 'today')
+    return isValidTabId(savedTab) ? savedTab : 'today'
+  })
   const [isPhoneView, setIsPhoneView] = useState(() => typeof window !== 'undefined' ? resolvePhoneViewByWidth(window.innerWidth) : false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [libraryMode, setLibraryMode] = useState('list')
   const [librarySubtab, setLibrarySubtab] = useState('courses')
   const [learnSubtab, setLearnSubtab] = useState('audio')
   const [showStudyTools, setShowStudyTools] = useState(false)
-  const [outputMode, setOutputMode] = useState('guided')
+  const [outputMode, setOutputMode] = useState(() => {
+    const requestedMode = typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('mode')
+      : ''
+    return normalizeOutputMode(requestedMode || load(OUTPUT_MODE_KEY, 'guided'))
+  })
   const [freeTalkLevel, setFreeTalkLevel] = useState('A2')
   const [reviewMode, setReviewMode] = useState('today')
   const [reviewQueueExpanded, setReviewQueueExpanded] = useState(false)
@@ -2255,21 +2762,29 @@ function App() {
   const [answerShown, setAnswerShown] = useState(false)
   const [typed, setTyped] = useState('')
   const [message, setMessage] = useState('')
+  const [rewriteLoading, setRewriteLoading] = useState(false)
   const [textPack, setTextPack] = useState('')
+  const [importResult, setImportResult] = useState(null)
   const [audioForm, setAudioForm] = useState({ title: '', category: 'Textbook', level: 'A2', transcript: '', audioPreviewUrl: '', fileName: '', processingDepth: 'full', processStep: 'idle' })
   const [editingLineId, setEditingLineId] = useState('')
   const [splitLineId, setSplitLineId] = useState('')
   const [lineMoreId, setLineMoreId] = useState('')
   const [understandLineId, setUnderstandLineId] = useState('')
+  const [swipedLineId, setSwipedLineId] = useState('')
   const audioRef = useRef(null)
   const audioFileRef = useRef(null)
   const backupFileRef = useRef(null)
   const ttsCache = useRef(new Map())
   const originalAudioUrlCache = useRef(new Map())
+  const swipeStartRef = useRef({ id: '', x: 0, y: 0 })
 
   const activeCourse = useMemo(
     () => store.courses.find(course => course.id === store.activeCourseId) || store.courses[0],
     [store]
+  )
+  const activeProfile = useMemo(
+    () => userProfiles.find(user => user.id === activeUserId) || userProfiles[0] || DEFAULT_USER_PROFILES[0],
+    [userProfiles, activeUserId]
   )
   const dueReview = useMemo(() => store.reviewQueue.filter(item => item.nextReviewAt <= Date.now()), [store.reviewQueue])
   const textPreview = useMemo(() => parseImportText(textPack), [textPack])
@@ -2278,6 +2793,7 @@ function App() {
     const type = outputMode === 'guided' ? 'guidedSpeaking' : outputMode
     return activeCourse.outputTasks.filter(item => item.type === type)
   }, [activeCourse, outputMode])
+  const practicePool = useMemo(() => activeCourse?.practiceItems || [], [activeCourse])
   const courseGroups = useMemo(() => [
     { id: 'textbookCourse', title: 'Textbook Courses', courses: store.courses.filter(course => course.sourceType === 'textbookCourse') },
     { id: 'realLifeExpansion', title: 'Expansion Packs', courses: store.courses.filter(course => course.sourceType === 'realLifeExpansion') },
@@ -2323,6 +2839,19 @@ function App() {
   useEffect(() => save(ACTIVE_USER_KEY, activeUserId), [activeUserId])
   useEffect(() => save(USER_PROFILES_KEY, userProfiles), [userProfiles])
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
+  useEffect(() => save(OUTPUT_MODE_KEY, outputMode), [outputMode])
+  useEffect(() => {
+    save(TAB_KEY, tab)
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const alreadyCurrent = params.get('tab') === tab && params.get('v') && (tab !== 'output' || params.get('mode') === outputMode)
+    if (tab === 'output') params.set('mode', outputMode)
+    else params.delete('mode')
+    if (alreadyCurrent) return
+    params.set('tab', tab)
+    if (!params.get('v')) params.set('v', APP_VERSION.replace(/\./g, ''))
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`)
+  }, [tab, outputMode])
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
     const params = new URLSearchParams(window.location.search)
@@ -2366,7 +2895,8 @@ function App() {
     if (!isPhoneView) return
     if (showStudyTools) setShowStudyTools(false)
     if (learnSubtab !== 'audio') setLearnSubtab('audio')
-  }, [isPhoneView, showStudyTools, learnSubtab])
+    if (tab === 'library' || tab === 'practice') setTab('today')
+  }, [isPhoneView, showStudyTools, learnSubtab, tab])
   useEffect(() => {
     if (!isPhoneView || tab !== 'review' || reviewMode !== 'today') {
       if (reviewQueueExpanded) setReviewQueueExpanded(false)
@@ -2377,8 +2907,9 @@ function App() {
     if (!lineIds.has(editingLineId)) setEditingLineId(activeCourse?.transcriptLines?.[0]?.id || '')
     if (understandLineId && !lineIds.has(understandLineId)) setUnderstandLineId('')
     if (lineMoreId && !lineIds.has(lineMoreId)) setLineMoreId('')
+    if (swipedLineId && !lineIds.has(swipedLineId)) setSwipedLineId('')
     if (splitLineId && !lineIds.has(splitLineId)) setSplitLineId('')
-  }, [activeCourse, editingLineId, understandLineId, lineMoreId, splitLineId])
+  }, [activeCourse, editingLineId, understandLineId, lineMoreId, splitLineId, swipedLineId])
 
   function updateStore(next) {
     setStore(prev => typeof next === 'function' ? next(prev) : next)
@@ -2399,7 +2930,9 @@ function App() {
             ...course,
             lastStage: stage,
             lastStudiedAt: new Date().toISOString(),
-            progress: Math.max(course.progress || 0, options.minProgress || 0),
+            progress: typeof options.setProgress === 'number'
+              ? options.setProgress
+              : Math.max(course.progress || 0, options.minProgress || 0),
             updatedAt: new Date().toISOString()
           }
         : course)
@@ -2663,7 +3196,7 @@ function App() {
   }
 
   function resolveVisibleTab(nextTab) {
-    if (nextTab === 'practice') return 'output'
+    if (nextTab === 'practice' && isPhoneView) return 'output'
     return nextTab
   }
 
@@ -2676,7 +3209,16 @@ function App() {
     stopAudio()
     maybeResetViewportForTabSwitch()
     const routedTab = resolveVisibleTab(nextTab)
-    updateStore(prev => ({ ...prev, activeCourseId: courseId }))
+    const stageForCourse = ['learn', 'practice', 'output', 'review'].includes(routedTab) ? routedTab : ''
+    updateStore(prev => ({
+      ...prev,
+      activeCourseId: courseId,
+      courses: stageForCourse
+        ? prev.courses.map(course => course.id === courseId
+          ? { ...course, lastStage: stageForCourse, updatedAt: new Date().toISOString() }
+          : course)
+        : prev.courses
+    }))
     setActiveIndex(0)
     setAnswerShown(false)
     setTyped('')
@@ -2687,6 +3229,12 @@ function App() {
   function openCourseStage(courseId, stage = 'learn') {
     selectCourse(courseId, stage)
     if (stage === 'review') setReviewMode(weakReview.length ? 'weak' : 'today')
+  }
+
+  function startNextLoop(courseId = activeCourse?.id) {
+    if (!courseId) return
+    recordStudy('learn', { courseId, setProgress: 5 })
+    openCourseStage(courseId, 'learn')
   }
 
   function addCourse(course) {
@@ -2886,15 +3434,28 @@ function App() {
 
   function importTextPack() {
     if (!textPreview) return
+    const importedCourses = textPreview.kind === 'bundle' ? textPreview.courses : [textPreview]
+    const primaryCourse = importedCourses[0]
     if (textPreview.kind === 'bundle') {
-      addCourses(textPreview.courses)
-      setMessage(`${textPreview.courses.length} demo courses imported. Textbook Course keeps Original Audio Mode; Expansion and General packs use Generated Audio Mode.`)
+      addCourses(importedCourses)
+      setMessage(`${textPreview.courses.length} demo courses imported. ${t('importedOpenListen')}`)
     } else {
       addCourse(textPreview)
-      setMessage('Text Pack imported. Open Learn to start.')
+      setMessage(t('importedOpenListen'))
     }
+    setImportResult({
+      title: primaryCourse?.title || t('importSuccessTitle'),
+      learnItems: importedCourses.reduce((sum, course) => sum + (course.transcriptLines?.length || 0), 0),
+      speakItems: importedCourses.reduce((sum, course) => sum + (course.outputTasks?.length || 0), 0),
+      reviewItems: importedCourses.reduce((sum, course) => sum + (course.reviewItems?.length || 0), 0)
+    })
     setTextPack('')
     setLibraryMode('list')
+    setLibrarySubtab('courses')
+    setLearnSubtab('audio')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    maybeResetViewportForTabSwitch()
     setTab('learn')
   }
 
@@ -2946,11 +3507,22 @@ function App() {
       updatedAt: new Date().toISOString()
     }
     addCourse(course)
+    setImportResult({
+      title: course.title,
+      learnItems: course.transcriptLines?.length || 0,
+      speakItems: course.outputTasks?.length || 0,
+      reviewItems: course.reviewItems?.length || 0
+    })
     if (audioForm.audioPreviewUrl) URL.revokeObjectURL(audioForm.audioPreviewUrl)
     setAudioForm({ title: '', category: 'Textbook', level: 'A2', transcript: '', audioPreviewUrl: '', fileName: '', processingDepth: 'full', processStep: 'idle' })
     audioFileRef.current = null
     setLibraryMode('list')
-    setMessage(`Audio course imported with ${courseGenerated.languageItems.length} language items, ${courseGenerated.practiceItems.length} practice items, and ${countUnaligned(lines)} unaligned lines.`)
+    setLibrarySubtab('courses')
+    setLearnSubtab('audio')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    maybeResetViewportForTabSwitch()
+    setMessage(`${t('importedOpenListen')} ${courseGenerated.languageItems.length} language items, ${courseGenerated.practiceItems.length} practice items, ${countUnaligned(lines)} unaligned lines.`)
     setTab('learn')
   }
 
@@ -2964,10 +3536,12 @@ function App() {
   }
 
   function markReview(item, rating) {
+    const isLastReviewCard = activeIndex >= reviewPool.length - 1
     const updateReviewItem = row => {
-      const level = rating === 'good' ? (row.level || 0) + 1 : 0
-      const days = rating === 'good' ? reviewInterval(level) : 1
-      return { ...row, level, status: rating === 'good' ? 'learning' : 'weak', nextReviewAt: Date.now() + days * 86400000 }
+      const currentLevel = row.level || 0
+      const level = rating === 'good' ? currentLevel + 1 : rating === 'hard' ? Math.max(0, currentLevel) : 0
+      const days = rating === 'good' ? reviewInterval(level) : rating === 'hard' ? 2 : 1
+      return { ...row, level, status: rating === 'again' ? 'weak' : 'learning', nextReviewAt: Date.now() + days * 86400000 }
     }
     updateStore(prev => ({
       ...prev,
@@ -2976,33 +3550,52 @@ function App() {
         : { ...course, reviewItems: (course.reviewItems || []).map(row => row.id === item.id ? updateReviewItem(row) : row) }),
       reviewQueue: prev.reviewQueue.map(row => row.id === item.id ? updateReviewItem(row) : row)
     }))
-    recordStudy('review', { courseId: item.courseId, activityKind: 'review', minProgress: 90 })
+    recordStudy('review', { courseId: item.courseId, activityKind: 'review', minProgress: isLastReviewCard ? 100 : 90 })
     setAnswerShown(false)
-    setActiveIndex(i => Math.max(0, Math.min(i, reviewPool.length - 1)))
+    if (isLastReviewCard) {
+      setActiveIndex(0)
+      maybeResetViewportForTabSwitch()
+      setTab('today')
+      setMessage(t('reviewSessionDone'))
+      return
+    }
+    setActiveIndex(i => Math.max(0, Math.min(i + 1, reviewPool.length - 1)))
   }
 
   function upsertWeakReviewItem(reviewItem) {
     if (!activeCourse || !reviewItem.answerEn) return
-    updateActiveCourse(course => {
-      const reviewItems = course.reviewItems || []
-      const existing = reviewItems.find(item =>
-        reviewBucketLabel(item) === 'Weak / Stuck' &&
-        String(item.answerEn || '').trim().toLowerCase() === String(reviewItem.answerEn || '').trim().toLowerCase()
-      )
-      const nextItem = {
-        ...reviewItem,
-        id: existing?.id || uid('weak'),
-        courseId: course.id,
-        type: 'weak_sentence',
-        level: 0,
-        nextReviewAt: Date.now()
-      }
-      return {
-        ...course,
-        reviewItems: existing
-          ? reviewItems.map(item => item.id === existing.id ? { ...item, ...nextItem } : item)
-          : [...reviewItems, nextItem]
-      }
+    const answerKey = String(reviewItem.answerEn || '').trim().toLowerCase()
+    updateStore(prev => {
+      let nextWeakItem = null
+      const courses = prev.courses.map(course => {
+        if (course.id !== activeCourse.id) return course
+        const reviewItems = course.reviewItems || []
+        const existing = reviewItems.find(item =>
+          reviewBucketLabel(item) === 'Weak / Stuck' &&
+          String(item.answerEn || '').trim().toLowerCase() === answerKey
+        )
+        nextWeakItem = {
+          ...reviewItem,
+          id: existing?.id || uid('weak'),
+          courseId: course.id,
+          type: 'weak_sentence',
+          level: 0,
+          nextReviewAt: Date.now()
+        }
+        return {
+          ...course,
+          reviewItems: existing
+            ? reviewItems.map(item => item.id === existing.id ? { ...item, ...nextWeakItem } : item)
+            : [...reviewItems, nextWeakItem],
+          updatedAt: new Date().toISOString()
+        }
+      })
+      const reviewQueue = nextWeakItem
+        ? prev.reviewQueue.some(item => item.id === nextWeakItem.id)
+          ? prev.reviewQueue.map(item => item.id === nextWeakItem.id ? nextWeakItem : item)
+          : [...prev.reviewQueue, nextWeakItem]
+        : prev.reviewQueue
+      return { ...prev, courses, reviewQueue }
     })
   }
 
@@ -3025,8 +3618,66 @@ function App() {
   }
 
   function nextOutputItem() {
+    if (!outputPool.length) return
     recordStudy('output', { activityKind: 'output', minProgress: 80 })
-    setActiveIndex((activeIndex + 1) % outputPool.length)
+    if (activeIndex >= outputPool.length - 1) {
+      setReviewMode(dueReview.length ? 'today' : weakReview.length ? 'weak' : 'today')
+      setActiveIndex(0)
+      setAnswerShown(false)
+      maybeResetViewportForTabSwitch()
+      setTab('review')
+      setMessage(t('outputDoneMessage'))
+      return
+    }
+    setActiveIndex(activeIndex + 1)
+  }
+
+  function finishPracticeAndOpenSpeak() {
+    if (!activeCourse) return
+    recordStudy('practice', { activityKind: 'practice', minProgress: 60 })
+    setOutputMode('guided')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    setTyped('')
+    maybeResetViewportForTabSwitch()
+    setTab('output')
+    setMessage(t('practiceDoneMessage'))
+  }
+
+  function nextPracticeItem() {
+    if (!practicePool.length) return
+    if (activeIndex >= practicePool.length - 1) {
+      finishPracticeAndOpenSpeak()
+      return
+    }
+    recordStudy('practice', { activityKind: 'practice', minProgress: 55 })
+    setActiveIndex(activeIndex + 1)
+    setAnswerShown(false)
+    setTyped('')
+  }
+
+  function finishListenAndOpenSpeak() {
+    if (!activeCourse) return
+    recordStudy('learn', { minProgress: 35 })
+    const nextTab = !isPhoneView && practicePool.length ? 'practice' : 'output'
+    if (nextTab === 'output') setOutputMode('guided')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    setTyped('')
+    maybeResetViewportForTabSwitch()
+    setTab(nextTab)
+    setMessage(nextTab === 'practice' ? t('listenDonePracticeMessage') : t('listenDoneMessage'))
+  }
+
+  function finishSpeakAndOpenReview() {
+    if (!activeCourse) return
+    recordStudy('output', { activityKind: 'output', minProgress: 80 })
+    setReviewMode(dueReview.length ? 'today' : weakReview.length ? 'weak' : 'today')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    maybeResetViewportForTabSwitch()
+    setTab('review')
+    setMessage(dueReview.length || weakReview.length ? t('outputDoneMessage') : t('noReviewAfterSpeak'))
   }
 
   function exportCurrentUserData() {
@@ -3148,6 +3799,40 @@ function App() {
     }
   }
 
+  function startSentenceSwipe(line, event) {
+    if (!isPhoneView) return
+    const point = event.touches?.[0]
+    if (!point) return
+    swipeStartRef.current = { id: line.id, x: point.clientX, y: point.clientY }
+  }
+
+  function endSentenceSwipe(line, event) {
+    if (!isPhoneView || swipeStartRef.current.id !== line.id) return
+    const point = event.changedTouches?.[0]
+    if (!point) return
+    const dx = point.clientX - swipeStartRef.current.x
+    const dy = point.clientY - swipeStartRef.current.y
+    if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      setSwipedLineId(dx < 0 ? line.id : '')
+    }
+  }
+
+  function saveTranscriptLine(line) {
+    addTextToReview({ en: line.en, cn: line.cn, type: 'usefulSentence', source: 'Transcript' })
+    setSwipedLineId('')
+  }
+
+  function openTranscriptLineTools(line, index) {
+    setActiveIndex(index)
+    if (isPhoneView) {
+      setUnderstandLineId(line.id)
+      setSwipedLineId('')
+      return
+    }
+    setEditingLineId(line.id)
+    setLineMoreId(lineMoreId === line.id ? '' : line.id)
+  }
+
   function buildUnderstandUnits(line) {
     const en = String(line?.en || '').trim()
     const cn = String(line?.cn || '').trim()
@@ -3201,29 +3886,40 @@ function App() {
     if (!activeCourse || !payload?.en) return
     const answerEn = String(payload.en || '').trim()
     const promptCn = String(payload.cn || payload.promptCn || 'Recall this expression').trim()
-    updateActiveCourse(course => {
-      const reviewItems = course.reviewItems || []
-      const existing = reviewItems.find(item =>
-        String(item.answerEn || '').trim().toLowerCase() === answerEn.toLowerCase()
-      )
-      const nextItem = {
-        ...(existing || {}),
-        id: existing?.id || uid('review'),
-        courseId: course.id,
-        type: payload.type || existing?.type || 'usefulSentence',
-        promptCn,
-        answerEn,
-        source: payload.source || existing?.source || 'Saved',
-        nextReviewAt: Date.now(),
-        level: existing?.level || 0,
-        status: existing?.status || 'new'
-      }
-      return {
-        ...course,
-        reviewItems: existing
-          ? reviewItems.map(item => item.id === existing.id ? nextItem : item)
-          : [...reviewItems, nextItem]
-      }
+    updateStore(prev => {
+      let savedItem = null
+      const courses = prev.courses.map(course => {
+        if (course.id !== activeCourse.id) return course
+        const reviewItems = course.reviewItems || []
+        const existing = reviewItems.find(item =>
+          String(item.answerEn || '').trim().toLowerCase() === answerEn.toLowerCase()
+        )
+        savedItem = {
+          ...(existing || {}),
+          id: existing?.id || uid('review'),
+          courseId: course.id,
+          type: payload.type || existing?.type || 'usefulSentence',
+          promptCn,
+          answerEn,
+          source: payload.source || existing?.source || 'Saved',
+          nextReviewAt: Date.now(),
+          level: existing?.level || 0,
+          status: existing?.status || 'new'
+        }
+        return {
+          ...course,
+          reviewItems: existing
+            ? reviewItems.map(item => item.id === existing.id ? savedItem : item)
+            : [...reviewItems, savedItem],
+          updatedAt: new Date().toISOString()
+        }
+      })
+      const reviewQueue = savedItem
+        ? prev.reviewQueue.some(item => item.id === savedItem.id)
+          ? prev.reviewQueue.map(item => item.id === savedItem.id ? savedItem : item)
+          : [...prev.reviewQueue, savedItem]
+        : prev.reviewQueue
+      return { ...prev, courses, reviewQueue }
     })
     setMessage(t('savedReview'))
   }
@@ -3296,8 +3992,34 @@ function App() {
       : `title.${tab}`
   const platformModeTitle = isPhoneView ? t('dailyTrainer') : t('studyWorkspace')
   const platformModeHint = isPhoneView ? t('iphoneHint') : t('macbookHint')
+  const linkedKevinCourse = activeCourse
+    ? store.courses.find(course => course.linkedCourseId === activeCourse.id && course.audioMode === 'generated' && /Kevin Melbourne Version|AI_REWRITE_PACK|Kevin Melbourne Rewrite/i.test(`${course.title} ${course.packType || ''} ${course.category || ''}`))
+    : null
+  const rewriteDraft = useMemo(() => activeCourse?.sourceType === 'textbookCourse' && activeCourse?.audioMode === 'original'
+    ? buildKevinRewriteDraft(activeCourse)
+    : null, [activeCourse])
+  const loopComplete = !!activeCourse && activeCourse.lastStage === 'review' && (activeCourse.progress || 0) >= 100
+  const flowStageOrder = ['learn', 'practice', 'output', 'review']
+  const currentFlowIndex = Math.max(0, flowStageOrder.indexOf(activeCourse?.lastStage || 'learn'))
+  const macFlowSteps = [
+    { id: 'learn', label: t('flowStep.listen'), detail: `${activeCourse?.transcriptLines?.length || 0} ${t('lines')}` },
+    { id: 'practice', label: t('flowStep.practice'), detail: `${activeCourse?.practiceItems?.length || 0} ${t('practiceTasks')}` },
+    { id: 'output', label: t('flowStep.speak'), detail: `${activeCourse?.outputTasks?.length || 0} ${t('speakTasks')}` },
+    { id: 'review', label: t('flowStep.review'), detail: `${dueReview.length} ${t('dueReview')}` }
+  ].map((step, index) => ({
+    ...step,
+    state: loopComplete
+      ? 'done'
+      : (activeCourse?.lastStage || 'learn') === step.id
+      ? 'current'
+      : index < currentFlowIndex || (step.id === 'learn' && (activeCourse?.progress || 0) >= 25) || (step.id === 'practice' && (activeCourse?.progress || 0) >= 55) || (step.id === 'output' && (activeCourse?.progress || 0) >= 80) || (step.id === 'review' && (activeCourse?.progress || 0) >= 90)
+        ? 'done'
+        : index === currentFlowIndex + 1
+          ? 'next'
+          : 'ready'
+  }))
 
-  function goToTab(nextTab) {
+  function goToTab(nextTab, options = {}) {
     const routedTab = resolveVisibleTab(nextTab)
     if (routedTab === tab) return
     stopAudio()
@@ -3308,11 +4030,133 @@ function App() {
       setLibrarySubtab('courses')
     }
     if (routedTab === 'learn') setLearnSubtab('audio')
-    if (routedTab === 'output') setOutputMode('guided')
+    if (routedTab === 'practice') setActiveIndex(0)
+    if (routedTab === 'output') {
+      const nextOutputMode = normalizeOutputMode(options.outputMode || 'guided')
+      save(OUTPUT_MODE_KEY, nextOutputMode)
+      setOutputMode(nextOutputMode)
+    }
     if (answerShown) setAnswerShown(false)
     if (typed) setTyped('')
   }
 
+  function openOutputMode(nextMode = 'guided') {
+    const safeMode = normalizeOutputMode(nextMode)
+    stopAudio()
+    maybeResetViewportForTabSwitch()
+    save(OUTPUT_MODE_KEY, safeMode)
+    setOutputMode(safeMode)
+    setActiveIndex(0)
+    if (answerShown) setAnswerShown(false)
+    if (typed) setTyped('')
+    setTab('output')
+    window.setTimeout(() => setOutputMode(safeMode), 0)
+  }
+
+  function addAndOpenRewriteCourse(course) {
+    stopAudio()
+    maybeResetViewportForTabSwitch()
+    updateStore(prev => ({
+      ...prev,
+      activeCourseId: course.id,
+      courses: [course, ...prev.courses],
+      reviewQueue: [...prev.reviewQueue, ...(course.reviewItems || [])]
+    }))
+    setOutputMode('rolePlay')
+    setActiveIndex(0)
+    setAnswerShown(false)
+    setTab('output')
+    window.setTimeout(() => setTab('output'), 0)
+  }
+
+  async function requestAiRewriteDraft(course) {
+    const response = await fetch('/api/openai-rewrite-course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(settings.apiKey ? { 'x-openai-key': settings.apiKey } : {})
+      },
+      body: JSON.stringify({
+        apiKey: settings.apiKey,
+        title: course.title,
+        level: course.level,
+        userName: activeUserId === 'mandy' ? 'Mandy' : 'Kevin',
+        lines: (course.transcriptLines || []).slice(0, 12).map(line => ({ id: line.id, speaker: line.speaker, en: line.en, cn: line.cn }))
+      })
+    })
+    if (!response.ok) throw new Error(await response.text())
+    return response.json()
+  }
+
+  async function openGeneratedKevinVersion() {
+    if (linkedKevinCourse) {
+      selectCourse(linkedKevinCourse.id, 'output')
+      setOutputMode('rolePlay')
+      return
+    }
+    if (!activeCourse) return
+    setRewriteLoading(true)
+    try {
+      const aiDraft = await requestAiRewriteDraft(activeCourse)
+      addAndOpenRewriteCourse(buildKevinRewriteCourse(activeCourse, aiDraft))
+      setMessage(t('rewriteSaved'))
+    } catch {
+      addAndOpenRewriteCourse(buildKevinRewriteCourse(activeCourse))
+      setMessage(t('rewriteFallback'))
+    } finally {
+      setRewriteLoading(false)
+    }
+  }
+
+  function localFreeTalkReply({ item, level, userText }) {
+    const clean = String(userText || '').trim()
+    const keyword = item?.keywords?.[0] || 'help'
+    const reply = !clean
+      ? 'Try one simple sentence.'
+      : level === 'A2'
+        ? 'Good. What do you need next?'
+        : level === 'B1'
+          ? 'That sounds clear. What would you ask next?'
+          : 'That sounds natural. Add one small detail now.'
+    return {
+      reply,
+      hint: level === 'A2'
+        ? `Use: I need ${keyword}.`
+        : `Stay in the scene and use ${keyword}.`,
+      feedback: t('freeTalkFallback'),
+      suggestedReview: item?.sample || reply,
+      fallback: true
+    }
+  }
+
+  async function requestFreeTalkReply({ item, level, messages, userText }) {
+    try {
+      const response = await fetch('/api/openai-free-talk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(settings.apiKey ? { 'x-openai-key': settings.apiKey } : {})
+        },
+        body: JSON.stringify({
+          apiKey: settings.apiKey,
+          userName: activeProfile?.name || 'Kevin',
+          level,
+          scenario: item?.prompt || '',
+          keywords: item?.keywords || [],
+          history: messages || [],
+          userText
+        })
+      })
+      if (!response.ok) throw new Error(await response.text())
+      const data = await response.json()
+      if (!data.reply) throw new Error('Free Talk reply is empty.')
+      return data
+    } catch {
+      return localFreeTalkReply({ item, level, userText })
+    }
+  }
+
+  const currentPractice = practicePool[activeIndex] || practicePool[0]
   const currentOutput = outputPool[activeIndex] || outputPool[0]
   const currentReview = reviewPool[activeIndex] || reviewPool[0]
   const currentAudioLineIndex = activeCourse?.transcriptLines?.length ? Math.min(activeIndex, activeCourse.transcriptLines.length - 1) : 0
@@ -3344,7 +4188,436 @@ function App() {
     })
   }
 
-  return <div className={`appShell platform-${isPhoneView ? 'phone' : 'mac'} font-${settings.fontScale}`}>
+  function renderMacFlowPanel(extraClass = '') {
+    if (isPhoneView || !activeCourse) return null
+    return <div className={`macFlowPanel ${extraClass}`}>
+      <div>
+        <strong>{t('macFlowTitle')}</strong>
+        <span>{t('macFlowHint')}</span>
+      </div>
+      <div className="macFlowSteps">
+        {macFlowSteps.map(step => <button key={step.id} className={`flowStep ${step.state}`} onClick={() => openCourseStage(activeCourse.id, step.id)}>
+          <em>{t(`flowState.${step.state}`)}</em>
+          <strong>{step.label}</strong>
+          <span>{step.detail}</span>
+        </button>)}
+      </div>
+    </div>
+  }
+
+  function renderMacCommandCenter() {
+    if (isPhoneView || !activeCourse) return null
+    const currentStep = loopComplete ? macFlowSteps[0] : macFlowSteps.find(step => step.id === resumeStage) || macFlowSteps[0]
+    const reviewCount = activeCourse.reviewItems?.length || 0
+    return <div className="macCommandCenter" data-testid="mac-command-center">
+      <section className="macCommandMain">
+        <span>{t('macCommandTitle')}</span>
+        <h2>{activeCourse.title}</h2>
+        <p>{loopComplete ? t('todayCompleteBody') : t('macCommandBody')}</p>
+        <div className="macCommandActions">
+          <button className="primary" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>{loopComplete ? t('nextLoop') : `${t('openCurrentStep')}: ${currentStep.label}`}</button>
+          <button className="secondary" onClick={() => goToTab('library')}>{t('manageLibrary')}</button>
+          {!!dueReview.length && <button className="secondary" onClick={() => { setReviewMode('today'); openCourseStage(activeCourse.id, 'review') }}>{t('clearReviewFirst')}</button>}
+        </div>
+      </section>
+      <section className="macCommandMetrics">
+        <div>
+          <small>{t('recommendedNext')}</small>
+          <strong>{currentStep.label}</strong>
+          <span>{currentStep.detail}</span>
+        </div>
+        <div>
+          <small>{t('contentHealth')}</small>
+          <strong>{activeCourse.status || 'Ready'}</strong>
+          <span>{t('contentHealthBody', {
+            lines: activeCourse.transcriptLines?.length || 0,
+            tasks: activeCourse.outputTasks?.length || 0,
+            reviews: reviewCount
+          })}</span>
+        </div>
+        <div>
+          <small>{t('reviewPressure')}</small>
+          <strong>{dueReview.length}</strong>
+          <span>{weakReview.length} {t('weakStuck')}</span>
+        </div>
+        <div>
+          <small>{t('courseProgress')}</small>
+          <strong>{activeCourse.progress || 0}%</strong>
+          <span>{stageLabel(resumeStage)}</span>
+        </div>
+      </section>
+    </div>
+  }
+
+  function renderMacStudyQueue() {
+    if (isPhoneView || !activeCourse) return null
+    const currentStep = loopComplete ? macFlowSteps[0] : macFlowSteps.find(step => step.id === resumeStage) || macFlowSteps[0]
+    const reviewCount = dueReview.length
+    return <div className="macStudyQueue">
+      <div className="sectionTitleLine">
+        <span>{t('studyQueueTitle')}</span>
+        <strong>{t('studyQueueBody')}</strong>
+      </div>
+      <div className="macQueueGrid">
+        <article className="macQueueTile current">
+          <span>{t('queueCurrent')}</span>
+          <strong>{activeCourse.title}</strong>
+          <p>{t('queueCurrentBody')}</p>
+          <div className="macQueueMeta">
+            <em>{sourceLabel(activeCourse.sourceType)}</em>
+            <em>{audioLabel(activeCourse.audioMode)}</em>
+            <em>{stageLabel(resumeStage)}</em>
+          </div>
+          <button className="primary compact" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>
+            {loopComplete ? t('nextLoop') : t('queueOpenCurrent')}
+          </button>
+        </article>
+        <article className="macQueueTile review">
+          <span>{t('queueReview')}</span>
+          <strong>{reviewCount}</strong>
+          <p>{t('queueReviewBody')}</p>
+          <div className="macQueueMeta">
+            <em>{weakReview.length} {t('weakStuck')}</em>
+            <em>{todayActivity.review} {t('reviewDone')}</em>
+          </div>
+          <button className="secondary compact" onClick={() => { setReviewMode(dueReview.length ? 'today' : 'weak'); openCourseStage(activeCourse.id, 'review') }}>
+            {t('queueGoReview')}
+          </button>
+        </article>
+        <article className="macQueueTile import">
+          <span>{t('queueImport')}</span>
+          <strong>{t('libraryImport')}</strong>
+          <p>{t('queueImportBody')}</p>
+          <div className="macQueueMeta">
+            <em>{store.courses.length} {t('courses')}</em>
+            <em>{activeCourse.sourceType === 'textbookCourse' ? t('originalAudioRule') : t('generatedAudioRule')}</em>
+          </div>
+          <button className="secondary compact" onClick={() => goToTab('library')}>
+            {t('queueOpenLibrary')}
+          </button>
+        </article>
+      </div>
+    </div>
+  }
+
+  function renderMobileStageRail() {
+    if (!isPhoneView || !activeCourse) return null
+    const steps = [
+      { id: 'learn', label: t('flowStep.listen'), hint: t('mobileStageHint.listen') },
+      { id: 'output', label: t('flowStep.speak'), hint: t('mobileStageHint.speak') },
+      { id: 'review', label: t('flowStep.review'), hint: t('mobileStageHint.review') }
+    ]
+    return <div className="mobileStageRail">
+      {steps.map(step => {
+        const flowStep = macFlowSteps.find(item => item.id === step.id)
+        return <button key={step.id} className={`mobileStageStep ${flowStep?.state || 'ready'}`} onClick={() => openCourseStage(activeCourse.id, step.id)}>
+          <em>{t(`flowState.${flowStep?.state || 'ready'}`)}</em>
+          <strong>{step.label}</strong>
+          <span>{step.hint}</span>
+        </button>
+      })}
+    </div>
+  }
+
+  function renderTodayMission() {
+    if (!activeCourse) {
+      return <div className="todayMission emptyMission">
+        <div className="missionIntro">
+          <span>{t('todayHeroKicker')}</span>
+          <h2>{t('missionCourseEmpty')}</h2>
+          <p>{t('missionCourseEmptyBody')}</p>
+        </div>
+        {!isPhoneView && <button className="primary" onClick={() => goToTab('library')}>{t('importOnMac')}</button>}
+      </div>
+    }
+    const missionSteps = [
+      {
+        id: 'learn',
+        number: '01',
+        title: t('pathListenTitle'),
+        body: t('pathListenBody'),
+        meta: `${activeCourse.transcriptLines?.length || 0} ${t('lines')}`,
+        action: t('startListeningNow')
+      },
+      ...(!isPhoneView ? [{
+        id: 'practice',
+        number: '02',
+        title: t('practiceTaskTitle'),
+        body: t('practiceTaskBody'),
+        meta: `${activeCourse.practiceItems?.length || 0} ${t('practiceTasks')}`,
+        action: t('practiceAction')
+      }] : []),
+      {
+        id: 'output',
+        number: isPhoneView ? '02' : '03',
+        title: t('pathSpeakTitle'),
+        body: t('pathSpeakBody'),
+        meta: `${activeCourse.outputTasks?.length || 0} ${t('speakTasks')}`,
+        action: t('startSpeakingNow')
+      },
+      {
+        id: 'review',
+        number: isPhoneView ? '03' : '04',
+        title: t('pathReviewTitle'),
+        body: t('pathReviewBody'),
+        meta: `${dueReview.length} ${t('dueReview')}`,
+        action: t('startReview')
+      }
+    ]
+    const currentStep = loopComplete ? missionSteps[0] : missionSteps.find(step => step.id === resumeStage) || (isPhoneView && resumeStage === 'practice' ? missionSteps.find(step => step.id === 'output') : missionSteps[0])
+    const statusLabel = state => {
+      if (state === 'done') return t('missionDone')
+      if (state === 'current') return t('missionCurrent')
+      if (state === 'next') return t('missionNext')
+      return t('missionReady')
+    }
+    if (isPhoneView) {
+      const phoneStageIds = ['learn', 'output', 'review']
+      const doneCount = loopComplete ? 3 : macFlowSteps.filter(step => phoneStageIds.includes(step.id) && step.state === 'done').length
+      const phoneSteps = missionSteps.map(step => {
+        const flowStep = macFlowSteps.find(item => item.id === step.id)
+        return { ...step, state: flowStep?.state || 'ready', status: statusLabel(flowStep?.state || 'ready') }
+      })
+      return <div className="phoneTodayStack">
+        <section className="phoneCourseCard">
+          <div className="phoneCourseHead">
+            <div>
+              <span>{activeCourse.title}</span>
+              <strong>{sourceLabel(activeCourse.sourceType)} · {activeCourse.goal || activeCourse.category}</strong>
+            </div>
+            <em>{doneCount}<small>/3</small></em>
+          </div>
+          <div className="phoneStageBars" aria-label={t('learningPathTitle')}>
+            {phoneSteps.map(step => <button key={step.id} className={`phoneStageBar ${step.state}`} onClick={() => openCourseStage(activeCourse.id, step.id)}>
+              <i />
+              <strong>{step.title}</strong>
+              <span>{step.status}</span>
+            </button>)}
+          </div>
+          <button className="primary phoneMainAction" data-testid="continue-current-step" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>
+            {loopComplete ? t('nextLoop') : t('continueCurrentStep')}
+          </button>
+        </section>
+        <section className="phoneActionCards">
+          <button className="phoneActionCard talk" onClick={() => openOutputMode('retell')}>
+            <strong>Free Talk</strong>
+            <span>{t('mobileQuickSpeak')}</span>
+            <b>{t('open')} →</b>
+          </button>
+          <button className="phoneActionCard review" onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); goToTab('review') }}>
+            <strong>{dueReview.length || activeCourse.reviewItems?.length || 0} {t('dueReview')}</strong>
+            <span>{t('mobileQuickReview')}</span>
+            <b>{t('startReview')} →</b>
+          </button>
+        </section>
+      </div>
+    }
+    return <div className="todayMission">
+      <div className="missionIntro">
+        <span>{t('todayHeroKicker')}</span>
+        <h2>{loopComplete ? t('todayCompleteTitle') : t('todayMissionTitle')}</h2>
+        <p>{loopComplete ? t('todayCompleteBody') : t('todayMissionBody')}</p>
+      </div>
+      {loopComplete && <div className="completionPanel" data-testid="today-completion-panel">
+        <div>
+          <span>{t('todayCompleteBadge')}</span>
+          <strong>{activeCourse.title}</strong>
+          <p>{t('todayCompleteBody')}</p>
+        </div>
+        <button className="primary compact" data-testid="start-next-loop" onClick={() => startNextLoop(activeCourse.id)}>{t('nextLoop')}</button>
+      </div>}
+      <div className="missionCourseCard">
+        <div>
+          <small>{t('currentCourse')}</small>
+          <strong>{activeCourse.title}</strong>
+          <span>{sourceLabel(activeCourse.sourceType)} · {audioLabel(activeCourse.audioMode)} · {activeCourse.level}</span>
+        </div>
+        <button className="primary compact" data-testid="continue-current-step" onClick={() => loopComplete ? startNextLoop(activeCourse.id) : openCourseStage(activeCourse.id, currentStep.id)}>{loopComplete ? t('nextLoop') : t('continueCurrentStep')}</button>
+      </div>
+      <div className="missionSteps">
+        {missionSteps.map(step => {
+          const flowStep = macFlowSteps.find(item => item.id === step.id)
+          const state = flowStep?.state || 'ready'
+          return <button key={step.id} data-testid={`mission-${step.id}`} className={`missionStep ${state}`} onClick={() => openCourseStage(activeCourse.id, step.id)}>
+            <em>{step.number}</em>
+            <div>
+              <span>{statusLabel(state)}</span>
+              <strong>{step.title}</strong>
+              <p>{step.body}</p>
+              <small>{step.meta}</small>
+              <b>{t('enterStep')} {step.title}</b>
+            </div>
+          </button>
+        })}
+      </div>
+      <div className="missionStats">
+        <span>{t('todayMissionStats')}</span>
+        <strong>{todayActivity.practice}</strong><em>{t('practiceDone')}</em>
+        <strong>{todayActivity.output}</strong><em>{t('outputDone')}</em>
+        <strong>{todayActivity.review}</strong><em>{t('reviewDone')}</em>
+      </div>
+    </div>
+  }
+
+  function renderLearningPathCards() {
+    if (!activeCourse) return null
+    const path = [
+      { id: 'learn', number: '1', title: t('pathListenTitle'), body: t('pathListenBody'), meta: `${activeCourse.transcriptLines?.length || 0} ${t('lines')}` },
+      { id: 'practice', number: '2', title: t('practiceTaskTitle'), body: t('practiceTaskBody'), meta: `${activeCourse.practiceItems?.length || 0} ${t('practiceTasks')}` },
+      { id: 'output', number: '3', title: t('pathSpeakTitle'), body: t('pathSpeakBody'), meta: `${activeCourse.outputTasks?.length || 0} ${t('speakTasks')}` },
+      { id: 'review', number: '4', title: t('pathReviewTitle'), body: t('pathReviewBody'), meta: `${dueReview.length} ${t('dueReview')}` }
+    ]
+    return <div className="learningPathPanel">
+      <div className="sectionTitleLine">
+        <span>{t('learningPathTitle')}</span>
+        <strong>{activeCourse.title}</strong>
+      </div>
+      <div className="learningPathCards">
+        {path.map(step => <button key={step.id} className={`pathCard ${resumeStage === step.id || activeCourse.lastStage === step.id ? 'current' : ''}`} onClick={() => openCourseStage(activeCourse.id, step.id)}>
+          <em>{step.number}</em>
+          <strong>{step.title}</strong>
+          <span>{step.body}</span>
+          <small>{step.meta}</small>
+        </button>)}
+      </div>
+    </div>
+  }
+
+  function renderTaskHero(kind) {
+    if (!activeCourse) return null
+    const config = {
+      listen: {
+        step: isPhoneView ? '1 / 3' : '1 / 4',
+        title: t('listenTaskTitle'),
+        body: t('listenTaskBody'),
+        primary: t('playLine'),
+        secondary: t('finishListen'),
+        onPrimary: () => currentAudioLine ? playLine(currentAudioLine) : playCourseMain(activeCourse),
+        onSecondary: finishListenAndOpenSpeak
+      },
+      practice: {
+        step: '2 / 4',
+        title: t('practiceTaskTitle'),
+        body: t('practiceTaskBody'),
+        primary: t('checkAnswer'),
+        secondary: t('completeAndSpeak'),
+        onPrimary: () => setAnswerShown(true),
+        onSecondary: finishPracticeAndOpenSpeak
+      },
+      speak: {
+        step: isPhoneView ? '2 / 3' : '3 / 4',
+        title: t('speakTaskTitle'),
+        body: t('speakTaskBody'),
+        primary: outputMode === 'guided' ? t('guidedSpeaking') : outputMode === 'rolePlay' ? t('rolePlay') : t('retell'),
+        secondary: t('completeAndReview'),
+        onPrimary: () => currentOutput?.sample ? playText(currentOutput.sample) : setMessage(t('startPractice')),
+        onSecondary: finishSpeakAndOpenReview
+      },
+      review: {
+        step: isPhoneView ? '3 / 3' : '4 / 4',
+        title: t('reviewTaskTitle'),
+        body: t('reviewTaskBody'),
+        primary: t('showAnswer'),
+        secondary: t('startListeningNow'),
+        onPrimary: () => setAnswerShown(true),
+        onSecondary: () => openCourseStage(activeCourse.id, 'learn')
+      }
+    }[kind]
+    if (!config) return null
+    return <div className={`taskHero task-${kind}`}>
+      <span>{t('pageTask')} · {config.step}</span>
+      <h2>{config.title}</h2>
+      <p>{config.body}</p>
+      <div className="taskHeroActions">
+        <button className="primary" data-testid={`task-${kind}-primary`} onClick={config.onPrimary} disabled={kind === 'review' && !currentReview}>{config.primary}</button>
+        <button className="secondary" data-testid={`task-${kind}-next`} onClick={config.onSecondary}>{config.secondary}</button>
+      </div>
+    </div>
+  }
+
+  function renderReviewEmpty() {
+    return <div className="reviewEmptyPanel">
+      <span>{reviewMode === 'today' ? t('todayReview') : reviewMode === 'weak' ? t('weakStuck') : reviewMode === 'chunks' ? t('chunks') : t('usefulSentences')}</span>
+      <h2>{t('reviewEmptyTitle')}</h2>
+      <p>{reviewMode === 'today' ? t('noReviewToday') : t('noReviewSection')} {t('reviewEmptyBody')}</p>
+      <div className="reviewEmptyActions">
+        <button className="primary" onClick={() => goToTab('today')}>{t('backToToday')}</button>
+        <button className="secondary" onClick={() => activeCourse && openCourseStage(activeCourse.id, 'learn')}>{t('startListeningNow')}</button>
+        <button className="secondary" onClick={() => activeCourse && openCourseStage(activeCourse.id, 'output')}>{t('startSpeakingNow')}</button>
+        {!isPhoneView && <button className="secondary" onClick={() => goToTab('library')}>{t('manageLibrary')}</button>}
+      </div>
+    </div>
+  }
+
+  function renderSpeakRoundPanel() {
+    if (!currentOutput) return null
+    const total = outputPool.length || 1
+    const isLast = activeIndex >= total - 1
+    const modeLabel = outputMode === 'guided' ? t('guidedSpeaking') : outputMode === 'rolePlay' ? t('rolePlay') : t('retell')
+    return <div className="speakRoundPanel">
+      <div>
+        <span>{t('speakRoundTitle')}</span>
+        <strong>{modeLabel}</strong>
+      </div>
+      <p>{isLast ? t('speakRoundLast') : t('speakRoundBody', { current: Math.min(activeIndex + 1, total), total })}</p>
+      <em>{Math.min(activeIndex + 1, total)} / {total}</em>
+    </div>
+  }
+
+  function renderPracticeRoundPanel() {
+    if (!currentPractice) return null
+    const total = practicePool.length || 1
+    const isLast = activeIndex >= total - 1
+    return <div className="practiceRoundPanel">
+      <div>
+        <span>{t('practiceRoundTitle')}</span>
+        <strong>{t(currentPractice.type) || t('practiceTasks')}</strong>
+      </div>
+      <p>{isLast ? t('practiceRoundLast') : t('practiceRoundBody', { current: Math.min(activeIndex + 1, total), total })}</p>
+      <em>{Math.min(activeIndex + 1, total)} / {total}</em>
+    </div>
+  }
+
+  function renderListenRoundPanel() {
+    if (!isPhoneView || !currentAudioLine) return null
+    const total = activeCourse?.transcriptLines?.length || 1
+    const current = Math.min(currentAudioLineIndex + 1, total)
+    const isLast = currentAudioLineIndex >= total - 1
+    return <div className="listenRoundPanel" data-testid="listen-round-panel">
+      <div>
+        <span>{t('listenRoundTitle')}</span>
+        <strong>{t('currentLine')} {sentenceDisplayNumber(currentAudioLineIndex)}</strong>
+      </div>
+      <p>{isLast ? t('listenRoundLast') : t('listenRoundBody', { current, total })}</p>
+      <button className="primary compact" data-testid="listen-round-next" onClick={() => isLast ? finishListenAndOpenSpeak() : setActiveIndex(currentAudioLineIndex + 1)}>
+        {isLast ? t('finishListen') : t('nextListenLine')}
+      </button>
+      <em>{current} / {total}</em>
+    </div>
+  }
+
+  function renderImportSuccessBridge() {
+    if (!importResult || tab !== 'learn') return null
+    return <div className="importSuccessBridge" data-testid="import-success-bridge">
+      <div>
+        <span>{t('importSuccessTitle')}</span>
+        <strong>{importResult.title}</strong>
+        <p>{t('importSuccessBody')}</p>
+      </div>
+      <div className="importSuccessStats">
+        <em>{importResult.learnItems || 0} {t('lines')}</em>
+        <em>{importResult.speakItems || 0} {t('speakTasks')}</em>
+        <em>{importResult.reviewItems || 0} {t('nav.review')}</em>
+      </div>
+      <div className="importSuccessActions">
+        <button className="primary compact" onClick={() => { setImportResult(null); setActiveIndex(0); setLearnSubtab('audio') }}>{t('startFirstLine')}</button>
+        <button className="secondary compact" onClick={() => { setImportResult(null); activeCourse && openCourseStage(activeCourse.id, 'output') }}>{t('startSpeakingNow')}</button>
+        <button className="secondary compact" onClick={() => setImportResult(null)}>{t('close')}</button>
+      </div>
+    </div>
+  }
+
+  return <div className={`appShell platform-${isPhoneView ? 'phone' : 'mac'} tab-${tab} font-${settings.fontScale}`}>
     <aside className="sidebar">
       <div className="brand">
         <div className="brandMark">K</div>
@@ -3360,7 +4633,7 @@ function App() {
         </div>
       </div>
       <nav className="sideNav">
-        {visibleNavItems.map(item => <button type="button" key={item.id} className={tab === item.id ? 'active' : ''} onClick={() => goToTab(item.id)}>
+        {visibleNavItems.map(item => <button type="button" key={item.id} data-testid={`nav-${item.id}`} className={tab === item.id ? 'active' : ''} onClick={() => goToTab(item.id)}>
           <span>{t(isPhoneView ? (item.phoneLabelKey || item.labelKey) : item.labelKey)}</span>
           {isPhoneView && <small>{t(item.phoneHintKey || item.hintKey)}</small>}
         </button>)}
@@ -3387,8 +4660,17 @@ function App() {
       </header>
 
       {message && <div className="messageBar">{message}</div>}
+      {renderImportSuccessBridge()}
 
       {tab === 'today' && <section className="pageGrid">
+        {isPhoneView && <div className="phoneGreeting">
+          <span>{t('dailyTrainer')}</span>
+          <h2>{t('mobileGreeting', { name: activeProfile?.name || 'Kevin' })}</h2>
+          <p>{t('mobileGoal')}</p>
+        </div>}
+        {renderTodayMission()}
+        {renderMacCommandCenter()}
+        {renderMacStudyQueue()}
         <div className="heroPanel">
           <span>{t('continueLearning')}</span>
           <h2>{activeCourse?.title || t('chooseCourse')}</h2>
@@ -3398,13 +4680,17 @@ function App() {
           </div>}
           <div className="actionRow">
             <button className="primary" onClick={() => openCourseStage(activeCourse.id, resumeStage)} disabled={!activeCourse}>{t('resumeStage', { stage: stageLabel(resumeStage) })}</button>
-            <button className="secondary" onClick={() => goToTab('library')}>{t('openLibrary')}</button>
+            {!isPhoneView && <button className="secondary" onClick={() => goToTab('library')}>{t('openLibrary')}</button>}
           </div>
           <div className="sessionFlow">
             <button onClick={() => openCourseStage(activeCourse.id, 'learn')} disabled={!activeCourse}>
               <strong>{t('listenAction')}</strong>
               <span>{activeCourse?.transcriptLines?.length || 0} {t('lines')}</span>
             </button>
+            {!isPhoneView && <button onClick={() => openCourseStage(activeCourse.id, 'practice')} disabled={!activeCourse}>
+              <strong>{t('practiceAction')}</strong>
+              <span>{activeCourse?.practiceItems?.length || 0} {t('practiceTasks')}</span>
+            </button>}
             <button onClick={() => openCourseStage(activeCourse.id, 'output')} disabled={!activeCourse}>
               <strong>{t('speakAction')}</strong>
               <span>{activeCourse?.outputTasks?.length || 0} {t('speakTasks')}</span>
@@ -3414,6 +4700,8 @@ function App() {
               <span>{dueReview.length} {t('dueReview')}</span>
             </button>
           </div>
+          {renderMobileStageRail()}
+          {renderMacFlowPanel()}
         </div>
         <div className="summaryGrid">
           <div><strong>{store.courses.length}</strong><span>{t('courses')}</span></div>
@@ -3426,32 +4714,49 @@ function App() {
           <strong>{todayActivity.output}</strong><em>{t('outputDone')}</em>
           <strong>{todayActivity.review}</strong><em>{t('reviewDone')}</em>
         </div>
-        <div className="todayGrid">
+        <div className={`todayGrid ${isPhoneView ? 'phoneQuickGrid' : ''}`}>
           <article>
             <span>{t('todayPractice')}</span>
             <strong>{todayPractice[0]?.promptCn || todayPractice[0]?.base || t('quickResponse')}</strong>
-            <p>{todayPractice.length ? t('practiceSuggested', { count: todayPractice.length }) : t('noPracticeQueued')}</p>
-            <button className="secondary compact" onClick={() => goToTab('output')}>{t('startPractice')}</button>
+            <p>{isPhoneView ? t('mobileQuickSpeak') : todayPractice.length ? t('practiceSuggested', { count: todayPractice.length }) : t('noPracticeQueued')}</p>
+            <button className="secondary compact" onClick={() => goToTab(isPhoneView ? 'output' : 'practice')}>{t('startPractice')}</button>
           </article>
           <article>
             <span>{t('todayReview')}</span>
             <strong>{weakReview[0]?.promptCn || dueReview[0]?.promptCn || t('reviewMemory')}</strong>
-            <p>{weakReview.length ? t('weakPriority', { count: weakReview.length }) : t('reviewReady', { count: dueReview.length })}</p>
+            <p>{isPhoneView ? t('mobileQuickReview') : weakReview.length ? t('weakPriority', { count: weakReview.length }) : t('reviewReady', { count: dueReview.length })}</p>
             <button className="secondary compact" onClick={() => { setReviewMode(weakReview.length ? 'weak' : 'today'); goToTab('review') }}>{t('startReview')}</button>
           </article>
-          <article>
+          {!isPhoneView && <article>
             <span>{t('libraryImport')}</span>
             <strong>{t('manageContent')}</strong>
             <p>{t('manageContentHint')}</p>
             <button className="secondary compact" onClick={() => { goToTab('library'); setLibrarySubtab('courses') }}>{t('openLibrary')}</button>
-          </article>
+          </article>}
         </div>
-        <div className="courseStrip">
-          {recentCourses.map(course => <button key={course.id} onClick={() => selectCourse(course.id)}>
-            <strong>{course.title}</strong>
-            <small>{sourceLabel(course.sourceType)} · {audioLabel(course.audioMode)}</small>
-          </button>)}
-        </div>
+        {!isPhoneView && <div className="recentCoursesPanel">
+          <div className="sectionTitleLine">
+            <span>{t('recentCoursesTitle')}</span>
+            <strong>{store.courses.length} {t('courses')}</strong>
+          </div>
+          <div className="courseStrip">
+            {recentCourses.map(course => {
+              const resumeStep = course.lastStage || 'learn'
+              return <div className="courseStripItem" key={course.id}>
+                <button className="courseStripMain" onClick={() => selectCourse(course.id, resumeStep)}>
+                  <strong>{course.title}</strong>
+                  <small>{sourceLabel(course.sourceType)} · {audioLabel(course.audioMode)} · {stageLabel(resumeStep)}</small>
+                </button>
+                <div className="courseStripActions">
+                  <button className="secondary compact" onClick={() => selectCourse(course.id, 'learn')}>{t('listenAction')}</button>
+                  <button className="secondary compact" onClick={() => selectCourse(course.id, 'practice')}>{t('practiceAction')}</button>
+                  <button className="secondary compact" onClick={() => selectCourse(course.id, 'output')}>{t('speakAction')}</button>
+                  <button className="secondary compact" onClick={() => { setReviewMode('today'); selectCourse(course.id, 'review') }}>{t('reviewAction')}</button>
+                </div>
+              </div>
+            })}
+          </div>
+        </div>}
       </section>}
 
       {tab === 'library' && <section>
@@ -3479,7 +4784,7 @@ function App() {
                   course={course}
                   linkedTitle={course.linkedCourseTitle || store.courses.find(row => row.id === course.linkedCourseId)?.title || ''}
                   onLearn={() => selectCourse(course.id, 'learn')}
-                  onPractice={() => selectCourse(course.id, 'output')}
+                  onPractice={() => selectCourse(course.id, 'practice')}
                   t={t}
                   sourceLabel={sourceLabel}
                   audioLabel={audioLabel}
@@ -3488,23 +4793,38 @@ function App() {
               </div>
             </section>)}
           </div>}
-          {librarySubtab === 'import' && <div className="importChoice">
-            <button onClick={() => setLibraryMode('audioImport')}>
-              <strong>{t('audioImport')}</strong>
-              <span>{t('audioImportHint')}</span>
-            </button>
-            <button onClick={() => setLibraryMode('textImport')}>
-              <strong>{t('textPackImport')}</strong>
-              <span>{t('textPackImportHint')}</span>
-            </button>
-          </div>}
+          {librarySubtab === 'import' && <>
+            <div className="importFlowPanel">
+              <div>
+                <strong>{t('libraryFlowTitle')}</strong>
+                <span>{t('libraryFlowHint')}</span>
+              </div>
+              <div>
+                <em>1 {t('import')}</em>
+                <em>2 {t('listenAction')}</em>
+                <em>3 {t('practiceAction')}</em>
+                <em>4 {t('speakAction')}</em>
+                <em>5 {t('reviewAction')}</em>
+              </div>
+            </div>
+            <div className="importChoice">
+              <button data-testid="import-choice-audio" onClick={() => setLibraryMode('audioImport')}>
+                <strong>{t('audioImport')}</strong>
+                <span>{t('audioImportHint')}</span>
+              </button>
+              <button data-testid="import-choice-text" onClick={() => setLibraryMode('textImport')}>
+                <strong>{t('textPackImport')}</strong>
+                <span>{t('textPackImportHint')}</span>
+              </button>
+            </div>
+          </>}
         </>}
         {libraryMode === 'import' && <div className="importChoice">
-          <button onClick={() => setLibraryMode('audioImport')}>
+          <button data-testid="import-choice-audio" onClick={() => setLibraryMode('audioImport')}>
             <strong>{t('audioImport')}</strong>
             <span>{t('audioImportHint')}</span>
           </button>
-          <button onClick={() => setLibraryMode('textImport')}>
+          <button data-testid="import-choice-text" onClick={() => setLibraryMode('textImport')}>
             <strong>{t('textPackImport')}</strong>
             <span>{t('textPackImportHint')}</span>
           </button>
@@ -3512,6 +4832,7 @@ function App() {
         </div>}
         {libraryMode === 'audioImport' && <div className="importPanel">
           <div className="topActions"><button className="secondary compact" onClick={() => { setLibraryMode('list'); setLibrarySubtab('import') }}>{t('back')}</button><span>{t('textbookAudioMode')}</span></div>
+          <ImportRouteGuide mode="audio" t={t} />
           <div className="modeNotice">
             <strong>{t('audioImportNoticeTitle')}</strong>
             <p>{t('audioImportNoticeBody')}</p>
@@ -3547,18 +4868,22 @@ function App() {
             <span>3 Generate training content</span>
             <span>4 Edit timestamps if needed</span>
           </div>
-          <button className="primary" disabled={!audioFileRef.current || !audioForm.transcript.trim()} onClick={importAudioCourse}>{t('saveAudioCourse')}</button>
+          <button className="primary" data-testid="confirm-audio-import" disabled={!audioFileRef.current || !audioForm.transcript.trim()} onClick={importAudioCourse}>{t('saveAudioCourse')}</button>
         </div>}
         {libraryMode === 'textImport' && <div className="importPanel">
           <div className="topActions"><button className="secondary compact" onClick={() => { setLibraryMode('list'); setLibrarySubtab('import') }}>{t('back')}</button><span>{t('textPackDemoImport')}</span></div>
+          <ImportRouteGuide mode="generated" t={t} />
           <textarea value={textPack} onChange={e => setTextPack(e.target.value)} placeholder={t('textPackPlaceholder')} />
           {textPreview && <ImportPreview preview={textPreview} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />}
-          <button className="primary" disabled={!textPreview} onClick={importTextPack}>{textPreview?.kind === 'bundle' ? t('importDemoPack') : t('importTextPack')}</button>
+          <button className="primary" data-testid="confirm-text-import" disabled={!textPreview} onClick={importTextPack}>{t('confirmImport')}</button>
         </div>}
       </section>}
 
       {tab === 'learn' && activeCourse && <section>
         <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
+        {renderTaskHero('listen')}
+        {renderListenRoundPanel()}
+        {renderMacFlowPanel('compactFlow')}
         <div className="subTabs learnTabsPrimary">
           <button className={learnSubtab === 'audio' ? 'active' : ''} onClick={() => setLearnSubtab('audio')}>{t('listen')}</button>
           {!isPhoneView && <button className={showStudyTools || learnSubtab === 'notes' || learnSubtab === 'editor' ? 'active' : ''} onClick={() => {
@@ -3586,6 +4911,28 @@ function App() {
             </div>
             <button className="secondary compact" onClick={() => playCourseTranscript(activeCourse)}>{t('listenAll')}</button>
           </div>
+          {!isPhoneView && activeCourse.sourceType === 'textbookCourse' && activeCourse.audioMode === 'original' && rewriteDraft?.pairs?.length > 0 && <div className="rewritePanel">
+            <div className="topActions">
+              <div>
+                <h2>{t('rewriteTitle')}</h2>
+                <p>{t('rewriteHint')}</p>
+              </div>
+              <button className="primary compact" onClick={openGeneratedKevinVersion} disabled={rewriteLoading}>{rewriteLoading ? t('generatingRewrite') : linkedKevinCourse ? t('openKevinVersion') : t('useKevinVersion')}</button>
+            </div>
+            <div className="rewriteCompareHeader">
+              <span>{t('originalVersion')}</span>
+              <span>{t('kevinVersion')}</span>
+            </div>
+            <div className="rewriteCompareList">
+              {rewriteDraft.pairs.slice(0, 5).map((pair, index) => <div key={`${pair.original}-${index}`} className="rewriteCompareRow">
+                <button onClick={() => {
+                  const originalLine = activeCourse.transcriptLines.find(line => line.id === pair.originalLineId)
+                  if (originalLine) playLine(originalLine)
+                }}>{pair.original}</button>
+                <button onClick={() => playText(pair.rewritten, 'Kevin')}>{pair.rewritten}</button>
+              </div>)}
+            </div>
+          </div>}
           {currentAudioLine && <div className="focusPlayer">
             <div className="focusPlayerMeta">
               <div>
@@ -3669,16 +5016,20 @@ function App() {
               </div>
             </div>
             {activeCourse.transcriptLines.map((line, index) => <React.Fragment key={line.id}>
-              <div className={`sentenceRow ${line.aligned ? '' : 'needCheck'} ${currentAudioLine?.id === line.id ? 'activeLine' : ''}`}>
+              <div
+                className={`sentenceRow ${line.aligned ? '' : 'needCheck'} ${currentAudioLine?.id === line.id ? 'activeLine' : ''} ${swipedLineId === line.id ? 'actionsOpen' : ''}`}
+                onTouchStart={event => startSentenceSwipe(line, event)}
+                onTouchEnd={event => endSentenceSwipe(line, event)}
+              >
                 <span className="lineNumber">{sentenceDisplayNumber(index)}</span>
-                <button className="sentenceText sentencePlay" onClick={() => { setActiveIndex(index); playLineRepeated(line) }}>{displayLine(line)}</button>
+                <button className="sentenceText sentencePlay" onClick={() => { if (swipedLineId && swipedLineId !== line.id) setSwipedLineId(''); setActiveIndex(index); playLineRepeated(line) }}>{displayLine(line)}</button>
                 <div className="lineActions">
                   {!line.aligned && <em>{t('unaligned')}</em>}
-                  <button className="starButton" title={t('saveReview')} aria-label={t('saveReview')} onClick={() => addTextToReview({ en: line.en, cn: line.cn, type: 'usefulSentence', source: 'Transcript' })}>⭐</button>
-                  <button title={t('lineMore')} aria-label={t('lineMore')} onClick={() => { setActiveIndex(index); setEditingLineId(line.id); setLineMoreId(lineMoreId === line.id ? '' : line.id) }}>🔧</button>
+                  <button className="starButton" title={t('saveReview')} aria-label={t('saveReview')} onClick={() => saveTranscriptLine(line)}>{isPhoneView ? t('saveShort') : t('starShort')}</button>
+                  <button className="toolButton" title={isPhoneView ? t('toolShort') : t('lineMore')} aria-label={isPhoneView ? t('toolShort') : t('lineMore')} onClick={() => openTranscriptLineTools(line, index)}>{isPhoneView ? t('toolShort') : '🔧'}</button>
                 </div>
               </div>
-              {lineMoreId === line.id && <div className="lineMorePanel">
+              {!isPhoneView && lineMoreId === line.id && <div className="lineMorePanel">
                 <div className="topActions">
                   <div>
                     <span>{t('lineMore')}</span>
@@ -3736,6 +5087,13 @@ function App() {
                 </section>
               </div>}
             </React.Fragment>)}
+          </div>
+          <div className="nextStepBanner">
+            <div>
+              <strong>{t('finishListen')}</strong>
+              <span>{activeCourse.outputTasks?.length || 0} {t('speakTasks')}</span>
+            </div>
+            <button className="primary compact" onClick={finishListenAndOpenSpeak}>{t('finishListen')}</button>
           </div>
         </div>}
         {learnSubtab === 'language' && <div className="languagePreview">
@@ -3833,13 +5191,44 @@ function App() {
         {learnSubtab === 'notes' && <BackgroundPanel course={activeCourse} t={t} />}
       </section>}
 
+      {tab === 'practice' && activeCourse && <section>
+        <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
+        {renderTaskHero('practice')}
+        {renderMacFlowPanel('compactFlow')}
+        {renderPracticeRoundPanel()}
+        {currentPractice ? <PracticeCard
+          item={currentPractice}
+          typed={typed}
+          setTyped={setTyped}
+          answerShown={answerShown}
+          setAnswerShown={setAnswerShown}
+          playText={playText}
+          onSaveReview={payload => addTextToReview({ ...payload, source: payload.source || 'Practice' })}
+          onNext={nextPracticeItem}
+          nextLabel={activeIndex >= practicePool.length - 1 ? t('completeAndSpeak') : t('nextPracticeTask')}
+          t={t}
+        /> : <Empty text={t('noPracticeTasks')} />}
+        {currentPractice && <div className="nextStepBanner">
+          <div>
+            <strong>{activeIndex >= practicePool.length - 1 ? t('completeAndSpeak') : t('nextPracticeTask')}</strong>
+            <span>{activeCourse.outputTasks?.length || 0} {t('speakTasks')}</span>
+          </div>
+          <button className="primary compact" onClick={activeIndex >= practicePool.length - 1 ? finishPracticeAndOpenSpeak : nextPracticeItem}>
+            {activeIndex >= practicePool.length - 1 ? t('completeAndSpeak') : t('nextPracticeTask')}
+          </button>
+        </div>}
+      </section>}
+
       {tab === 'output' && activeCourse && <section>
         <CourseHeader course={activeCourse} t={t} sourceLabel={sourceLabel} audioLabel={audioLabel} />
-        <div className="subTabs">
+        {renderTaskHero('speak')}
+        {renderMacFlowPanel('compactFlow')}
+        <div className="subTabs outputModeTabs">
           <button className={outputMode === 'guided' ? 'active' : ''} onClick={() => { setOutputMode('guided'); setActiveIndex(0) }}>{t('guidedSpeaking')}</button>
           <button className={outputMode === 'rolePlay' ? 'active' : ''} onClick={() => { setOutputMode('rolePlay'); setActiveIndex(0) }}>{t('rolePlay')}</button>
           <button className={outputMode === 'retell' ? 'active' : ''} onClick={() => { setOutputMode('retell'); setActiveIndex(0) }}>{t('retell')}</button>
         </div>
+        {renderSpeakRoundPanel()}
         <p className="modeHint">{outputMode === 'guided' ? t('guidedHint') : outputMode === 'rolePlay' ? t('rolePlayHint') : t('retellHint')}</p>
         {outputMode === 'retell' && <div className="speakConstraintBar">
           <span>{t('freeTalkLevel')}</span>
@@ -3849,10 +5238,35 @@ function App() {
           <span>{freeTalkLevel === 'A2' ? (uiLanguage === 'zh' ? '每轮 1 句，最多 10 词' : '1 sentence, up to 10 words') : freeTalkLevel === 'B1' ? (uiLanguage === 'zh' ? '每轮 1-2 句，最多 15 词' : '1-2 sentences, up to 15 words') : (uiLanguage === 'zh' ? '每轮 2 句，允许更自然表达' : '2 sentences, more natural range')}</span>
           <span>{uiLanguage === 'zh' ? '仅限当前主题' : 'Stay in current topic'}</span>
         </div>}
-        {currentOutput ? <OutputCard item={currentOutput} isPhoneView={isPhoneView} freeTalkLevel={freeTalkLevel} playText={playText} playList={playOutputLines} onSaveReview={payload => addTextToReview({ ...payload, source: payload.source || 'Output' })} onMarkStuck={() => markOutputStuck(currentOutput)} onNext={nextOutputItem} t={t} /> : <Empty text={t('noOutputTasks')} />}
+        {currentOutput ? <OutputCard item={currentOutput} isPhoneView={isPhoneView} freeTalkLevel={freeTalkLevel} playText={playText} playList={playOutputLines} requestFreeTalkReply={requestFreeTalkReply} getPauseSeconds={autoPauseSecondsForLine} onSaveReview={payload => addTextToReview({ ...payload, source: payload.source || 'Output' })} onMarkStuck={() => markOutputStuck(currentOutput)} onNext={nextOutputItem} nextLabel={activeIndex >= outputPool.length - 1 ? t('completeAndReview') : t('nextSpeakingTask')} t={t} /> : <Empty text={t('noOutputTasks')} />}
+        {currentOutput && <div className="nextStepBanner">
+          <div>
+            <strong>{activeIndex >= outputPool.length - 1 ? t('completeAndReview') : t('nextSpeakingTask')}</strong>
+            <span>{dueReview.length} {t('dueReview')}</span>
+          </div>
+          <button className="primary compact" onClick={activeIndex >= outputPool.length - 1 ? finishSpeakAndOpenReview : nextOutputItem}>
+            {activeIndex >= outputPool.length - 1 ? t('completeAndReview') : t('nextSpeakingTask')}
+          </button>
+        </div>}
       </section>}
 
       {tab === 'review' && <section>
+        {renderTaskHero('review')}
+        {renderMacFlowPanel('compactFlow')}
+        {!!currentReview && <div className="reviewRoundPanel">
+          <div>
+            <span>{t('reviewRoundTitle')}</span>
+            <strong>{reviewMode === 'today' ? t('todayReview') : reviewMode === 'weak' ? t('weakStuck') : reviewMode === 'chunks' ? t('chunks') : t('usefulSentences')}</strong>
+          </div>
+          <p>{activeIndex >= reviewPool.length - 1 ? t('reviewRoundDoneSoon') : t('reviewRoundBody', { remaining: Math.max(1, reviewPool.length - activeIndex) })}</p>
+        </div>}
+        {isPhoneView && currentReview && <div className="reviewFocusPanel" data-testid="review-focus-panel">
+          <div>
+            <span>{t('reviewFocusTitle')}</span>
+            <strong>{t('cardProgress', { current: Math.min(activeIndex + 1, reviewPool.length || 1), total: reviewPool.length || 1 })}</strong>
+          </div>
+          <p>{t('reviewFocusBody')}</p>
+        </div>}
         <div className="reviewBuckets">
           {Object.entries(reviewBuckets).map(([label, count]) => <div key={label}><strong>{count}</strong><span>{reviewLabel(label)}</span></div>)}
         </div>
@@ -3865,14 +5279,24 @@ function App() {
         <div className="reviewCard">
           <span>{reviewMode === 'today' ? t('todayReview') : reviewMode === 'chunks' ? t('chunks') : reviewMode === 'sentences' ? t('usefulSentences') : t('weakStuck')}</span>
           {currentReview ? <>
+            <div className="reviewCardMeta">
+              <em>{t('cardProgress', { current: Math.min(activeIndex + 1, reviewPool.length || 1), total: reviewPool.length || 1 })}</em>
+              <em>{reviewLabel(reviewBucketLabel(currentReview))}</em>
+            </div>
             <h2>{currentReview.promptCn}</h2>
-            {answerShown ? <button className="answerBox playableAnswer" onClick={() => playText(currentReview.answerEn)}>{currentReview.answerEn}</button> : <button className="primary" onClick={() => setAnswerShown(true)}>{t('showAnswer')}</button>}
+            <p className="reviewThinkHint">{t('thinkFirst')}</p>
+            {answerShown ? <button className="answerBox playableAnswer reviewAnswer" onClick={() => playText(currentReview.answerEn)}>{currentReview.answerEn}</button> : <button className="primary revealButton" onClick={() => setAnswerShown(true)}>{t('showAnswer')}</button>}
+            <div className="reviewSourceLine">
+              <span>{t('sourceLabel')}: {currentReview.source || reviewLabel(reviewBucketLabel(currentReview))}</span>
+              <span>{t('nextDue')}: {dateLabel(currentReview.nextReviewAt)}</span>
+            </div>
             <div className="actionRow">
               <button className="secondary" onClick={() => playText(currentReview.answerEn)}>{t('play')}</button>
               <button className="secondary" onClick={() => markReview(currentReview, 'again')}>{t('again')}</button>
+              <button className="secondary" onClick={() => markReview(currentReview, 'hard')}>{t('hard')}</button>
               <button className="primary" onClick={() => markReview(currentReview, 'good')}>{t('good')}</button>
             </div>
-          </> : <Empty text={reviewMode === 'today' ? t('noReviewToday') : t('noReviewSection')} />}
+          </> : renderReviewEmpty()}
         </div>
         {(reviewMode !== 'today' || !isPhoneView || reviewQueueExpanded) && <div className="queueList">
           {reviewPool.slice(0, 12).map(item => <button key={item.id} onClick={() => playText(item.answerEn)}><strong>{item.answerEn}</strong><span>{reviewLabel(reviewBucketLabel(item))} · {dateLabel(item.nextReviewAt)} · {item.status}</span></button>)}
@@ -3987,11 +5411,42 @@ function DisplaySwitch({ settings, setSettings }) {
   </div>
 }
 
+function ImportRouteGuide({ mode, t }) {
+  const isAudio = mode === 'audio'
+  return <div className={`importRouteGuide ${isAudio ? 'audio' : 'generated'}`}>
+    <div className="importRouteCompare">
+      <section className="importRouteColumn importRouteSource">
+        <span>{isAudio ? t('originalAudioRule') : t('generatedAudioRule')}</span>
+        <strong>{isAudio ? t('importGuideAudioTitle') : t('importGuideTextTitle')}</strong>
+        <p>{isAudio ? t('importGuideAudioBody') : t('importGuideTextBody')}</p>
+      </section>
+      <section className="importRouteColumn importRouteResult">
+        <span>{isAudio ? t('kevinVersion') : t('openKevinVersion')}</span>
+        <strong>{isAudio ? t('rewriteSaved') : t('saveSuggested')}</strong>
+        <p>{isAudio ? t('generatedAudioRule') : t('freeTalkFallback')}</p>
+      </section>
+    </div>
+    <div className="importPath">
+      <em>1 {t('import')}</em>
+      <em>2 {t('importCreatesListen')}</em>
+      <em>3 {t('importCreatesSpeak')}</em>
+      <em>4 {t('importCreatesReview')}</em>
+    </div>
+    <small>{t('importAfterSave')}</small>
+  </div>
+}
+
 function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
   const courses = preview.kind === 'bundle' ? preview.courses : [preview]
   const report = preview.importReport
   return <div className="previewBox importReport">
-    <strong>{report.title}</strong>
+    <div className="importConfirmHead">
+      <div>
+        <span>{t('importConfirmTitle')}</span>
+        <strong>{report.title}</strong>
+      </div>
+      <em>{t('importConfirmHint')}</em>
+    </div>
     <div className="reportGrid">
       <span>PACK_TYPE: {report.packType || 'TEXT_PACK'}</span>
       <span>SOURCE_TYPE: {report.sourceType}</span>
@@ -4004,6 +5459,11 @@ function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
       <div><strong>{(Number(report.practiceItems) || 0) + (Number(report.outputItems) || 0)}</strong><span>{t('speakTasks')}</span></div>
       <div><strong>{report.reviewItems}</strong><span>{t('nav.review')}</span></div>
     </div>
+    <div className="importRouteChecklist">
+      <span>{t('importRouteListen')}</span>
+      <span>{t('importRouteSpeak')}</span>
+      <span>{t('importRouteReview')}</span>
+    </div>
     <div className="coursePreviewList">
       {courses.map(course => <div key={course.id}>
         <strong>{course.title}</strong>
@@ -4015,41 +5475,178 @@ function ImportPreview({ preview, t, sourceLabel, audioLabel }) {
   </div>
 }
 
-function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, onSaveReview, onMarkStuck, onNext, t }) {
+function PracticeCard({ item, typed, setTyped, answerShown, setAnswerShown, playText, onSaveReview, onNext, nextLabel, t }) {
+  const expected = String(item.answerEn || '').trim()
+  const normalizedTyped = normalizeAnswerText(typed)
+  const normalizedExpected = normalizeAnswerText(expected)
+  const isClose = !!normalizedTyped && !!normalizedExpected && (
+    normalizedTyped === normalizedExpected ||
+    normalizedExpected.includes(normalizedTyped) ||
+    normalizedTyped.includes(normalizedExpected)
+  )
+  const prompt = item.type === 'replacement'
+    ? item.replacement || item.promptCn || item.base
+    : item.promptCn || item.hint || item.base || expected
+  const supportLabel = item.type === 'typing'
+    ? t('typing')
+    : item.type === 'replacement'
+      ? t('replacement')
+      : t('quickResponse')
+
+  return <div className={`practiceCard controlledPracticeCard practice-${item.type}`}>
+    <span>{supportLabel}</span>
+    <h2>{prompt}</h2>
+    {item.type === 'replacement' && <div className="practiceSupportGrid">
+      <div><small>{t('originalLine')}</small><strong>{item.base}</strong></div>
+      <div><small>{t('dailyLine')}</small><strong>{item.replacement}</strong></div>
+    </div>}
+    {item.hint && <div className="guidedStarter"><span>{t('practicePrompt')}</span><strong>{item.hint}</strong></div>}
+    <label className="practiceAnswerEntry">
+      <span>{t('yourAnswer')}</span>
+      <textarea value={typed} onChange={event => setTyped(event.target.value)} placeholder={expected || t('answerPlaceholder')} />
+    </label>
+    {answerShown && <div className={`answerBox ${isClose ? 'correct' : normalizedTyped ? 'wrong' : ''}`}>
+      <small>{isClose ? t('practiceMatched') : t('practiceTryAgain')}</small>
+      <button className="playableAnswer" onClick={() => playText(expected)}>{expected}</button>
+    </div>}
+    <div className="actionRow">
+      <button className="secondary" onClick={() => playText(expected)}>{t('play')}</button>
+      <button className="secondary" onClick={() => setAnswerShown(true)}>{t('checkAnswer')}</button>
+      <button className="secondary" onClick={() => onSaveReview?.({ en: expected, cn: prompt, type: item.type === 'replacement' ? 'pattern' : 'usefulSentence' })}>{t('saveReview')}</button>
+      <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
+    </div>
+  </div>
+}
+
+function normalizeAnswerText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^\w\s']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, requestFreeTalkReply, getPauseSeconds, onSaveReview, onMarkStuck, onNext, nextLabel, t }) {
   const [userRole, setUserRole] = useState(item.userRole || 'Kevin')
   const [showScript, setShowScript] = useState(!isPhoneView)
+  const [recordingEnabled, setRecordingEnabled] = useState(false)
+  const [activeRoleIndex, setActiveRoleIndex] = useState(-1)
+  const [countdown, setCountdown] = useState(0)
+  const [roleRunning, setRoleRunning] = useState(false)
+  const [freeTalkMessages, setFreeTalkMessages] = useState([])
+  const [freeTalkText, setFreeTalkText] = useState('')
+  const [freeTalkResult, setFreeTalkResult] = useState(null)
+  const [freeTalkLoading, setFreeTalkLoading] = useState(false)
+  const [saveFeedback, setSaveFeedback] = useState('')
   useEffect(() => {
     setShowScript(!isPhoneView)
+    setActiveRoleIndex(-1)
+    setCountdown(0)
+    setRoleRunning(false)
+    setFreeTalkMessages([])
+    setFreeTalkText('')
+    setFreeTalkResult(null)
+    setFreeTalkLoading(false)
+    setSaveFeedback('')
   }, [item.id, isPhoneView])
 
+  function saveToReview(payload) {
+    onSaveReview?.(payload)
+    setSaveFeedback(t('savedReviewInline'))
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  async function runRolePlay() {
+    if (!item.lines?.length || roleRunning) return
+    setRoleRunning(true)
+    setCountdown(0)
+    for (let index = 0; index < item.lines.length; index += 1) {
+      const line = item.lines[index]
+      const isUserLine = line.speaker?.toLowerCase() === userRole.toLowerCase()
+      setActiveRoleIndex(index)
+      if (isUserLine) {
+        const seconds = Math.max(1, Math.round(Number(getPauseSeconds?.(line) || 3)))
+        for (let remaining = seconds; remaining > 0; remaining -= 1) {
+          setCountdown(remaining)
+          await wait(1000)
+        }
+        setCountdown(0)
+      } else {
+        await playText(line.en, line.speaker)
+        await wait(Math.max(900, Math.round(String(line.en || '').split(/\s+/).length * 320)))
+      }
+    }
+    setRoleRunning(false)
+  }
+
+  function startFreeTalk() {
+    setFreeTalkMessages([{ role: 'ai', text: t('freeTalkOpening') }])
+    setFreeTalkResult(null)
+  }
+
+  async function sendFreeTalkTurn() {
+    const userText = freeTalkText.trim()
+    if (!userText || freeTalkLoading) return
+    const nextMessages = [...freeTalkMessages, { role: 'user', text: userText }]
+    setFreeTalkMessages(nextMessages)
+    setFreeTalkText('')
+    setFreeTalkLoading(true)
+    const result = await requestFreeTalkReply?.({ item, level: freeTalkLevel || 'A2', messages: nextMessages, userText })
+    const reply = result?.reply || 'Try again with one simple sentence.'
+    setFreeTalkResult(result || null)
+    setFreeTalkMessages([...nextMessages, { role: 'ai', text: reply }])
+    setFreeTalkLoading(false)
+  }
+
   if (item.type === 'rolePlay') {
-    return <div className="practiceCard">
+    return <div className="practiceCard practice-rolePlay">
       <span>{t('rolePlay')}</span>
       <h2>{item.scenario}</h2>
-      <select value={userRole} onChange={e => setUserRole(e.target.value)}>
-        {[...new Set(item.lines.map(line => line.speaker).filter(Boolean))].map(role => <option key={role}>{role}</option>)}
-      </select>
+      <div className="roleSetupRow">
+        <label>{t('rolePlay')}<select value={userRole} onChange={e => setUserRole(e.target.value)}>
+          {[...new Set(item.lines.map(line => line.speaker).filter(Boolean))].map(role => <option key={role}>{role}</option>)}
+        </select></label>
+        <button className={`recordToggle ${recordingEnabled ? 'active' : ''}`} onClick={() => setRecordingEnabled(value => !value)}>{recordingEnabled ? t('recordingOn') : t('recordingOff')}</button>
+      </div>
+      <div className="rolePlayStage">
+        <div className={`countdownRing ${countdown ? 'active' : ''}`}>
+          <strong>{countdown || 'GO'}</strong>
+          <span>{activeRoleIndex >= 0 && item.lines[activeRoleIndex]?.speaker?.toLowerCase() === userRole.toLowerCase() ? t('yourTurn') : t('partnerTurn')}</span>
+        </div>
+        <div>
+          <strong>{activeRoleIndex >= 0 ? item.lines[activeRoleIndex]?.en : item.lines.find(line => line.speaker?.toLowerCase() !== userRole.toLowerCase())?.en || item.lines[0]?.en}</strong>
+          <span>{t('pauseAuto', { seconds: activeRoleIndex >= 0 ? Math.round(Number(getPauseSeconds?.(item.lines[activeRoleIndex]) || 3)) : 3 })}</span>
+        </div>
+      </div>
       <div className="actionRow">
-        <button className="primary" onClick={() => playList(item.lines, { skipSpeaker: userRole })}>{t('rolePlay')}</button>
+        <button className="primary" onClick={runRolePlay} disabled={roleRunning}>{roleRunning ? t('yourTurn') : t('startRolePlay')}</button>
         <button className="secondary" onClick={() => setShowScript(value => !value)}>{showScript ? t('hide') : t('transcript')}</button>
       </div>
-      {showScript && <div className="sentenceList compactList">
-        {item.lines.map((line, index) => <div className="sentenceRow" key={index}>
-          <span className="speaker">{line.speaker}</span>
-          <button className="sentenceText sentencePlay" onClick={() => playText(line.en, line.speaker)}><span>{line.en}</span>{line.cn && <small>{line.cn}</small>}</button>
-          <div className="lineActions">
-            <button title={t('saveReview')} onClick={() => onSaveReview({ en: line.en, cn: line.cn, type: 'usefulSentence' })}>⭐</button>
+      {(showScript || isPhoneView) && <div className="roleChatList">
+        {item.lines.map((line, index) => {
+          const isUser = line.speaker?.toLowerCase() === userRole.toLowerCase()
+          return <div className={`roleBubbleRow ${isUser ? 'user' : 'ai'} ${activeRoleIndex === index ? 'activeLine' : ''}`} key={`${line.speaker}-${index}`}>
+            <button className="roleBubble" onClick={() => playText(line.en, line.speaker)}>
+              <span>{isUser ? t('yourTurn') : (line.speaker || t('partnerTurn'))}</span>
+              <strong>{line.en}</strong>
+              {line.cn && <small>{line.cn}</small>}
+            </button>
+            <button className="roleBubbleSave" title={t('saveReview')} onClick={() => saveToReview({ en: line.en, cn: line.cn, type: 'usefulSentence' })}>{t('starShort')}</button>
           </div>
-        </div>)}
+        })}
       </div>}
+      {saveFeedback && <div className="inlineSuccess" data-testid="saved-review-feedback">{saveFeedback}</div>}
       <div className="actionRow">
         <button className="secondary weakAction" onClick={onMarkStuck}>{t('markStuck')}</button>
-        <button className="primary" onClick={onNext}>{t('next')}</button>
+        <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
       </div>
     </div>
   }
   if (item.type === 'retell') {
-    return <div className="practiceCard">
+    return <div className="practiceCard practice-retell">
       <span>{t('retell')}</span>
       <h2>{item.prompt}</h2>
       <div className="chipRow">{(item.keywords || []).map(k => <span key={k}>{k}</span>)}</div>
@@ -4058,26 +5655,48 @@ function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, onSa
         <span>{freeTalkLevel === 'A2' ? (t('retell').includes('自由') ? '每轮 1 句' : '1 sentence per turn') : freeTalkLevel === 'B1' ? (t('retell').includes('自由') ? '每轮 1-2 句' : '1-2 sentences per turn') : (t('retell').includes('自由') ? '每轮 2 句' : '2 sentences per turn')}</span>
         <span>{t('retell').includes('自由') ? '只聊当前场景' : 'Keep the same scenario'}</span>
       </div>
-      <textarea placeholder={t('retellPlaceholder')} />
+      <div className="freeTalkPanel">
+        {!freeTalkMessages.length ? <button className="primary freeTalkStart" onClick={startFreeTalk}>{t('freeTalkStart')}</button> : <>
+          <div className="freeTalkMessages">
+            {freeTalkMessages.map((message, index) => <div key={`${message.role}-${index}`} className={`freeTalkBubble ${message.role}`}>
+              <span>{message.role === 'user' ? t('freeTalkYou') : t('freeTalkAi')}</span>
+              <strong>{message.text}</strong>
+            </div>)}
+            {freeTalkLoading && <div className="freeTalkBubble ai"><span>{t('freeTalkAi')}</span><strong>{t('freeTalkThinking')}</strong></div>}
+          </div>
+          <div className="freeTalkComposer">
+            <textarea value={freeTalkText} onChange={e => setFreeTalkText(e.target.value)} placeholder={t('freeTalkInput')} />
+            <button className="primary" disabled={!freeTalkText.trim() || freeTalkLoading} onClick={sendFreeTalkTurn}>{t('freeTalkSend')}</button>
+          </div>
+          {freeTalkResult && <div className="freeTalkFeedback">
+            {freeTalkResult.hint && <p><strong>{t('freeTalkHint')}:</strong> {freeTalkResult.hint}</p>}
+            {freeTalkResult.feedback && <p><strong>{t('freeTalkFeedback')}:</strong> {freeTalkResult.feedback}</p>}
+            {freeTalkResult.suggestedReview && <button className="secondary compact" onClick={() => saveToReview({ en: freeTalkResult.suggestedReview, cn: item.prompt, type: 'usefulSentence' })}>{t('saveSuggested')}</button>}
+          </div>}
+        </>}
+      </div>
+      {saveFeedback && <div className="inlineSuccess" data-testid="saved-review-feedback">{saveFeedback}</div>}
       <div className="actionRow">
         <button className="secondary" onClick={() => playText(item.sample)}>{t('play')}</button>
-        <button className="secondary" onClick={() => onSaveReview({ en: item.sample, cn: item.prompt, type: 'usefulSentence' })}>{t('saveReview')}</button>
+        <button className="secondary" data-testid="task-speak-save" onClick={() => saveToReview({ en: item.sample, cn: item.prompt, type: 'usefulSentence' })}>{t('saveReview')}</button>
         <button className="secondary weakAction" onClick={onMarkStuck}>{t('markStuck')}</button>
-        <button className="primary" onClick={onNext}>{t('next')}</button>
+        <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
       </div>
       <button className="answerBox playableAnswer" onClick={() => playText(item.sample)}>{item.sample}</button>
     </div>
   }
-  return <div className="practiceCard">
+  return <div className="practiceCard practice-guidedSpeaking">
     <span>{t('guidedSpeaking')}</span>
     <h2>{item.prompt}</h2>
+    {item.sentenceStarter && <div className="guidedStarter"><span>Starter</span><strong>{item.sentenceStarter}</strong></div>}
     <div className="chipRow">{(item.hints || []).map(h => <span key={h}>{h}</span>)}</div>
     <textarea placeholder={t('answerPlaceholder')} />
+    {saveFeedback && <div className="inlineSuccess" data-testid="saved-review-feedback">{saveFeedback}</div>}
     <div className="actionRow">
       <button className="secondary" onClick={() => playText(item.sample)}>{t('play')}</button>
-      <button className="secondary" onClick={() => onSaveReview({ en: item.sample, cn: item.prompt, type: 'usefulSentence' })}>{t('saveReview')}</button>
+      <button className="secondary" data-testid="task-speak-save" onClick={() => saveToReview({ en: item.sample, cn: item.prompt, type: 'usefulSentence' })}>{t('saveReview')}</button>
       <button className="secondary weakAction" onClick={onMarkStuck}>{t('markStuck')}</button>
-      <button className="primary" onClick={onNext}>{t('next')}</button>
+      <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
     </div>
     {item.sample && <button className="answerBox playableAnswer" onClick={() => playText(item.sample)}>{item.sample}</button>}
   </div>
