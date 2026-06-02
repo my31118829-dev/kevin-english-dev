@@ -1,7 +1,7 @@
 {
   "name": "kevin-english-dev",
   "private": true,
-  "version": "3.9.52",
+  "version": "3.9.53",
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",

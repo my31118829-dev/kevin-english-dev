@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3952'
-const SETTINGS_KEY = 'ke_dev_settings_v3952'
-const TAB_KEY = 'ke_dev_tab_v3952'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3952'
-const APP_VERSION = '3.9.52'
+const STORE_KEY = 'ke_dev_store_v3953'
+const SETTINGS_KEY = 'ke_dev_settings_v3953'
+const TAB_KEY = 'ke_dev_tab_v3953'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3953'
+const APP_VERSION = '3.9.53'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -5320,11 +5320,11 @@ function App() {
               <span>{t('sourceLabel')}: {currentReview.source || reviewLabel(reviewBucketLabel(currentReview))}</span>
               <span>{t('nextDue')}: {dateLabel(currentReview.nextReviewAt)}</span>
             </div>
-            <div className="actionRow">
-              <button className="secondary" onClick={() => playText(currentReview.answerEn)}>{t('play')}</button>
-              <button className="secondary" onClick={() => markReview(currentReview, 'again')}>{t('again')}</button>
-              <button className="secondary" onClick={() => markReview(currentReview, 'hard')}>{t('hard')}</button>
-              <button className="primary" onClick={() => markReview(currentReview, 'good')}>{t('good')}</button>
+            <div className="actionRow reviewActions">
+              <button className="secondary" onClick={() => playText(currentReview.answerEn)} disabled={!answerShown}>{t('play')}</button>
+              <button className="secondary" onClick={() => markReview(currentReview, 'again')} disabled={!answerShown}>{t('again')}</button>
+              <button className="secondary" onClick={() => markReview(currentReview, 'hard')} disabled={!answerShown}>{t('hard')}</button>
+              <button className="primary" onClick={() => markReview(currentReview, 'good')} disabled={!answerShown}>{t('good')}</button>
             </div>
           </> : renderReviewEmpty()}
         </div>
@@ -5583,12 +5583,14 @@ function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAns
       : t('quickResponse')
   const result = evaluatePracticeAnswer(typed, expected)
   const canMoveNext = answerShown || !expected
+  const progressPercent = Math.max(0, Math.min(100, Math.round((index / Math.max(total, 1)) * 100)))
 
   return <div className={`practiceCard controlledPracticeCard practice-${item.type}`}>
     <div className="practiceMetaRow">
       <span>{supportLabel}</span>
       <small>{t('practiceProgressLabel')}: {index}/{total}</small>
     </div>
+    <div className="practiceProgressTrack" aria-hidden="true"><i style={{ width: `${progressPercent}%` }} /></div>
     <h2>{prompt}</h2>
     {item.type === 'replacement' && <div className="practiceSupportGrid">
       <div><small>{t('originalLine')}</small><strong>{item.base}</strong></div>
@@ -5599,7 +5601,7 @@ function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAns
       <span>{t('yourAnswer')}</span>
       <textarea value={typed} onChange={event => setTyped(event.target.value)} placeholder={expected || t('answerPlaceholder')} />
     </label>
-    {answerShown && <div className={`answerBox ${result.tone}`}>
+    {answerShown && <div className={`answerBox practiceResultBox ${result.tone || 'neutral'}`}>
       <small>{t(result.titleKey)}</small>
       <p>{t(result.bodyKey)}</p>
       <button className="playableAnswer" onClick={() => playText(expected)}>{expected}</button>

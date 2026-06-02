@@ -3403,6 +3403,20 @@ textarea{
   font-weight:760;
 }
 
+.practiceProgressTrack{
+  height:8px;
+  border-radius:999px;
+  background:#ece3d5;
+  overflow:hidden;
+}
+
+.practiceProgressTrack i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:#1f3a2e;
+}
+
 .practiceSupportGrid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -3454,6 +3468,10 @@ textarea{
 
 .controlledPracticeCard .answerBox{
   margin:0;
+}
+
+.practiceResultBox{
+  border-width:2px;
 }
 
 .controlledPracticeCard .answerBox p{
@@ -5265,6 +5283,11 @@ textarea{
     border-color:#eadfce;
   }
 
+  .platform-phone.tab-review .taskHero,
+  .platform-phone.tab-review .reviewRoundPanel{
+    display:none;
+  }
+
   .platform-phone.tab-review .reviewRoundPanel p{
     text-align:left;
   }
@@ -5357,5 +5380,209 @@ textarea{
 
   .platform-phone.tab-review .mainArea>section>button.secondary.compact{
     display:none;
+  }
+}
+
+@media(max-width:760px){
+  .platform-phone.tab-learn{
+    background:#faf6ef;
+    color:#2b2925;
+  }
+
+  .platform-phone.tab-learn .topBar h1{
+    color:#2b2925;
+  }
+
+  .platform-phone.tab-learn .settingsButton{
+    background:#efe8dc;
+    color:#365f3d;
+  }
+
+  .platform-phone.tab-learn .taskHero,
+  .platform-phone.tab-learn .listenRoundPanel,
+  .platform-phone.tab-learn .playerCard,
+  .platform-phone.tab-learn .focusPlayer,
+  .platform-phone.tab-learn .listenToolPanel,
+  .platform-phone.tab-learn .audioToolsFooter,
+  .platform-phone.tab-learn .understandPanel,
+  .platform-phone.tab-learn .sentenceList,
+  .platform-phone.tab-learn .nextStepBanner{
+    background:#fffefa;
+    border-color:#eadfce;
+    color:#2b2925;
+  }
+
+  .platform-phone.tab-learn .taskHero{
+    padding:16px;
+    gap:8px;
+  }
+
+  .platform-phone.tab-learn .taskHero,
+  .platform-phone.tab-output .taskHero{
+    display:none;
+  }
+
+  .platform-phone.tab-learn .taskHero h2{
+    font-size:26px;
+  }
+
+  .platform-phone.tab-learn .taskHero p,
+  .platform-phone.tab-learn .playerCard p,
+  .platform-phone.tab-learn .playerCard small,
+  .platform-phone.tab-learn .listenRoundPanel p,
+  .platform-phone.tab-learn .toolCluster span,
+  .platform-phone.tab-learn .toolCluster small,
+  .platform-phone.tab-learn .sentenceListHeader span{
+    color:#6f675d;
+  }
+
+  .platform-phone.tab-learn .subTabs{
+    background:#efe8dc;
+    border-color:#e2d5c3;
+  }
+
+  .platform-phone.tab-learn .subTabs button{
+    color:#746d63;
+  }
+
+  .platform-phone.tab-learn .subTabs button.active{
+    background:#fffefa;
+    color:#1f3a2e;
+  }
+
+  .platform-phone.tab-learn .playerCard .compact{
+    background:#efe8dc;
+    color:#365f3d;
+  }
+
+  .platform-phone.tab-learn .playerCard{
+    display:none;
+  }
+
+  .platform-phone.tab-learn .playCircle,
+  .platform-phone.tab-learn .focusPlayButton{
+    background:#1f3a2e;
+  }
+
+  .platform-phone.tab-learn .focusPlayer{
+    box-shadow:var(--shadow-card);
+  }
+
+  .platform-phone.tab-learn .focusLineButton span{
+    color:#1d1d1f;
+    font-size:16px;
+    line-height:1.34;
+    font-weight:700;
+  }
+
+  .platform-phone.tab-learn .focusLineButton small{
+    color:#6f675d;
+  }
+
+  .platform-phone.tab-learn .speakerPill,
+  .platform-phone.tab-learn .lineNumber{
+    background:#efe8dc;
+    color:#5f574d;
+  }
+
+  .platform-phone.tab-learn .focusChunkRow button{
+    background:#f6f0e6;
+    border-color:#eadfce;
+    color:#365f3d;
+  }
+
+  .platform-phone.tab-learn .toolCluster{
+    background:#f6f0e6;
+    border:1px solid #eadfce;
+    border-radius:14px;
+    padding:12px;
+  }
+
+  .platform-phone.tab-learn .sentenceListHeader strong{
+    color:#2b2925;
+  }
+
+  .platform-phone.tab-learn .sentenceRow{
+    background:#fffefa;
+    border-color:#eadfce;
+    grid-template-columns:26px minmax(0,1fr);
+  }
+
+  .platform-phone.tab-learn .sentenceRow.activeLine{
+    background:#edf7ef;
+    border-color:#c8e4cf;
+  }
+
+  .platform-phone.tab-learn .sentenceText span,
+  .platform-phone.tab-learn .sentenceRow.activeLine .sentenceText span{
+    color:#2b2925;
+    font-size:16px;
+    line-height:1.38;
+  }
+
+  .platform-phone.tab-learn .sentenceText small,
+  .platform-phone.tab-learn .sentenceRow.activeLine .sentenceText small{
+    color:#7a7268;
+  }
+
+  .platform-phone.tab-learn .lineActions{
+    background:#efe8dc;
+    border-left:1px solid #e2d5c3;
+  }
+
+  .platform-phone.tab-learn .lineActions button,
+  .platform-phone.tab-learn .lineActions .starButton{
+    background:#fffefa;
+    border-color:#d8ccba;
+    color:#365f3d;
+  }
+
+  .platform-phone.tab-output .taskHero{
+    padding:16px;
+  }
+
+  .platform-phone.tab-output .practiceCard.practice-guidedSpeaking h2{
+    font-size:22px;
+    line-height:1.2;
+  }
+
+  .platform-phone.tab-output .guidedStarter strong{
+    font-size:18px;
+    line-height:1.28;
+  }
+
+  .platform-phone.tab-output .chipRow span{
+    font-size:14px;
+  }
+
+  .platform-phone.tab-review .reviewCard{
+    border-radius:22px;
+    padding:20px;
+  }
+
+  .platform-phone.tab-review .reviewCard h2{
+    font-size:28px;
+    line-height:1.14;
+    margin:16px 0 8px;
+  }
+
+  .platform-phone.tab-review .reviewThinkHint{
+    font-size:15px;
+    margin-bottom:16px;
+  }
+
+  .platform-phone.tab-review .revealButton{
+    min-height:62px;
+    border-radius:18px;
+    font-size:18px;
+  }
+
+  .platform-phone.tab-review .reviewSourceLine span{
+    min-height:34px;
+  }
+
+  .platform-phone.tab-review .reviewActions button{
+    min-height:56px;
+    border-radius:16px;
   }
 }

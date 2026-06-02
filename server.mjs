@@ -274,7 +274,7 @@ const host = process.env.HOST || '0.0.0.0'
 app.listen(port, host, () => {
   const networkUrl = localNetworkUrl(port)
   console.log('')
-  console.log('  Kevin English Learning System V3.9.52')
+  console.log('  Kevin English Learning System V3.9.53')
   console.log(`  Local:   http://127.0.0.1:${port}/`)
   if (networkUrl) console.log(`  Phone:   ${networkUrl}`)
   console.log('  Tip: open the Phone URL on the same Wi-Fi.')
