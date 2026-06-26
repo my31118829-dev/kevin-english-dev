@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3953'
-const SETTINGS_KEY = 'ke_dev_settings_v3953'
-const TAB_KEY = 'ke_dev_tab_v3953'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3953'
-const APP_VERSION = '3.9.53'
+const STORE_KEY = 'ke_dev_store_v3954'
+const SETTINGS_KEY = 'ke_dev_settings_v3954'
+const TAB_KEY = 'ke_dev_tab_v3954'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3954'
+const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
+const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
+const APP_VERSION = '3.9.54'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -37,6 +39,7 @@ function resolvePhoneViewByWidth(width) {
 }
 
 const NAV_ITEMS = [
+  { id: 'reader', labelKey: 'nav.reader', hintKey: 'navHint.reader', showOnPhone: false, showOnMac: true },
   { id: 'today', labelKey: 'nav.today', hintKey: 'navHint.today', phoneLabelKey: 'nav.today', phoneHintKey: 'navHint.phone.today', showOnPhone: true, showOnMac: true },
   { id: 'learn', labelKey: 'nav.study', hintKey: 'navHint.study', phoneLabelKey: 'nav.listen', phoneHintKey: 'navHint.phone.listen', showOnPhone: true, showOnMac: true },
   { id: 'practice', labelKey: 'nav.practice', hintKey: 'navHint.practice', showOnPhone: false, showOnMac: true },
@@ -56,6 +59,7 @@ function normalizeOutputMode(mode) {
 const UI_TEXT = {
   en: {
     'nav.today': 'Today',
+    'nav.reader': 'Reader',
     'nav.library': 'Library',
     'nav.learn': 'Learn',
     'nav.listen': 'Listen',
@@ -66,6 +70,7 @@ const UI_TEXT = {
     'nav.speak': 'Speak',
     'nav.review': 'Review',
     'navHint.today': 'Daily',
+    'navHint.reader': 'Kevin in Australia',
     'navHint.library': 'Content',
     'navHint.learn': 'Input',
     'navHint.study': 'Deep session',
@@ -79,6 +84,7 @@ const UI_TEXT = {
     'navHint.phone.speak': 'Talk',
     'navHint.phone.review': 'Recall',
     'title.today': 'Today',
+    'title.reader': 'Kevin in Australia',
     'title.library': 'Library',
     'title.learn': 'Learn Input',
     'title.study': 'Study Workspace',
@@ -523,6 +529,7 @@ const UI_TEXT = {
   },
   zh: {
     'nav.today': '今日',
+    'nav.reader': '阅读器',
     'nav.library': '内容库',
     'nav.learn': '输入',
     'nav.listen': '听',
@@ -533,6 +540,7 @@ const UI_TEXT = {
     'nav.speak': '说',
     'nav.review': '复习',
     'navHint.today': '学习首页',
+    'navHint.reader': '澳洲课程',
     'navHint.library': '课程管理',
     'navHint.learn': '听懂预习',
     'navHint.study': '深度学习',
@@ -546,6 +554,7 @@ const UI_TEXT = {
     'navHint.phone.speak': '开口',
     'navHint.phone.review': '回忆',
     'title.today': '今日',
+    'title.reader': 'Kevin in Australia',
     'title.library': '内容库',
     'title.learn': '输入理解',
     'title.study': '深度学习工作台',
@@ -1556,8 +1565,8 @@ function normalizeSettings(rawSettings) {
   const saved = rawSettings && typeof rawSettings === 'object' ? rawSettings : {}
   const pauseSeconds = saved.pauseSeconds === 'auto'
     ? saved.pauseSeconds
-    : ([1.5, 3, 4.5].includes(Number(saved.pauseSeconds)) ? Number(saved.pauseSeconds) : defaultSettings.pauseSeconds)
-  const playbackSpeed = [0.75, 1, 1.25].includes(Number(saved.playbackSpeed)) ? Number(saved.playbackSpeed) : defaultSettings.playbackSpeed
+    : ([1, 1.5, 2.5, 3, 4, 4.5, 6].includes(Number(saved.pauseSeconds)) ? Number(saved.pauseSeconds) : defaultSettings.pauseSeconds)
+  const playbackSpeed = [0.75, 0.9, 1, 1.15, 1.25].includes(Number(saved.playbackSpeed)) ? Number(saved.playbackSpeed) : defaultSettings.playbackSpeed
   return {
     ...defaultSettings,
     ...saved,
@@ -1589,6 +1598,201 @@ function save(key, value) {
 
 function escapeRegExp(value = '') {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function slugifyHeading(text = '', fallback = 'section') {
+  const slug = String(text || '')
+    .toLowerCase()
+    .replace(/[`*_#[\]()]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+  return slug || fallback
+}
+
+function stripMarkdownInline(text = '') {
+  return String(text || '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .trim()
+}
+
+function containsCjk(text = '') {
+  return /[\u3400-\u9fff]/.test(String(text || ''))
+}
+
+function cleanPlayableEnglish(text = '') {
+  let clean = stripMarkdownInline(text)
+    .replace(/^[-*+]\s+/, '')
+    .replace(/^\d+[.)]\s+/, '')
+    .trim()
+  const dialogueMatch = clean.match(/^([A-Z][A-Za-z .'-]{0,32}):\s*(.+)$/)
+  if (dialogueMatch) clean = dialogueMatch[2].trim()
+  return clean
+}
+
+function isPurePlayableEnglish(text = '') {
+  const clean = cleanPlayableEnglish(text)
+  if (!clean || containsCjk(clean)) return false
+  if (!/[A-Za-z]/.test(clean)) return false
+  if (/^\|?[-:\s|]+\|?$/.test(clean)) return false
+  if (/[{}<>]/.test(clean)) return false
+  const allowed = /^[A-Za-z0-9\s.,!?'"’‘“”():;\-–—/&]+$/.test(clean)
+  return allowed && clean.split(/\s+/).filter(Boolean).length <= 40
+}
+
+function playableEnglishFromText(text = '') {
+  const clean = cleanPlayableEnglish(text)
+  return isPurePlayableEnglish(clean) ? clean : ''
+}
+
+function splitMarkdownTableRow(line = '') {
+  return String(line || '')
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map(cell => cell.trim())
+}
+
+function normalizeReaderLessons(rawLessons) {
+  const lessons = Array.isArray(rawLessons) ? rawLessons : []
+  return lessons
+    .filter(lesson => lesson && typeof lesson.raw === 'string')
+    .map(lesson => ({
+      id: lesson.id || uid('reader'),
+      title: lesson.title || deriveReaderTitle(lesson.raw),
+      raw: lesson.raw,
+      createdAt: lesson.createdAt || new Date().toISOString(),
+      updatedAt: lesson.updatedAt || lesson.createdAt || new Date().toISOString()
+    }))
+}
+
+function deriveReaderTitle(raw = '') {
+  const lines = String(raw || '').split(/\r?\n/)
+  const episode = lines.find(line => /^##\s+/.test(line))
+  const title = lines.find(line => /^#\s+/.test(line))
+  return stripMarkdownInline((episode || title || '').replace(/^#+\s*/, '')) || 'Kevin in Australia Lesson'
+}
+
+function parseReaderMarkdown(raw = '') {
+  const lines = String(raw || '').replace(/\r\n/g, '\n').split('\n')
+  const blocks = []
+  const contents = []
+  const headingCounts = new Map()
+  let paragraph = []
+  let listItems = []
+  let tableLines = []
+  let inCode = false
+  let codeLines = []
+
+  const uniqueHeadingId = text => {
+    const base = slugifyHeading(text)
+    const count = (headingCounts.get(base) || 0) + 1
+    headingCounts.set(base, count)
+    return count === 1 ? base : `${base}-${count}`
+  }
+  const flushParagraph = () => {
+    if (!paragraph.length) return
+    blocks.push({ type: 'paragraph', text: paragraph.join('\n') })
+    paragraph = []
+  }
+  const flushList = () => {
+    if (!listItems.length) return
+    blocks.push({ type: 'list', items: listItems })
+    listItems = []
+  }
+  const flushTable = () => {
+    if (!tableLines.length) return
+    const rows = tableLines
+      .filter(line => !/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line))
+      .map(splitMarkdownTableRow)
+      .filter(row => row.some(Boolean))
+    if (rows.length) blocks.push({ type: 'table', rows })
+    tableLines = []
+  }
+  const flushLoose = () => {
+    flushParagraph()
+    flushList()
+    flushTable()
+  }
+
+  lines.forEach((line, index) => {
+    if (/^```/.test(line.trim())) {
+      if (inCode) {
+        blocks.push({ type: 'code', text: codeLines.join('\n') })
+        codeLines = []
+        inCode = false
+      } else {
+        flushLoose()
+        inCode = true
+      }
+      return
+    }
+    if (inCode) {
+      codeLines.push(line)
+      return
+    }
+    if (/^\s*$/.test(line)) {
+      flushLoose()
+      return
+    }
+    const heading = line.match(/^(#{1,6})\s+(.+)$/)
+    if (heading) {
+      flushLoose()
+      const level = heading[1].length
+      const text = stripMarkdownInline(heading[2])
+      const id = uniqueHeadingId(text || `section-${index}`)
+      blocks.push({ type: 'heading', level, text, id })
+      if (level >= 2) contents.push({ id, level, text })
+      return
+    }
+    if (/^\s*---+\s*$/.test(line)) {
+      flushLoose()
+      blocks.push({ type: 'hr' })
+      return
+    }
+    if (/^\s*\|.*\|\s*$/.test(line)) {
+      flushParagraph()
+      flushList()
+      tableLines.push(line)
+      return
+    }
+    const list = line.match(/^\s*(?:[-*+]|\d+[.)])\s+(.+)$/)
+    if (list) {
+      flushParagraph()
+      flushTable()
+      listItems.push(list[1])
+      return
+    }
+    flushTable()
+    flushList()
+    paragraph.push(line)
+  })
+  if (inCode) blocks.push({ type: 'code', text: codeLines.join('\n') })
+  flushLoose()
+  return { blocks, contents }
+}
+
+function readerBlockPlayableLines(block) {
+  if (!block) return []
+  if (block.type === 'code') {
+    return String(block.text || '').split('\n').map(playableEnglishFromText).filter(Boolean)
+  }
+  if (block.type === 'paragraph') {
+    return String(block.text || '').split('\n').map(playableEnglishFromText).filter(Boolean)
+  }
+  if (block.type === 'list') {
+    return (block.items || []).map(playableEnglishFromText).filter(Boolean)
+  }
+  if (block.type === 'table') {
+    return (block.rows || []).flatMap(row => row.map(playableEnglishFromText)).filter(Boolean)
+  }
+  return []
+}
+
+function readerEnglishSentences(blocks = []) {
+  return [...new Set(blocks.flatMap(readerBlockPlayableLines))]
 }
 
 function loadUserStore(userId) {
@@ -2761,12 +2965,22 @@ function App() {
     return DEFAULT_USER_PROFILES.some(user => user.id === saved) ? saved : DEFAULT_USER_PROFILES[0].id
   })
   const [store, setStore] = useState(() => normalizeStore(loadUserStore(activeUserId)))
+  const [readerLessons, setReaderLessons] = useState(() => normalizeReaderLessons(load(READER_LESSONS_KEY, [])))
+  const [readerActiveId, setReaderActiveId] = useState(() => load(READER_ACTIVE_KEY, ''))
+  const [readerDraft, setReaderDraft] = useState('')
+  const [readerSpeed, setReaderSpeed] = useState(1)
+  const [readerPauseSeconds, setReaderPauseSeconds] = useState(2.5)
+  const [readerPlaying, setReaderPlaying] = useState(false)
+  const [readerPracticeIndex, setReaderPracticeIndex] = useState(0)
+  const [readerPracticeInput, setReaderPracticeInput] = useState('')
+  const [readerPracticeReveal, setReaderPracticeReveal] = useState(true)
+  const [readerPracticeChecked, setReaderPracticeChecked] = useState(false)
   const [settings, setSettings] = useState(() => normalizeSettings(load(SETTINGS_KEY, {})))
   const [tab, setTab] = useState(() => {
     const requestedTab = typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('tab')
       : ''
-    const savedTab = requestedTab || load(TAB_KEY, 'today')
+    const savedTab = requestedTab || load(TAB_KEY, 'reader')
     return isValidTabId(savedTab) ? savedTab : 'today'
   })
   const [isPhoneView, setIsPhoneView] = useState(() => typeof window !== 'undefined' ? resolvePhoneViewByWidth(window.innerWidth) : false)
@@ -2804,10 +3018,23 @@ function App() {
   const ttsCache = useRef(new Map())
   const originalAudioUrlCache = useRef(new Map())
   const swipeStartRef = useRef({ id: '', x: 0, y: 0 })
+  const readerStopRef = useRef(false)
 
   const activeCourse = useMemo(
     () => store.courses.find(course => course.id === store.activeCourseId) || store.courses[0],
     [store]
+  )
+  const activeReaderLesson = useMemo(
+    () => readerLessons.find(lesson => lesson.id === readerActiveId) || readerLessons[0] || null,
+    [readerLessons, readerActiveId]
+  )
+  const activeReaderParsed = useMemo(
+    () => parseReaderMarkdown(activeReaderLesson?.raw || ''),
+    [activeReaderLesson]
+  )
+  const readerSentences = useMemo(
+    () => readerEnglishSentences(activeReaderParsed.blocks),
+    [activeReaderParsed]
   )
   const activeProfile = useMemo(
     () => userProfiles.find(user => user.id === activeUserId) || userProfiles[0] || DEFAULT_USER_PROFILES[0],
@@ -2863,6 +3090,8 @@ function App() {
   const t = (key, values) => formatUiText(UI_TEXT[uiLanguage]?.[key] ?? UI_TEXT.en[key] ?? key, values)
 
   useEffect(() => save(userStoreKey(activeUserId), store), [store, activeUserId])
+  useEffect(() => save(READER_LESSONS_KEY, readerLessons), [readerLessons])
+  useEffect(() => save(READER_ACTIVE_KEY, activeReaderLesson?.id || readerActiveId || ''), [activeReaderLesson, readerActiveId])
   useEffect(() => save(ACTIVE_USER_KEY, activeUserId), [activeUserId])
   useEffect(() => save(USER_PROFILES_KEY, userProfiles), [userProfiles])
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
@@ -2922,7 +3151,7 @@ function App() {
     if (!isPhoneView) return
     if (showStudyTools) setShowStudyTools(false)
     if (learnSubtab !== 'audio') setLearnSubtab('audio')
-    if (tab === 'library' || tab === 'practice') setTab('today')
+    if (tab === 'reader' || tab === 'library' || tab === 'practice') setTab('today')
   }, [isPhoneView, showStudyTools, learnSubtab, tab])
   useEffect(() => {
     if (!isPhoneView || tab !== 'review' || reviewMode !== 'today') {
@@ -3080,6 +3309,124 @@ function App() {
     } catch (error) {
       setMessage(error?.message || 'Audio failed. Check Settings API key.')
     }
+  }
+
+  function importReaderLesson() {
+    const raw = readerDraft.trim()
+    if (!raw) {
+      setMessage('Paste one full ChatGPT lesson first.')
+      return
+    }
+    const lesson = {
+      id: uid('reader'),
+      title: deriveReaderTitle(raw),
+      raw,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    setReaderLessons(prev => [lesson, ...prev])
+    setReaderActiveId(lesson.id)
+    setReaderDraft('')
+    setReaderPracticeIndex(0)
+    setReaderPracticeInput('')
+    setReaderPracticeChecked(false)
+    setMessage('Kevin in Australia lesson imported. Full original text is preserved.')
+  }
+
+  function deleteReaderLesson(lessonId) {
+    setReaderLessons(prev => prev.filter(lesson => lesson.id !== lessonId))
+    if (readerActiveId === lessonId) setReaderActiveId('')
+  }
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  function playUrlToEnd(url, speed = 1) {
+    return new Promise((resolve, reject) => {
+      stopAudio()
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.playbackRate = Number(speed) || 1
+      audio.onended = resolve
+      audio.onerror = () => reject(new Error('Audio playback failed.'))
+      audio.play().catch(reject)
+    })
+  }
+
+  async function playReaderText(text) {
+    const clean = playableEnglishFromText(text)
+    if (!clean) {
+      setMessage('Only pure English lines can be played.')
+      return
+    }
+    try {
+      readerStopRef.current = false
+      setReaderPlaying(true)
+      setMessage('Preparing audio...')
+      const url = await getTtsUrl(clean)
+      if (!readerStopRef.current) await playUrlToEnd(url, readerSpeed)
+      setMessage('')
+    } catch (error) {
+      setMessage(error?.message || 'Audio failed. Check Settings API key.')
+    } finally {
+      setReaderPlaying(false)
+    }
+  }
+
+  async function playReaderLines(lines = []) {
+    const playable = lines.map(playableEnglishFromText).filter(Boolean)
+    if (!playable.length) {
+      setMessage('No pure English lines found in this block.')
+      return
+    }
+    try {
+      readerStopRef.current = false
+      setReaderPlaying(true)
+      setMessage(`Playing ${playable.length} English lines...`)
+      for (const line of playable) {
+        if (readerStopRef.current) break
+        const url = await getTtsUrl(line)
+        if (readerStopRef.current) break
+        await playUrlToEnd(url, readerSpeed)
+        if (readerStopRef.current) break
+        await delay(Number(readerPauseSeconds) * 1000)
+      }
+      setMessage(readerStopRef.current ? 'Playback stopped.' : '')
+    } catch (error) {
+      setMessage(error?.message || 'Continuous playback failed.')
+    } finally {
+      setReaderPlaying(false)
+    }
+  }
+
+  function stopReaderPlayback() {
+    readerStopRef.current = true
+    stopAudio()
+    setReaderPlaying(false)
+    setMessage('Playback stopped.')
+  }
+
+  function nextReaderPracticeSentence() {
+    if (!readerSentences.length) return
+    const nextIndex = readerSentences.length === 1
+      ? 0
+      : Math.floor(Math.random() * readerSentences.length)
+    setReaderPracticeIndex(nextIndex)
+    setReaderPracticeInput('')
+    setReaderPracticeChecked(false)
+  }
+
+  function readerPracticeResult() {
+    const expected = readerSentences[readerPracticeIndex] || ''
+    if (!readerPracticeChecked) return ''
+    return normalizeAnswerText(readerPracticeInput) === normalizeAnswerText(expected)
+      ? 'Correct'
+      : 'Check spelling and punctuation, then try again.'
+  }
+
+  function scrollToReaderSection(id) {
+    document.getElementById(`reader-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   function lineWordCount(line) {
@@ -4645,6 +4992,86 @@ function App() {
     </div>
   }
 
+  function renderReaderWorkspace() {
+    const currentPracticeSentence = readerSentences[readerPracticeIndex] || readerSentences[0] || ''
+    const result = readerPracticeResult()
+    return <section className="readerShell" data-testid="kevin-australia-reader">
+      <aside className="readerSidebar">
+        <div className="readerBrand">
+          <span>Kevin in Australia</span>
+          <strong>Interactive Course Reader</strong>
+          <small>Paste ChatGPT lesson text. The original manuscript stays intact.</small>
+        </div>
+        <div className="readerImportBox">
+          <label>Import ChatGPT Lesson
+            <textarea value={readerDraft} onChange={event => setReaderDraft(event.target.value)} placeholder="# Kevin in Australia&#10;## Episode 1: A Coffee and a New Neighbour&#10;&#10;Paste the full ChatGPT lesson here..." />
+          </label>
+          <button className="primary compact" onClick={importReaderLesson}>Import Lesson</button>
+        </div>
+        <div className="readerLessonList">
+          <span>Lessons</span>
+          {readerLessons.length ? readerLessons.map(lesson => <button key={lesson.id} className={activeReaderLesson?.id === lesson.id ? 'active' : ''} onClick={() => setReaderActiveId(lesson.id)}>
+            <strong>{lesson.title}</strong>
+            <small>{shortDateLabel(lesson.updatedAt || lesson.createdAt)}</small>
+          </button>) : <p>No lessons yet.</p>}
+        </div>
+        {!!activeReaderParsed.contents.length && <div className="readerContents">
+          <span>Contents</span>
+          {activeReaderParsed.contents.map(item => <button key={item.id} className={`level-${Math.min(item.level, 4)}`} onClick={() => scrollToReaderSection(item.id)}>{item.text}</button>)}
+        </div>}
+      </aside>
+      <article className="readerDocument">
+        <div className="readerTopline">
+          <div>
+            <span>MacBook PWA</span>
+            <h2>{activeReaderLesson?.title || 'Paste a Kevin in Australia lesson'}</h2>
+            <p>Original Markdown-style ChatGPT lesson, with English-only audio layered on top.</p>
+          </div>
+          {activeReaderLesson && <button className="secondary compact weakAction" onClick={() => deleteReaderLesson(activeReaderLesson.id)}>Delete</button>}
+        </div>
+        <div className="readerControls" aria-label="Playback controls">
+          <label>Speed<select value={readerSpeed} onChange={event => setReaderSpeed(Number(event.target.value))}>
+            {[0.75, 0.9, 1, 1.15].map(speed => <option value={speed} key={speed}>{speed}x</option>)}
+          </select></label>
+          <label>Pause<select value={readerPauseSeconds} onChange={event => setReaderPauseSeconds(Number(event.target.value))}>
+            {[1, 2.5, 4, 6].map(seconds => <option value={seconds} key={seconds}>{seconds.toFixed(1)}s</option>)}
+          </select></label>
+          <button className="secondary compact" onClick={() => playReaderLines(readerSentences)} disabled={!readerSentences.length || readerPlaying}>Play All English</button>
+          <button className="secondary compact" onClick={stopReaderPlayback} disabled={!readerPlaying}>Stop</button>
+        </div>
+        {activeReaderLesson ? <>
+          <div className="readerPracticePanel">
+            <div>
+              <span>Typing Practice</span>
+              <strong>{readerSentences.length ? `${readerSentences.length} English lines detected` : 'No playable English lines yet'}</strong>
+            </div>
+            <label><input type="checkbox" checked={readerPracticeReveal} onChange={event => setReaderPracticeReveal(event.target.checked)} /> Show model sentence</label>
+            {currentPracticeSentence && <button className="secondary compact" onClick={() => playReaderText(currentPracticeSentence)}>Play Sentence</button>}
+            <button className="secondary compact" onClick={nextReaderPracticeSentence} disabled={!readerSentences.length}>Random</button>
+            {readerPracticeReveal && currentPracticeSentence && <p>{currentPracticeSentence}</p>}
+            <textarea value={readerPracticeInput} onChange={event => { setReaderPracticeInput(event.target.value); setReaderPracticeChecked(false) }} placeholder="Type the English sentence here..." />
+            <div className="readerPracticeActions">
+              <button className="primary compact" disabled={!currentPracticeSentence} onClick={() => setReaderPracticeChecked(true)}>Check</button>
+              {result && <strong className={result === 'Correct' ? 'correct' : 'retry'}>{result}</strong>}
+            </div>
+          </div>
+          <div className="readerBlocks">
+            {activeReaderParsed.blocks.map((block, index) => <ReaderBlock
+              key={`${block.type}-${index}`}
+              block={block}
+              index={index}
+              onPlayText={playReaderText}
+              onPlayLines={playReaderLines}
+            />)}
+          </div>
+        </> : <div className="readerEmpty">
+          <h2>Start with one full ChatGPT lesson.</h2>
+          <p>Paste the complete Episode text on the left. Headings, tables, code blocks, Chinese explanation, role-play, writing and preview sections will render as a course handout.</p>
+        </div>}
+      </article>
+    </section>
+  }
+
   return <div className={`appShell platform-${isPhoneView ? 'phone' : 'mac'} tab-${tab} font-${settings.fontScale}`}>
     <aside className="sidebar">
       <div className="brand">
@@ -4689,6 +5116,8 @@ function App() {
 
       {message && <div className="messageBar">{message}</div>}
       {renderImportSuccessBridge()}
+
+      {tab === 'reader' && renderReaderWorkspace()}
 
       {tab === 'today' && <section className="pageGrid">
         {isPhoneView && <div className="phoneGreeting">
@@ -5368,8 +5797,8 @@ function App() {
           {speakerVoiceNames.map(speaker => <label key={speaker}>{t('voiceFor', { speaker })}<select value={settings.speakerVoices?.[speaker] || settings.voice} onChange={e => setSpeakerVoice(speaker, e.target.value)}>{VOICE_OPTIONS.map(v => <option key={v}>{v}</option>)}</select></label>)}
         </div>
         <label>{t('languageDisplay')}<select value={settings.displayMode} onChange={e => setSettings({ ...settings, displayMode: e.target.value })}><option value="both">EN + CN</option><option value="en">EN</option><option value="cn">CN</option><option value="hide">Hide English</option></select></label>
-        <label>{t('playbackSpeed')}<select value={settings.playbackSpeed} onChange={e => setPlaybackSpeed(Number(e.target.value))}><option value={0.75}>0.75x</option><option value={1}>1.0x</option><option value={1.25}>1.25x</option></select></label>
-        <label>{t('pauseSeconds')}<select value={settings.pauseSeconds} onChange={e => setSettings({ ...settings, pauseSeconds: e.target.value === 'auto' ? e.target.value : Number(e.target.value) })}><option value="auto">{t('autoPause')}</option><option value={1.5}>1.5 seconds</option><option value={3}>3 seconds</option><option value={4.5}>4.5 seconds</option></select></label>
+        <label>{t('playbackSpeed')}<select value={settings.playbackSpeed} onChange={e => setPlaybackSpeed(Number(e.target.value))}><option value={0.75}>0.75x</option><option value={0.9}>0.9x</option><option value={1}>1.0x</option><option value={1.15}>1.15x</option><option value={1.25}>1.25x</option></select></label>
+        <label>{t('pauseSeconds')}<select value={settings.pauseSeconds} onChange={e => setSettings({ ...settings, pauseSeconds: e.target.value === 'auto' ? e.target.value : Number(e.target.value) })}><option value="auto">{t('autoPause')}</option><option value={1}>1.0 seconds</option><option value={2.5}>2.5 seconds</option><option value={4}>4.0 seconds</option><option value={6}>6.0 seconds</option></select></label>
         <label>{t('displayScale')}<select value={settings.fontScale} onChange={e => setSettings({ ...settings, fontScale: e.target.value })}><option value="normal">{t('normal')}</option><option value="comfortable">{t('comfortable')}</option><option value="large">{t('large')}</option></select></label>
       </div>
     </div>}
@@ -5788,6 +6217,71 @@ function OutputCard({ item, isPhoneView, freeTalkLevel, playText, playList, requ
       <button className="primary" onClick={onNext}>{nextLabel || t('next')}</button>
     </div>
     {item.sample && <button className="answerBox playableAnswer" onClick={() => playText(item.sample)}>{item.sample}</button>}
+  </div>
+}
+
+function ReaderInline({ text }) {
+  const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g)
+  return <>{parts.map((part, index) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={`${part}-${index}`}>{part.slice(2, -2)}</strong>
+    return <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>
+  })}</>
+}
+
+function ReaderPlayButton({ text, onPlayText }) {
+  const playable = playableEnglishFromText(text)
+  if (!playable) return null
+  return <button className="readerPlayButton" title="Play English" onClick={() => onPlayText(playable)}>Play</button>
+}
+
+function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
+  const playableLines = readerBlockPlayableLines(block)
+  if (block.type === 'heading') {
+    const Tag = `h${Math.min(Math.max(block.level, 1), 4)}`
+    return <Tag id={`reader-${block.id}`} className={`readerHeading level-${block.level}`}>
+      <ReaderInline text={block.text} />
+    </Tag>
+  }
+  if (block.type === 'hr') return <hr className="readerDivider" />
+  if (block.type === 'code') {
+    const lines = String(block.text || '').split('\n')
+    return <div className="readerCodeBlock">
+      {!!playableLines.length && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play block</button>}
+      <pre>{lines.map((line, lineIndex) => <span key={`${line}-${lineIndex}`}>
+        <code>{line || ' '}</code>
+        <ReaderPlayButton text={line} onPlayText={onPlayText} />
+      </span>)}</pre>
+    </div>
+  }
+  if (block.type === 'table') {
+    const [head, ...body] = block.rows || []
+    return <div className="readerTableWrap">
+      {!!playableLines.length && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play table English</button>}
+      <table className="readerTable">
+        {head && <thead><tr>{head.map((cell, cellIndex) => <th key={`${cell}-${cellIndex}`}><ReaderInline text={cell} /></th>)}</tr></thead>}
+        <tbody>{body.map((row, rowIndex) => <tr key={`row-${index}-${rowIndex}`}>
+          {row.map((cell, cellIndex) => <td key={`${cell}-${cellIndex}`}>
+            <span><ReaderInline text={cell} /></span>
+            <ReaderPlayButton text={cell} onPlayText={onPlayText} />
+          </td>)}
+        </tr>)}</tbody>
+      </table>
+    </div>
+  }
+  if (block.type === 'list') {
+    return <ul className="readerList">
+      {block.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`}>
+        <span><ReaderInline text={item} /></span>
+        <ReaderPlayButton text={item} onPlayText={onPlayText} />
+      </li>)}
+    </ul>
+  }
+  const lines = String(block.text || '').split('\n')
+  return <div className="readerParagraph">
+    {lines.map((line, lineIndex) => <p key={`${line}-${lineIndex}`}>
+      <span><ReaderInline text={line} /></span>
+      <ReaderPlayButton text={line} onPlayText={onPlayText} />
+    </p>)}
   </div>
 }
 
