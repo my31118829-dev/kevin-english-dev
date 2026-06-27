@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3960'
-const SETTINGS_KEY = 'ke_dev_settings_v3960'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3960'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3960'
+const STORE_KEY = 'ke_dev_store_v3961'
+const SETTINGS_KEY = 'ke_dev_settings_v3961'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3961'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3961'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.60'
+const APP_VERSION = '3.9.61'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -5147,12 +5147,12 @@ function App() {
         <div className="readerStudyControls" aria-label="Reader study controls">
           <div className="readerSideSectionTitle">
             <span>Mode</span>
-            <strong>{readerMode === 'type' ? 'Typing practice' : readerMode === 'listen' ? 'Focused listening' : 'Clean reading'}</strong>
+            <strong>{readerMode === 'type' ? 'Type' : readerMode === 'listen' ? 'Listen' : 'Read'}</strong>
           </div>
           <div className="readerModeSwitch" aria-label="Reader mode">
             <button className={`readerModeButton ${readerMode === 'read' ? 'active' : ''}`} onClick={() => setReaderMode('read')} title="Reading mode" aria-label="Reading mode">Read</button>
-            <button className={`readerModeButton ${readerMode === 'listen' ? 'active' : ''}`} onClick={() => setReaderMode('listen')} title="Listening mode" aria-label="Listening mode">▶</button>
-            <button className={`readerModeButton ${readerMode === 'type' ? 'active' : ''}`} onClick={() => setReaderMode('type')} title="Typing mode" aria-label="Typing mode" disabled={!readerTypingItems.length}>⌨</button>
+            <button className={`readerModeButton ${readerMode === 'listen' ? 'active' : ''}`} onClick={() => setReaderMode('listen')} title="Listening mode" aria-label="Listening mode">▶ Listen</button>
+            <button className={`readerModeButton ${readerMode === 'type' ? 'active' : ''}`} onClick={() => setReaderMode('type')} title="Typing mode" aria-label="Typing mode" disabled={!readerTypingItems.length}>⌨ Type</button>
           </div>
           <div className="readerIconBar slim">
             <button className="readerIconButton" title="Stop audio" aria-label="Stop audio" onClick={stopReaderPlayback} disabled={!readerPlaying}>■</button>
@@ -5218,7 +5218,12 @@ function App() {
             onClear={clearReaderTyping}
             onReveal={toggleReaderTypingAnswer}
             onPlayText={playReaderText}
-          /> : <div className={`readerBlocks mode-${readerMode}`}>
+          /> : readerMode === 'listen' ? <ReaderListenWorkspace
+            block={selectedReaderBlock}
+            onPlayText={playReaderText}
+            onPlayLines={playReaderLines}
+            playing={readerPlaying}
+          /> : <div className="readerBlocks mode-read">
             {activeReaderParsed.blocks.map((block, index) => <ReaderBlock
               key={`${block.type}-${index}`}
               block={block}
@@ -6451,6 +6456,24 @@ function ReaderTypingCard({ item, mode, value, checked, revealed, onAnswerChange
     </div>
     {revealed && <p className="readerTypingAnswer">{item.text}</p>}
   </article>
+}
+
+function ReaderListenWorkspace({ block, onPlayText, onPlayLines, playing }) {
+  const lines = block?.lines?.map(playableEnglishFromText).filter(Boolean) || []
+  return <div className="readerListenWorkspace">
+    <div className="readerListenHeader">
+      <span>Listening practice</span>
+      <h3>{block?.label || 'Choose a block'}</h3>
+      <button className="primary compact" onClick={() => onPlayLines(lines)} disabled={!lines.length || playing}>▶ Block</button>
+    </div>
+    {lines.length ? <div className="readerListenLines">
+      {lines.map((line, index) => <div className="readerListenLine" key={`${line}-${index}`}>
+        <span>{index + 1}</span>
+        <p>{line}</p>
+        <button className="readerMiniIcon" title="Play sentence" aria-label="Play sentence" onClick={() => onPlayText(line)}>▶</button>
+      </div>)}
+    </div> : <div className="readerEmpty"><h2>No playable lines in this block.</h2></div>}
+  </div>
 }
 
 function ReaderBlock({ block, index, onPlayText, onPlayLines }) {

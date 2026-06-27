@@ -4138,8 +4138,9 @@ textarea{
   background:#f3f0ea;
   color:#3a352e;
   padding:0 8px;
-  font-size:13px;
+  font-size:12px;
   font-weight:850;
+  white-space:nowrap;
 }
 
 .readerModeButton.active,.readerTypingModePicker button.active{
@@ -4326,6 +4327,72 @@ textarea{
 .readerTypingWorkspace{
   max-width:920px;
   margin:0 auto;
+}
+
+.readerListenWorkspace{
+  max-width:920px;
+  margin:0 auto;
+}
+
+.readerListenHeader{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px 12px;
+  align-items:end;
+  padding:18px 0 14px;
+  border-bottom:1px solid #ede5d8;
+  margin-bottom:16px;
+}
+
+.readerListenHeader span{
+  grid-column:1 / -1;
+  color:#247154;
+  font-size:12px;
+  font-weight:850;
+  text-transform:uppercase;
+}
+
+.readerListenHeader h3{
+  margin:0;
+  color:#1d1d1f;
+  font-size:28px;
+  line-height:1.1;
+}
+
+.readerListenLines{
+  display:grid;
+  gap:10px;
+}
+
+.readerListenLine{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  background:#fffefa;
+  border:1px solid #e4dacb;
+  border-radius:14px;
+  padding:12px;
+}
+
+.readerListenLine>span{
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#edf7ef;
+  color:#247154;
+  font-size:12px;
+  font-weight:850;
+}
+
+.readerListenLine p{
+  margin:0;
+  color:#1d1d1f;
+  font-size:18px;
+  line-height:1.4;
+  font-weight:720;
 }
 
 .readerTypingHeader{
