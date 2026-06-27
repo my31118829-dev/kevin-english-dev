@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3956'
-const SETTINGS_KEY = 'ke_dev_settings_v3956'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3956'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3956'
+const STORE_KEY = 'ke_dev_store_v3957'
+const SETTINGS_KEY = 'ke_dev_settings_v3957'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3957'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3957'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.56'
+const APP_VERSION = '3.9.57'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -1693,6 +1693,14 @@ function isDialogueBlock(block) {
   return block?.type === 'code' && parseDialogueLines(block.text).length >= 2
 }
 
+function refineReaderContents(contents = []) {
+  const levelTwo = contents.filter(item => item.level === 2)
+  const numbered = levelTwo.filter(item => /^\d+[.)]?\s+/.test(item.text))
+  if (numbered.length >= 3) return numbered
+  const withoutEpisodeTitle = levelTwo.filter(item => !/^Episode\s+\d+:/i.test(item.text))
+  return withoutEpisodeTitle.length ? withoutEpisodeTitle : levelTwo
+}
+
 function splitMarkdownTableRow(line = '') {
   return String(line || '')
     .trim()
@@ -1818,7 +1826,7 @@ function parseReaderMarkdown(raw = '') {
   })
   if (inCode) blocks.push({ type: 'code', text: codeLines.join('\n') })
   flushLoose()
-  return { blocks, contents }
+  return { blocks, contents: refineReaderContents(contents) }
 }
 
 function readerBlockPlayableLines(block) {
@@ -3024,6 +3032,7 @@ function App() {
   const [readerPracticeInput, setReaderPracticeInput] = useState('')
   const [readerPracticeReveal, setReaderPracticeReveal] = useState(true)
   const [readerPracticeChecked, setReaderPracticeChecked] = useState(false)
+  const [readerPracticeOpen, setReaderPracticeOpen] = useState(false)
   const [settings, setSettings] = useState(() => normalizeSettings(loadSettingsWithFallback()))
   const [tab, setTab] = useState(() => {
     const requestedTab = typeof window !== 'undefined'
@@ -3472,6 +3481,7 @@ function App() {
     setReaderPracticeText('')
     setReaderPracticeInput('')
     setReaderPracticeChecked(false)
+    setReaderPracticeOpen(true)
   }
 
   function startReaderSpelling(text) {
@@ -3483,6 +3493,7 @@ function App() {
     setReaderPracticeReveal(false)
     setReaderPracticeInput('')
     setReaderPracticeChecked(false)
+    setReaderPracticeOpen(true)
     window.requestAnimationFrame(() => {
       document.getElementById('reader-spelling-practice')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
@@ -5096,6 +5107,10 @@ function App() {
           {activeReaderLesson && <button className="secondary compact weakAction" onClick={() => deleteReaderLesson(activeReaderLesson.id)}>Delete</button>}
         </div>
         <div className="readerControls" aria-label="Playback controls">
+          <div className="readerControlsTitle">
+            <span>Quick tools</span>
+            <strong>Playback and practice</strong>
+          </div>
           <label>Speed<select value={readerSpeed} onChange={event => setReaderSpeed(Number(event.target.value))}>
             {[0.75, 0.9, 1, 1.15].map(speed => <option value={speed} key={speed}>{speed}x</option>)}
           </select></label>
@@ -5106,10 +5121,11 @@ function App() {
             {[1, 2.5, 4, 6].map(seconds => <option value={seconds} key={seconds}>{seconds.toFixed(1)}s</option>)}
           </select></label>
           <button className="secondary compact" onClick={() => playReaderLines(readerSentences)} disabled={!readerSentences.length || readerPlaying}>▶ All English</button>
+          <button className="secondary compact" onClick={() => setReaderPracticeOpen(value => !value)} disabled={!readerSentences.length}>{readerPracticeOpen ? 'Hide Spell' : 'Spell Practice'}</button>
           <button className="secondary compact" onClick={stopReaderPlayback} disabled={!readerPlaying}>Stop</button>
         </div>
         {activeReaderLesson ? <>
-          <div className="readerPracticePanel" id="reader-spelling-practice">
+          {readerPracticeOpen && <div className="readerPracticePanel" id="reader-spelling-practice">
             <div>
               <span>Spelling Practice</span>
               <strong>{currentPracticeSentence || 'Choose Spell beside any English line'}</strong>
@@ -5123,7 +5139,7 @@ function App() {
               <button className="primary compact" disabled={!currentPracticeSentence} onClick={() => setReaderPracticeChecked(true)}>Check</button>
               {result && <strong className={result === 'Correct' ? 'correct' : 'retry'}>{result}</strong>}
             </div>
-          </div>
+          </div>}
           <div className="readerBlocks">
             {activeReaderParsed.blocks.map((block, index) => <ReaderBlock
               key={`${block.type}-${index}`}
