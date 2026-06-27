@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3954'
-const SETTINGS_KEY = 'ke_dev_settings_v3954'
-const TAB_KEY = 'ke_dev_tab_v3954'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3954'
+const STORE_KEY = 'ke_dev_store_v3955'
+const SETTINGS_KEY = 'ke_dev_settings_v3955'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3955'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3955'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.54'
+const APP_VERSION = '3.9.55'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -1596,6 +1597,27 @@ function save(key, value) {
   }
 }
 
+function loadSettingsWithFallback() {
+  const current = load(SETTINGS_KEY, null)
+  const previousSettings = PREVIOUS_SETTINGS_KEYS
+    .map(key => load(key, null))
+    .filter(settings => settings && typeof settings === 'object')
+  const previous = previousSettings.find(settings => settings.apiKey) ||
+    previousSettings.find(settings => settings.voice || settings.speakerVoices)
+  if (!current && previous) return previous
+  if (!current) return {}
+  if (current.apiKey || !previous?.apiKey) return current
+  return {
+    ...previous,
+    ...current,
+    apiKey: previous.apiKey,
+    speakerVoices: {
+      ...(previous.speakerVoices || {}),
+      ...(current.speakerVoices || {})
+    }
+  }
+}
+
 function escapeRegExp(value = '') {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -1644,6 +1666,31 @@ function isPurePlayableEnglish(text = '') {
 function playableEnglishFromText(text = '') {
   const clean = cleanPlayableEnglish(text)
   return isPurePlayableEnglish(clean) ? clean : ''
+}
+
+function playableWordCount(text = '') {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length
+}
+
+function shouldShowContinuousPlay(lines = []) {
+  const playable = lines.map(playableEnglishFromText).filter(Boolean)
+  return playable.length > 1 || playable.some(line => playableWordCount(line) >= 4)
+}
+
+function parseDialogueLines(text = '') {
+  return String(text || '').split('\n')
+    .map(line => {
+      const match = line.trim().match(/^([A-Z][A-Za-z .'-]{0,32}):\s*(.+)$/)
+      if (!match) return null
+      const speech = playableEnglishFromText(match[2])
+      if (!speech) return null
+      return { speaker: match[1].trim(), text: speech }
+    })
+    .filter(Boolean)
+}
+
+function isDialogueBlock(block) {
+  return block?.type === 'code' && parseDialogueLines(block.text).length >= 2
 }
 
 function splitMarkdownTableRow(line = '') {
@@ -2975,7 +3022,7 @@ function App() {
   const [readerPracticeInput, setReaderPracticeInput] = useState('')
   const [readerPracticeReveal, setReaderPracticeReveal] = useState(true)
   const [readerPracticeChecked, setReaderPracticeChecked] = useState(false)
-  const [settings, setSettings] = useState(() => normalizeSettings(load(SETTINGS_KEY, {})))
+  const [settings, setSettings] = useState(() => normalizeSettings(loadSettingsWithFallback()))
   const [tab, setTab] = useState(() => {
     const requestedTab = typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('tab')
@@ -6236,6 +6283,7 @@ function ReaderPlayButton({ text, onPlayText }) {
 
 function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
   const playableLines = readerBlockPlayableLines(block)
+  const showContinuous = shouldShowContinuousPlay(playableLines)
   if (block.type === 'heading') {
     const Tag = `h${Math.min(Math.max(block.level, 1), 4)}`
     return <Tag id={`reader-${block.id}`} className={`readerHeading level-${block.level}`}>
@@ -6246,17 +6294,18 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
   if (block.type === 'code') {
     const lines = String(block.text || '').split('\n')
     return <div className="readerCodeBlock">
-      {!!playableLines.length && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play block</button>}
+      {showContinuous && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play block</button>}
       <pre>{lines.map((line, lineIndex) => <span key={`${line}-${lineIndex}`}>
         <code>{line || ' '}</code>
         <ReaderPlayButton text={line} onPlayText={onPlayText} />
       </span>)}</pre>
+      {isDialogueBlock(block) && <ReaderRolePlay block={block} onPlayText={onPlayText} onPlayLines={onPlayLines} />}
     </div>
   }
   if (block.type === 'table') {
     const [head, ...body] = block.rows || []
     return <div className="readerTableWrap">
-      {!!playableLines.length && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play table English</button>}
+      {showContinuous && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>Play table English</button>}
       <table className="readerTable">
         {head && <thead><tr>{head.map((cell, cellIndex) => <th key={`${cell}-${cellIndex}`}><ReaderInline text={cell} /></th>)}</tr></thead>}
         <tbody>{body.map((row, rowIndex) => <tr key={`row-${index}-${rowIndex}`}>
@@ -6269,19 +6318,56 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
     </div>
   }
   if (block.type === 'list') {
-    return <ul className="readerList">
-      {block.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`}>
-        <span><ReaderInline text={item} /></span>
-        <ReaderPlayButton text={item} onPlayText={onPlayText} />
-      </li>)}
-    </ul>
+    return <div className="readerListBlock">
+      {showContinuous && <button className="readerBlockPlay inline" onClick={() => onPlayLines(playableLines)}>Play list</button>}
+      <ul className="readerList">
+        {block.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`}>
+          <span><ReaderInline text={item} /></span>
+          <ReaderPlayButton text={item} onPlayText={onPlayText} />
+        </li>)}
+      </ul>
+    </div>
   }
   const lines = String(block.text || '').split('\n')
   return <div className="readerParagraph">
+    {showContinuous && <button className="readerBlockPlay inline" onClick={() => onPlayLines(playableLines)}>Play paragraph</button>}
     {lines.map((line, lineIndex) => <p key={`${line}-${lineIndex}`}>
       <span><ReaderInline text={line} /></span>
       <ReaderPlayButton text={line} onPlayText={onPlayText} />
     </p>)}
+  </div>
+}
+
+function ReaderRolePlay({ block, onPlayText, onPlayLines }) {
+  const dialogue = parseDialogueLines(block.text)
+  const speakers = [...new Set(dialogue.map(line => line.speaker))]
+  const [role, setRole] = useState(speakers.find(speaker => /Kevin/i.test(speaker)) || speakers[0] || '')
+  const partnerLines = dialogue.filter(line => line.speaker !== role).map(line => line.text)
+  return <div className="readerRolePlayLite">
+    <div className="readerRoleHeader">
+      <div>
+        <span>Light Role-play</span>
+        <strong>Choose your role, then answer out loud.</strong>
+      </div>
+      <label>I am<select value={role} onChange={event => setRole(event.target.value)}>
+        {speakers.map(speaker => <option key={speaker}>{speaker}</option>)}
+      </select></label>
+    </div>
+    <div className="readerRoleActions">
+      <button className="primary compact" onClick={() => onPlayLines(partnerLines)} disabled={!partnerLines.length}>Play partner lines</button>
+      <button className="secondary compact" onClick={() => onPlayLines(dialogue.map(line => line.text))}>Play full dialogue</button>
+    </div>
+    <div className="readerRoleBubbles">
+      {dialogue.map((line, index) => {
+        const isUser = line.speaker === role
+        return <div className={`readerRoleBubble ${isUser ? 'user' : 'partner'}`} key={`${line.speaker}-${line.text}-${index}`}>
+          <button onClick={() => onPlayText(line.text)} disabled={isUser}>
+            <span>{isUser ? `Your turn (${line.speaker})` : line.speaker}</span>
+            <strong>{line.text}</strong>
+          </button>
+        </div>
+      })}
+    </div>
   </div>
 }
 
