@@ -4127,8 +4127,12 @@ textarea{
 
 .readerModeSwitch,.readerTypingModePicker{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:7px;
+}
+
+.readerTypingModePicker{
+  grid-template-columns:repeat(3,1fr);
 }
 
 .readerModeButton,.readerTypingModePicker button{
@@ -4324,142 +4328,63 @@ textarea{
   margin:0 auto;
 }
 
-.readerTypingWorkspace{
-  max-width:920px;
-  margin:0 auto;
-}
-
-.readerListenWorkspace{
-  max-width:920px;
-  margin:0 auto;
-}
-
-.readerListenHeader{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px 12px;
-  align-items:end;
-  padding:18px 0 14px;
-  border-bottom:1px solid #ede5d8;
-  margin-bottom:16px;
-}
-
-.readerListenHeader span{
-  grid-column:1 / -1;
-  color:#247154;
-  font-size:12px;
-  font-weight:850;
-  text-transform:uppercase;
-}
-
-.readerListenHeader h3{
-  margin:0;
-  color:#1d1d1f;
-  font-size:28px;
-  line-height:1.1;
-}
-
-.readerListenLines{
-  display:grid;
-  gap:10px;
-}
-
-.readerListenLine{
-  display:grid;
-  grid-template-columns:34px minmax(0,1fr) auto;
-  align-items:center;
-  gap:10px;
-  background:#fffefa;
-  border:1px solid #e4dacb;
-  border-radius:14px;
-  padding:12px;
-}
-
-.readerListenLine>span{
+.readerTypingOverlay{
+  position:fixed;
+  inset:0;
+  z-index:30;
   display:grid;
   place-items:center;
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  background:#edf7ef;
-  color:#247154;
-  font-size:12px;
-  font-weight:850;
+  background:rgba(42,37,31,.28);
+  padding:20px;
 }
 
-.readerListenLine p{
-  margin:0;
-  color:#1d1d1f;
-  font-size:18px;
-  line-height:1.4;
-  font-weight:720;
+.readerTypingDialog{
+  width:min(720px,100%);
+  max-height:min(760px,calc(100vh - 40px));
+  overflow:auto;
+  display:grid;
+  gap:12px;
+  background:#fffefa;
+  border:1px solid #e4dacb;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 30px 80px rgba(31,58,46,.18);
 }
 
-.readerTypingHeader{
+.readerTypingDialogTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.readerTypingDialogTop div{
   display:grid;
   gap:4px;
-  padding:18px 0 14px;
-  border-bottom:1px solid #ede5d8;
-  margin-bottom:16px;
 }
 
-.readerTypingHeader span{
+.readerTypingDialogTop span{
   color:#247154;
   font-size:12px;
   font-weight:850;
   text-transform:uppercase;
 }
 
-.readerTypingHeader h3{
-  margin:0;
-  color:#1d1d1f;
-  font-size:30px;
-  line-height:1.1;
-}
-
-.readerTypingCards{
-  display:grid;
-  gap:20px;
-}
-
-.readerTypingSection{
-  display:grid;
-  gap:14px;
-  scroll-margin-top:18px;
-}
-
-.readerTypingSection h4{
-  margin:10px 0 0;
-  padding:10px 0 0 12px;
-  border-top:1px solid #ede5d8;
-  border-left:4px solid #247154;
+.readerTypingDialogTop strong{
   color:#1d1d1f;
   font-size:24px;
   line-height:1.15;
 }
 
-.readerTypingCard{
-  display:grid;
-  gap:12px;
-  background:#fffefa;
-  border:1px solid #e4dacb;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 10px 24px rgba(31,58,46,.05);
-}
-
-.readerTypingCardTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.readerTypingCardTop span{
+.readerTypingPlay{
+  justify-self:start;
+  min-height:40px;
+  border:1px solid #cfe4d6;
+  border-radius:12px;
+  background:#edf7ef;
   color:#247154;
-  font-size:12px;
+  padding:0 14px;
   font-weight:850;
-  text-transform:uppercase;
 }
 
 .readerTypingSource{
@@ -4480,7 +4405,7 @@ textarea{
   font-weight:720;
 }
 
-.readerTypingCard textarea{
+.readerTypingDialog textarea{
   min-height:96px;
   margin:0;
   border-radius:12px;
@@ -4636,6 +4561,18 @@ textarea{
   flex:0 0 auto;
   align-items:center;
   gap:5px;
+}
+
+.readerTypeButton{
+  flex:0 0 auto;
+  border:1px solid #d8e7d8;
+  border-radius:999px;
+  background:#fffefa;
+  color:#247154;
+  min-height:30px;
+  padding:0 10px;
+  font-size:11px;
+  font-weight:850;
 }
 
 .readerPlayButton:hover{

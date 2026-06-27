@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3962'
-const SETTINGS_KEY = 'ke_dev_settings_v3962'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3961', 'ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3962'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3962'
+const STORE_KEY = 'ke_dev_store_v3963'
+const SETTINGS_KEY = 'ke_dev_settings_v3963'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3962', 'ke_dev_settings_v3961', 'ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3963'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3963'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.62'
+const APP_VERSION = '3.9.63'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -1713,33 +1713,6 @@ function readerPlayableBlockChoices(blocks = []) {
   })
 }
 
-function readerTypingItemsFromBlocks(blocks = []) {
-  let currentHeading = 'Opening'
-  let currentSectionId = 'opening'
-  let order = 0
-  const items = []
-  blocks.forEach((block, blockIndex) => {
-    if (block.type === 'heading') {
-      currentHeading = block.text || currentHeading
-      currentSectionId = block.id || currentSectionId
-      return
-    }
-    readerBlockPlayableLines(block).forEach((line, lineIndex) => {
-      const playable = playableEnglishFromText(line)
-      if (!shouldShowReaderTyping(playable)) return
-      order += 1
-      items.push({
-        id: `typing-${blockIndex}-${lineIndex}`,
-        sectionId: currentSectionId,
-        order,
-        heading: String(currentHeading || 'Section').replace(/^\d+[.)]?\s*/, ''),
-        text: playable
-      })
-    })
-  })
-  return items
-}
-
 function readerKeywordPrompt(text = '') {
   const words = String(text || '').match(/[A-Za-z][A-Za-z'-]*/g) || []
   const stopwords = new Set(['about', 'after', 'again', 'because', 'before', 'could', 'there', 'these', 'those', 'their', 'would', 'should', 'still', 'where', 'which', 'while'])
@@ -3110,9 +3083,10 @@ function App() {
   const [readerPlaying, setReaderPlaying] = useState(false)
   const [readerMode, setReaderMode] = useState('read')
   const [readerTypingMode, setReaderTypingMode] = useState('copy')
-  const [readerTypingAnswers, setReaderTypingAnswers] = useState({})
-  const [readerTypingChecked, setReaderTypingChecked] = useState({})
-  const [readerTypingRevealed, setReaderTypingRevealed] = useState({})
+  const [readerTypingDialog, setReaderTypingDialog] = useState(null)
+  const [readerTypingInput, setReaderTypingInput] = useState('')
+  const [readerTypingChecked, setReaderTypingChecked] = useState(false)
+  const [readerTypingRevealed, setReaderTypingRevealed] = useState(false)
   const [readerBlockTarget, setReaderBlockTarget] = useState('')
   const [settings, setSettings] = useState(() => normalizeSettings(loadSettingsWithFallback()))
   const [tab, setTab] = useState(() => {
@@ -3553,40 +3527,29 @@ function App() {
     setMessage('Playback stopped.')
   }
 
-  function updateReaderTyping(key, value) {
-    setReaderTypingAnswers(current => ({ ...current, [key]: value }))
-    setReaderTypingChecked(current => ({ ...current, [key]: false }))
+  function openReaderTyping(text) {
+    const playable = playableEnglishFromText(text)
+    if (!playable) return
+    setReaderTypingDialog({ text: playable })
+    setReaderTypingInput('')
+    setReaderTypingChecked(false)
+    setReaderTypingRevealed(false)
   }
 
-  function checkReaderTyping(key) {
-    setReaderTypingChecked(current => ({ ...current, [key]: true }))
+  function closeReaderTyping() {
+    setReaderTypingDialog(null)
+    setReaderTypingInput('')
+    setReaderTypingChecked(false)
+    setReaderTypingRevealed(false)
   }
 
-  function clearReaderTyping(key) {
-    setReaderTypingAnswers(current => ({ ...current, [key]: '' }))
-    setReaderTypingChecked(current => ({ ...current, [key]: false }))
-    setReaderTypingRevealed(current => ({ ...current, [key]: false }))
-  }
-
-  function toggleReaderTypingAnswer(key) {
-    setReaderTypingRevealed(current => ({ ...current, [key]: !current[key] }))
+  function clearReaderTyping() {
+    setReaderTypingInput('')
+    setReaderTypingChecked(false)
+    setReaderTypingRevealed(false)
   }
 
   function scrollToReaderSection(id) {
-    if (readerMode === 'type') {
-      document.getElementById(`reader-type-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      return
-    }
-    if (readerMode === 'listen') {
-      const target = readerPlayableBlockChoices(activeReaderParsed.blocks).find(choice => choice.sectionId === id)
-      if (target) {
-        setReaderBlockTarget(target.id)
-        window.requestAnimationFrame(() => {
-          document.getElementById('reader-listen-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        })
-      }
-      return
-    }
     document.getElementById(`reader-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -5155,7 +5118,6 @@ function App() {
 
   function renderReaderWorkspace() {
     const readerBlockChoices = readerPlayableBlockChoices(activeReaderParsed.blocks)
-    const readerTypingItems = readerTypingItemsFromBlocks(activeReaderParsed.blocks)
     const selectedReaderBlock = readerBlockChoices.find(choice => choice.id === readerBlockTarget) || readerBlockChoices[0]
     const selectedReaderBlockId = selectedReaderBlock?.id || ''
     return <section className="readerShell" data-testid="kevin-australia-reader">
@@ -5167,12 +5129,11 @@ function App() {
         <div className="readerStudyControls" aria-label="Reader study controls">
           <div className="readerSideSectionTitle">
             <span>Mode</span>
-            <strong>{readerMode === 'type' ? 'Type' : readerMode === 'listen' ? 'Listen' : 'Read'}</strong>
+            <strong>{readerMode === 'listen' ? 'Listen + Type' : 'Read'}</strong>
           </div>
           <div className="readerModeSwitch" aria-label="Reader mode">
             <button className={`readerModeButton ${readerMode === 'read' ? 'active' : ''}`} onClick={() => setReaderMode('read')} title="Reading mode" aria-label="Reading mode">Read</button>
             <button className={`readerModeButton ${readerMode === 'listen' ? 'active' : ''}`} onClick={() => setReaderMode('listen')} title="Listening mode" aria-label="Listening mode">▶ Listen</button>
-            <button className={`readerModeButton ${readerMode === 'type' ? 'active' : ''}`} onClick={() => setReaderMode('type')} title="Typing mode" aria-label="Typing mode" disabled={!readerTypingItems.length}>⌨ Type</button>
           </div>
           <div className="readerIconBar slim">
             <button className="readerIconButton" title="Stop audio" aria-label="Stop audio" onClick={stopReaderPlayback} disabled={!readerPlaying}>■</button>
@@ -5187,11 +5148,6 @@ function App() {
           <div className="readerBlockActions">
             <button className="readerIconButton wide" title="Play selected block" aria-label="Play selected block" onClick={() => selectedReaderBlock && playReaderLines(selectedReaderBlock.lines)} disabled={!selectedReaderBlock || readerPlaying}>▶</button>
           </div>
-          {readerMode === 'type' && <div className="readerTypingModePicker" aria-label="Typing exercise type">
-            <button className={readerTypingMode === 'copy' ? 'active' : ''} onClick={() => setReaderTypingMode('copy')}>Copy</button>
-            <button className={readerTypingMode === 'blank' ? 'active' : ''} onClick={() => setReaderTypingMode('blank')}>Blank</button>
-            <button className={readerTypingMode === 'listen' ? 'active' : ''} onClick={() => setReaderTypingMode('listen')}>Listen</button>
-          </div>}
           <details className="readerAdvancedControls">
             <summary>Audio options</summary>
             <label>Speed<select value={readerSpeed} onChange={event => setReaderSpeed(Number(event.target.value))}>
@@ -5227,32 +5183,31 @@ function App() {
           {activeReaderLesson && <button className="secondary compact weakAction" onClick={() => deleteReaderLesson(activeReaderLesson.id)}>Delete</button>}
         </div>
         {activeReaderLesson ? <>
-          {readerMode === 'type' ? <ReaderTypingWorkspace
-            items={readerTypingItems}
-            contents={activeReaderParsed.contents}
-            mode={readerTypingMode}
-            answers={readerTypingAnswers}
-            checked={readerTypingChecked}
-            revealed={readerTypingRevealed}
-            onAnswerChange={updateReaderTyping}
-            onCheck={checkReaderTyping}
-            onClear={clearReaderTyping}
-            onReveal={toggleReaderTypingAnswer}
-            onPlayText={playReaderText}
-          /> : readerMode === 'listen' ? <ReaderListenWorkspace
-            block={selectedReaderBlock}
-            onPlayText={playReaderText}
-            onPlayLines={playReaderLines}
-            playing={readerPlaying}
-          /> : <div className="readerBlocks mode-read">
+          <div className={`readerBlocks mode-${readerMode}`}>
             {activeReaderParsed.blocks.map((block, index) => <ReaderBlock
               key={`${block.type}-${index}`}
               block={block}
               index={index}
               onPlayText={playReaderText}
               onPlayLines={playReaderLines}
+              showStudyActions={readerMode === 'listen'}
+              onOpenTyping={openReaderTyping}
             />)}
-          </div>}
+          </div>
+          {readerTypingDialog && <ReaderTypingDialog
+            text={readerTypingDialog.text}
+            mode={readerTypingMode}
+            input={readerTypingInput}
+            checked={readerTypingChecked}
+            revealed={readerTypingRevealed}
+            onModeChange={setReaderTypingMode}
+            onInputChange={value => { setReaderTypingInput(value); setReaderTypingChecked(false) }}
+            onCheck={() => setReaderTypingChecked(true)}
+            onReveal={() => setReaderTypingRevealed(value => !value)}
+            onClear={clearReaderTyping}
+            onClose={closeReaderTyping}
+            onPlayText={playReaderText}
+          />}
         </> : <div className="readerEmpty">
           <h2>Start with one full ChatGPT lesson.</h2>
           <p>Paste the complete Episode text on the left. Headings, tables, code blocks, Chinese explanation, role-play, writing and preview sections will render as a course handout.</p>
@@ -6423,88 +6378,51 @@ function ReaderInline({ text }) {
   })}</>
 }
 
-function ReaderAudioActions({ text, onPlayText }) {
+function ReaderAudioActions({ text, onPlayText, showStudyActions, onOpenTyping }) {
   const playable = playableEnglishFromText(text)
   if (!playable) return null
   return <span className="readerAudioActions">
     <button className="readerPlayButton" title="Play English" onClick={() => onPlayText(playable)}>▶</button>
+    {showStudyActions && shouldShowReaderTyping(playable) && <button className="readerTypeButton" title="Typing practice" onClick={() => onOpenTyping(playable)}>⌨ Type</button>}
   </span>
 }
 
-function ReaderTypingWorkspace({ items, contents, mode, answers, checked, revealed, onAnswerChange, onCheck, onClear, onReveal, onPlayText }) {
-  const grouped = contents.map(section => ({
-    ...section,
-    items: items.filter(item => item.sectionId === section.id)
-  })).filter(section => section.items.length)
-  return <div className="readerTypingWorkspace" id="reader-spelling-practice">
-    <div className="readerTypingHeader">
-      <span>Typing practice</span>
-      <h3>{mode === 'copy' ? '看原文打字' : mode === 'blank' ? '填空关键词打字' : '听音打字'}</h3>
+function ReaderTypingDialog({ text, mode, input, checked, revealed, onModeChange, onInputChange, onCheck, onReveal, onClear, onClose, onPlayText }) {
+  const blank = readerKeywordPrompt(text)
+  const expected = mode === 'blank' ? blank.answer : text
+  const acceptsFullSentence = mode === 'blank' && normalizeAnswerText(input) === normalizeAnswerText(text)
+  const correct = checked && (normalizeAnswerText(input) === normalizeAnswerText(expected) || acceptsFullSentence)
+  return <div className="readerTypingOverlay" role="dialog" aria-modal="true" aria-label="Typing practice">
+    <div className="readerTypingDialog">
+      <div className="readerTypingDialogTop">
+        <div>
+          <span>Typing practice</span>
+          <strong>{mode === 'copy' ? '看原文打字' : mode === 'blank' ? '填空关键词打字' : '听音打字'}</strong>
+        </div>
+        <button className="readerMiniIcon" title="Close" aria-label="Close typing practice" onClick={onClose}>×</button>
+      </div>
+      <div className="readerTypingModePicker" aria-label="Typing exercise type">
+        <button className={mode === 'copy' ? 'active' : ''} onClick={() => onModeChange('copy')}>Copy</button>
+        <button className={mode === 'blank' ? 'active' : ''} onClick={() => onModeChange('blank')}>Blank</button>
+        <button className={mode === 'listen' ? 'active' : ''} onClick={() => onModeChange('listen')}>Listen</button>
+      </div>
+      <button className="readerTypingPlay" onClick={() => onPlayText(text)}>▶ Sentence</button>
+      {mode === 'copy' && <p className="readerTypingSource">{text}</p>}
+      {mode === 'blank' && <p className="readerTypingSource blank">{blank.prompt}</p>}
+      {mode === 'listen' && <p className="readerTypingSource hiddenText">Listen first, then type.</p>}
+      <textarea value={input} onChange={event => onInputChange(event.target.value)} placeholder={mode === 'blank' ? 'Type the missing keywords or full sentence...' : 'Type the English here...'} />
+      <div className="readerTypingActions">
+        <button className="primary compact" onClick={onCheck} disabled={!input.trim()}>Check</button>
+        <button className="secondary compact" onClick={onReveal}>{revealed ? 'Hide answer' : 'Show answer'}</button>
+        <button className="secondary compact weakAction" onClick={onClear} disabled={!input}>Clear</button>
+        {checked && <strong className={correct ? 'correct' : 'retry'}>{correct ? 'Correct' : 'Try again'}</strong>}
+      </div>
+      {revealed && <p className="readerTypingAnswer">{text}</p>}
     </div>
-    {items.length ? <div className="readerTypingCards">
-      {(grouped.length ? grouped : [{ id: 'opening', text: 'Practice', items }]).map(section => <section className="readerTypingSection" id={`reader-type-${section.id}`} key={section.id}>
-        <h4>{section.text}</h4>
-        {section.items.map(item => <ReaderTypingCard
-          key={item.id}
-          item={item}
-          mode={mode}
-          value={answers[item.id] || ''}
-          checked={Boolean(checked[item.id])}
-          revealed={Boolean(revealed[item.id])}
-          onAnswerChange={onAnswerChange}
-          onCheck={onCheck}
-          onClear={onClear}
-          onReveal={onReveal}
-          onPlayText={onPlayText}
-        />)}
-      </section>)}
-    </div> : <div className="readerEmpty"><h2>No typing items yet.</h2></div>}
   </div>
 }
 
-function ReaderTypingCard({ item, mode, value, checked, revealed, onAnswerChange, onCheck, onClear, onReveal, onPlayText }) {
-  const blank = readerKeywordPrompt(item.text)
-  const expected = mode === 'blank' ? blank.answer : item.text
-  const acceptsFullSentence = mode === 'blank' && normalizeAnswerText(value) === normalizeAnswerText(item.text)
-  const correct = checked && (normalizeAnswerText(value) === normalizeAnswerText(expected) || acceptsFullSentence)
-  return <article className={`readerTypingCard mode-${mode}`}>
-    <div className="readerTypingCardTop">
-      <span>{item.order}. {item.heading}</span>
-      <button className="readerMiniIcon" title="Play sentence" aria-label="Play sentence" onClick={() => onPlayText(item.text)}>▶</button>
-    </div>
-    {mode === 'copy' && <p className="readerTypingSource">{item.text}</p>}
-    {mode === 'blank' && <p className="readerTypingSource blank">{blank.prompt}</p>}
-    {mode === 'listen' && <p className="readerTypingSource hiddenText">Listen first, then type.</p>}
-    <textarea value={value} onChange={event => onAnswerChange(item.id, event.target.value)} placeholder={mode === 'blank' ? 'Type the missing keywords or full sentence...' : 'Type the English here...'} />
-    <div className="readerTypingActions">
-      <button className="primary compact" onClick={() => onCheck(item.id)} disabled={!value.trim()}>Check</button>
-      <button className="secondary compact" onClick={() => onReveal(item.id)}>{revealed ? 'Hide answer' : 'Show answer'}</button>
-      <button className="secondary compact weakAction" onClick={() => onClear(item.id)} disabled={!value}>Clear</button>
-      {checked && <strong className={correct ? 'correct' : 'retry'}>{correct ? 'Correct' : 'Try again'}</strong>}
-    </div>
-    {revealed && <p className="readerTypingAnswer">{item.text}</p>}
-  </article>
-}
-
-function ReaderListenWorkspace({ block, onPlayText, onPlayLines, playing }) {
-  const lines = block?.lines?.map(playableEnglishFromText).filter(Boolean) || []
-  return <div className="readerListenWorkspace" id="reader-listen-workspace">
-    <div className="readerListenHeader">
-      <span>Listening practice</span>
-      <h3>{block?.label || 'Choose a block'}</h3>
-      <button className="primary compact" onClick={() => onPlayLines(lines)} disabled={!lines.length || playing}>▶ Block</button>
-    </div>
-    {lines.length ? <div className="readerListenLines">
-      {lines.map((line, index) => <div className="readerListenLine" key={`${line}-${index}`}>
-        <span>{index + 1}</span>
-        <p>{line}</p>
-        <button className="readerMiniIcon" title="Play sentence" aria-label="Play sentence" onClick={() => onPlayText(line)}>▶</button>
-      </div>)}
-    </div> : <div className="readerEmpty"><h2>No playable lines in this block.</h2></div>}
-  </div>
-}
-
-function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
+function ReaderBlock({ block, index, onPlayText, onPlayLines, showStudyActions, onOpenTyping }) {
   if (block.type === 'heading') {
     const Tag = `h${Math.min(Math.max(block.level, 1), 4)}`
     return <Tag id={`reader-${block.id}`} className={`readerHeading level-${block.level}`}>
@@ -6518,7 +6436,7 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
       <pre>{lines.map((line, lineIndex) => <span className="readerCodeLine" key={`${line}-${lineIndex}`}>
         <span>
           <code>{line || ' '}</code>
-          <ReaderAudioActions text={line} onPlayText={onPlayText} />
+          <ReaderAudioActions text={line} onPlayText={onPlayText} showStudyActions={showStudyActions} onOpenTyping={onOpenTyping} />
         </span>
       </span>)}</pre>
       {isDialogueBlock(block) && <ReaderRolePlay block={block} onPlayText={onPlayText} onPlayLines={onPlayLines} />}
@@ -6532,7 +6450,7 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
         <tbody>{body.map((row, rowIndex) => <tr key={`row-${index}-${rowIndex}`}>
           {row.map((cell, cellIndex) => <td key={`${cell}-${cellIndex}`}>
             <span><ReaderInline text={cell} /></span>
-            <ReaderAudioActions text={cell} onPlayText={onPlayText} />
+            <ReaderAudioActions text={cell} onPlayText={onPlayText} showStudyActions={showStudyActions} onOpenTyping={onOpenTyping} />
           </td>)}
         </tr>)}</tbody>
       </table>
@@ -6544,7 +6462,7 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
         {block.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`}>
           <div className="readerListLine">
             <span><ReaderInline text={item} /></span>
-            <ReaderAudioActions text={item} onPlayText={onPlayText} />
+            <ReaderAudioActions text={item} onPlayText={onPlayText} showStudyActions={showStudyActions} onOpenTyping={onOpenTyping} />
           </div>
         </li>)}
       </ul>
@@ -6555,7 +6473,7 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
     {lines.map((line, lineIndex) => <div className="readerParagraphLine" key={`${line}-${lineIndex}`}>
       <p>
         <span><ReaderInline text={line} /></span>
-        <ReaderAudioActions text={line} onPlayText={onPlayText} />
+        <ReaderAudioActions text={line} onPlayText={onPlayText} showStudyActions={showStudyActions} onOpenTyping={onOpenTyping} />
       </p>
     </div>)}
   </div>
