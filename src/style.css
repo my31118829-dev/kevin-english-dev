@@ -4419,7 +4419,23 @@ textarea{
 
 .readerTypingCards{
   display:grid;
+  gap:20px;
+}
+
+.readerTypingSection{
+  display:grid;
   gap:14px;
+  scroll-margin-top:18px;
+}
+
+.readerTypingSection h4{
+  margin:10px 0 0;
+  padding:10px 0 0 12px;
+  border-top:1px solid #ede5d8;
+  border-left:4px solid #247154;
+  color:#1d1d1f;
+  font-size:24px;
+  line-height:1.15;
 }
 
 .readerTypingCard{

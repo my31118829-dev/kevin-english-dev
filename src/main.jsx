@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3961'
-const SETTINGS_KEY = 'ke_dev_settings_v3961'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3961'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3961'
+const STORE_KEY = 'ke_dev_store_v3962'
+const SETTINGS_KEY = 'ke_dev_settings_v3962'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3961', 'ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3962'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3962'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.61'
+const APP_VERSION = '3.9.62'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -1692,10 +1692,12 @@ function readerBlockTypeLabel(block) {
 
 function readerPlayableBlockChoices(blocks = []) {
   let currentHeading = 'Opening'
+  let currentSectionId = 'opening'
   let order = 0
   return blocks.flatMap((block, index) => {
     if (block.type === 'heading') {
       currentHeading = block.text || currentHeading
+      currentSectionId = block.id || currentSectionId
       return []
     }
     const lines = readerBlockPlayableLines(block)
@@ -1704,6 +1706,7 @@ function readerPlayableBlockChoices(blocks = []) {
     const heading = String(currentHeading || 'Section').replace(/^\d+[.)]?\s*/, '')
     return [{
       id: `block-${index}`,
+      sectionId: currentSectionId,
       label: `${order}. ${readerBlockTypeLabel(block)} - ${heading}`,
       lines
     }]
@@ -1712,11 +1715,13 @@ function readerPlayableBlockChoices(blocks = []) {
 
 function readerTypingItemsFromBlocks(blocks = []) {
   let currentHeading = 'Opening'
+  let currentSectionId = 'opening'
   let order = 0
   const items = []
   blocks.forEach((block, blockIndex) => {
     if (block.type === 'heading') {
       currentHeading = block.text || currentHeading
+      currentSectionId = block.id || currentSectionId
       return
     }
     readerBlockPlayableLines(block).forEach((line, lineIndex) => {
@@ -1725,6 +1730,7 @@ function readerTypingItemsFromBlocks(blocks = []) {
       order += 1
       items.push({
         id: `typing-${blockIndex}-${lineIndex}`,
+        sectionId: currentSectionId,
         order,
         heading: String(currentHeading || 'Section').replace(/^\d+[.)]?\s*/, ''),
         text: playable
@@ -3567,6 +3573,20 @@ function App() {
   }
 
   function scrollToReaderSection(id) {
+    if (readerMode === 'type') {
+      document.getElementById(`reader-type-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+    if (readerMode === 'listen') {
+      const target = readerPlayableBlockChoices(activeReaderParsed.blocks).find(choice => choice.sectionId === id)
+      if (target) {
+        setReaderBlockTarget(target.id)
+        window.requestAnimationFrame(() => {
+          document.getElementById('reader-listen-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })
+      }
+      return
+    }
     document.getElementById(`reader-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -5209,6 +5229,7 @@ function App() {
         {activeReaderLesson ? <>
           {readerMode === 'type' ? <ReaderTypingWorkspace
             items={readerTypingItems}
+            contents={activeReaderParsed.contents}
             mode={readerTypingMode}
             answers={readerTypingAnswers}
             checked={readerTypingChecked}
@@ -6410,26 +6431,33 @@ function ReaderAudioActions({ text, onPlayText }) {
   </span>
 }
 
-function ReaderTypingWorkspace({ items, mode, answers, checked, revealed, onAnswerChange, onCheck, onClear, onReveal, onPlayText }) {
+function ReaderTypingWorkspace({ items, contents, mode, answers, checked, revealed, onAnswerChange, onCheck, onClear, onReveal, onPlayText }) {
+  const grouped = contents.map(section => ({
+    ...section,
+    items: items.filter(item => item.sectionId === section.id)
+  })).filter(section => section.items.length)
   return <div className="readerTypingWorkspace" id="reader-spelling-practice">
     <div className="readerTypingHeader">
       <span>Typing practice</span>
       <h3>{mode === 'copy' ? '看原文打字' : mode === 'blank' ? '填空关键词打字' : '听音打字'}</h3>
     </div>
     {items.length ? <div className="readerTypingCards">
-      {items.map(item => <ReaderTypingCard
-        key={item.id}
-        item={item}
-        mode={mode}
-        value={answers[item.id] || ''}
-        checked={Boolean(checked[item.id])}
-        revealed={Boolean(revealed[item.id])}
-        onAnswerChange={onAnswerChange}
-        onCheck={onCheck}
-        onClear={onClear}
-        onReveal={onReveal}
-        onPlayText={onPlayText}
-      />)}
+      {(grouped.length ? grouped : [{ id: 'opening', text: 'Practice', items }]).map(section => <section className="readerTypingSection" id={`reader-type-${section.id}`} key={section.id}>
+        <h4>{section.text}</h4>
+        {section.items.map(item => <ReaderTypingCard
+          key={item.id}
+          item={item}
+          mode={mode}
+          value={answers[item.id] || ''}
+          checked={Boolean(checked[item.id])}
+          revealed={Boolean(revealed[item.id])}
+          onAnswerChange={onAnswerChange}
+          onCheck={onCheck}
+          onClear={onClear}
+          onReveal={onReveal}
+          onPlayText={onPlayText}
+        />)}
+      </section>)}
     </div> : <div className="readerEmpty"><h2>No typing items yet.</h2></div>}
   </div>
 }
@@ -6460,7 +6488,7 @@ function ReaderTypingCard({ item, mode, value, checked, revealed, onAnswerChange
 
 function ReaderListenWorkspace({ block, onPlayText, onPlayLines, playing }) {
   const lines = block?.lines?.map(playableEnglishFromText).filter(Boolean) || []
-  return <div className="readerListenWorkspace">
+  return <div className="readerListenWorkspace" id="reader-listen-workspace">
     <div className="readerListenHeader">
       <span>Listening practice</span>
       <h3>{block?.label || 'Choose a block'}</h3>
