@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3957'
-const SETTINGS_KEY = 'ke_dev_settings_v3957'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3957'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3957'
+const STORE_KEY = 'ke_dev_store_v3958'
+const SETTINGS_KEY = 'ke_dev_settings_v3958'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3958'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3958'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.57'
+const APP_VERSION = '3.9.58'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -1677,6 +1677,34 @@ function shouldShowContinuousPlay(lines = []) {
   return playable.length > 1 || playable.some(line => playableWordCount(line) >= 4)
 }
 
+function readerBlockTypeLabel(block) {
+  if (isDialogueBlock(block)) return 'Dialogue'
+  if (block?.type === 'code') return 'Block'
+  if (block?.type === 'table') return 'Table'
+  if (block?.type === 'list') return 'List'
+  return 'Paragraph'
+}
+
+function readerPlayableBlockChoices(blocks = []) {
+  let currentHeading = 'Opening'
+  let order = 0
+  return blocks.flatMap((block, index) => {
+    if (block.type === 'heading') {
+      currentHeading = block.text || currentHeading
+      return []
+    }
+    const lines = readerBlockPlayableLines(block)
+    if (!shouldShowContinuousPlay(lines)) return []
+    order += 1
+    const heading = String(currentHeading || 'Section').replace(/^\d+[.)]?\s*/, '')
+    return [{
+      id: `block-${index}`,
+      label: `${order}. ${readerBlockTypeLabel(block)} - ${heading}`,
+      lines
+    }]
+  })
+}
+
 function parseDialogueLines(text = '') {
   return String(text || '').split('\n')
     .map(line => {
@@ -3033,6 +3061,7 @@ function App() {
   const [readerPracticeReveal, setReaderPracticeReveal] = useState(true)
   const [readerPracticeChecked, setReaderPracticeChecked] = useState(false)
   const [readerPracticeOpen, setReaderPracticeOpen] = useState(false)
+  const [readerBlockTarget, setReaderBlockTarget] = useState('')
   const [settings, setSettings] = useState(() => normalizeSettings(loadSettingsWithFallback()))
   const [tab, setTab] = useState(() => {
     const requestedTab = typeof window !== 'undefined'
@@ -3484,16 +3513,8 @@ function App() {
     setReaderPracticeOpen(true)
   }
 
-  function startReaderSpelling(text) {
-    const playable = playableEnglishFromText(text)
-    if (!playable) return
-    const existingIndex = readerSentences.findIndex(sentence => sentence === playable)
-    if (existingIndex >= 0) setReaderPracticeIndex(existingIndex)
-    setReaderPracticeText(playable)
-    setReaderPracticeReveal(false)
-    setReaderPracticeInput('')
-    setReaderPracticeChecked(false)
-    setReaderPracticeOpen(true)
+  function openRandomReaderSpelling() {
+    nextReaderPracticeSentence()
     window.requestAnimationFrame(() => {
       document.getElementById('reader-spelling-practice')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
@@ -5077,6 +5098,9 @@ function App() {
   function renderReaderWorkspace() {
     const currentPracticeSentence = readerPracticeText || readerSentences[readerPracticeIndex] || readerSentences[0] || ''
     const result = readerPracticeResult()
+    const readerBlockChoices = readerPlayableBlockChoices(activeReaderParsed.blocks)
+    const selectedReaderBlock = readerBlockChoices.find(choice => choice.id === readerBlockTarget) || readerBlockChoices[0]
+    const selectedReaderBlockId = selectedReaderBlock?.id || ''
     return <section className="readerShell" data-testid="kevin-australia-reader">
       <aside className="readerSidebar">
         <div className="readerBrand">
@@ -5084,6 +5108,40 @@ function App() {
           <strong>Interactive Course Reader</strong>
           <small>Lessons and contents stay here. Import lives in Settings.</small>
           <button className="readerSettingsShortcut" onClick={() => setSettingsOpen(true)}>Import in Settings</button>
+        </div>
+        <div className="readerStudyControls" aria-label="Reader study controls">
+          <div className="readerSideSectionTitle">
+            <span>Study controls</span>
+            <strong>Listen, block play, type</strong>
+          </div>
+          <div className="readerPrimaryTools">
+            <button className="primary compact" onClick={() => playReaderLines(readerSentences)} disabled={!readerSentences.length || readerPlaying}>▶ All English</button>
+            <button className="secondary compact" onClick={stopReaderPlayback} disabled={!readerPlaying}>Stop</button>
+          </div>
+          <label className="readerBlockSelect">Block
+            <select value={selectedReaderBlockId} onChange={event => setReaderBlockTarget(event.target.value)} disabled={!readerBlockChoices.length}>
+              {readerBlockChoices.length
+                ? readerBlockChoices.map(choice => <option value={choice.id} key={choice.id}>{choice.label}</option>)
+                : <option>No playable block</option>}
+            </select>
+          </label>
+          <button className="secondary compact readerFullButton" onClick={() => selectedReaderBlock && playReaderLines(selectedReaderBlock.lines)} disabled={!selectedReaderBlock || readerPlaying}>▶ Block</button>
+          <div className="readerPracticeShortcut">
+            <button className="secondary compact" onClick={() => setReaderPracticeOpen(value => !value)} disabled={!readerSentences.length}>{readerPracticeOpen ? 'Hide Typing' : 'Typing Practice'}</button>
+            <button className="secondary compact" onClick={openRandomReaderSpelling} disabled={!readerSentences.length}>Random Sentence</button>
+          </div>
+          <details className="readerAdvancedControls">
+            <summary>Audio options</summary>
+            <label>Speed<select value={readerSpeed} onChange={event => setReaderSpeed(Number(event.target.value))}>
+              {[0.75, 0.9, 1, 1.15].map(speed => <option value={speed} key={speed}>{speed}x</option>)}
+            </select></label>
+            <label>Repeat<select value={readerRepeatCount} onChange={event => setReaderRepeatCount(Number(event.target.value))}>
+              {[1, 2, 3, 5].map(count => <option value={count} key={count}>{count}x</option>)}
+            </select></label>
+            <label>Pause<select value={readerPauseSeconds} onChange={event => setReaderPauseSeconds(Number(event.target.value))}>
+              {[1, 2.5, 4, 6].map(seconds => <option value={seconds} key={seconds}>{seconds.toFixed(1)}s</option>)}
+            </select></label>
+          </details>
         </div>
         <div className="readerLessonList">
           <span>Lessons</span>
@@ -5106,37 +5164,22 @@ function App() {
           </div>
           {activeReaderLesson && <button className="secondary compact weakAction" onClick={() => deleteReaderLesson(activeReaderLesson.id)}>Delete</button>}
         </div>
-        <div className="readerControls" aria-label="Playback controls">
-          <div className="readerControlsTitle">
-            <span>Quick tools</span>
-            <strong>Playback and practice</strong>
-          </div>
-          <label>Speed<select value={readerSpeed} onChange={event => setReaderSpeed(Number(event.target.value))}>
-            {[0.75, 0.9, 1, 1.15].map(speed => <option value={speed} key={speed}>{speed}x</option>)}
-          </select></label>
-          <label>Repeat<select value={readerRepeatCount} onChange={event => setReaderRepeatCount(Number(event.target.value))}>
-            {[1, 2, 3, 5].map(count => <option value={count} key={count}>{count}x</option>)}
-          </select></label>
-          <label>Pause<select value={readerPauseSeconds} onChange={event => setReaderPauseSeconds(Number(event.target.value))}>
-            {[1, 2.5, 4, 6].map(seconds => <option value={seconds} key={seconds}>{seconds.toFixed(1)}s</option>)}
-          </select></label>
-          <button className="secondary compact" onClick={() => playReaderLines(readerSentences)} disabled={!readerSentences.length || readerPlaying}>▶ All English</button>
-          <button className="secondary compact" onClick={() => setReaderPracticeOpen(value => !value)} disabled={!readerSentences.length}>{readerPracticeOpen ? 'Hide Spell' : 'Spell Practice'}</button>
-          <button className="secondary compact" onClick={stopReaderPlayback} disabled={!readerPlaying}>Stop</button>
-        </div>
         {activeReaderLesson ? <>
           {readerPracticeOpen && <div className="readerPracticePanel" id="reader-spelling-practice">
             <div>
-              <span>Spelling Practice</span>
-              <strong>{currentPracticeSentence || 'Choose Spell beside any English line'}</strong>
+              <span>Typing Practice</span>
+              <strong>{currentPracticeSentence || 'Choose a random sentence from the left controls'}</strong>
             </div>
-            <label><input type="checkbox" checked={readerPracticeReveal} onChange={event => setReaderPracticeReveal(event.target.checked)} /> Show model sentence</label>
-            {currentPracticeSentence && <button className="secondary compact" onClick={() => playReaderText(currentPracticeSentence)}>▶ Sentence</button>}
-            <button className="secondary compact" onClick={nextReaderPracticeSentence} disabled={!readerSentences.length}>Random</button>
+            <div className="readerPracticeMode">
+              <label><input type="checkbox" checked={readerPracticeReveal} onChange={event => setReaderPracticeReveal(event.target.checked)} /> Show answer</label>
+              {currentPracticeSentence && <button className="secondary compact" onClick={() => playReaderText(currentPracticeSentence)}>▶ Sentence</button>}
+              <button className="secondary compact" onClick={nextReaderPracticeSentence} disabled={!readerSentences.length}>Random</button>
+            </div>
             {readerPracticeReveal && currentPracticeSentence && <p>{currentPracticeSentence}</p>}
             <textarea value={readerPracticeInput} onChange={event => { setReaderPracticeInput(event.target.value); setReaderPracticeChecked(false) }} placeholder="Type the English sentence here..." />
             <div className="readerPracticeActions">
               <button className="primary compact" disabled={!currentPracticeSentence} onClick={() => setReaderPracticeChecked(true)}>Check</button>
+              <button className="secondary compact" disabled={!currentPracticeSentence} onClick={() => { setReaderPracticeReveal(false); setReaderPracticeInput(''); setReaderPracticeChecked(false) }}>Listen and type</button>
               {result && <strong className={result === 'Correct' ? 'correct' : 'retry'}>{result}</strong>}
             </div>
           </div>}
@@ -5147,7 +5190,6 @@ function App() {
               index={index}
               onPlayText={playReaderText}
               onPlayLines={playReaderLines}
-              onPracticeText={startReaderSpelling}
             />)}
           </div>
         </> : <div className="readerEmpty">
@@ -6320,18 +6362,15 @@ function ReaderInline({ text }) {
   })}</>
 }
 
-function ReaderAudioActions({ text, onPlayText, onPracticeText }) {
+function ReaderAudioActions({ text, onPlayText }) {
   const playable = playableEnglishFromText(text)
   if (!playable) return null
   return <span className="readerAudioActions">
     <button className="readerPlayButton" title="Play English" onClick={() => onPlayText(playable)}>▶</button>
-    <button className="readerSpellButton" title="Spelling practice" onClick={() => onPracticeText(playable)}>Spell</button>
   </span>
 }
 
-function ReaderBlock({ block, index, onPlayText, onPlayLines, onPracticeText }) {
-  const playableLines = readerBlockPlayableLines(block)
-  const showContinuous = shouldShowContinuousPlay(playableLines)
+function ReaderBlock({ block, index, onPlayText, onPlayLines }) {
   if (block.type === 'heading') {
     const Tag = `h${Math.min(Math.max(block.level, 1), 4)}`
     return <Tag id={`reader-${block.id}`} className={`readerHeading level-${block.level}`}>
@@ -6342,24 +6381,22 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines, onPracticeText }) 
   if (block.type === 'code') {
     const lines = String(block.text || '').split('\n')
     return <div className="readerCodeBlock">
-      {showContinuous && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>▶ Block</button>}
       <pre>{lines.map((line, lineIndex) => <span key={`${line}-${lineIndex}`}>
         <code>{line || ' '}</code>
-        <ReaderAudioActions text={line} onPlayText={onPlayText} onPracticeText={onPracticeText} />
+        <ReaderAudioActions text={line} onPlayText={onPlayText} />
       </span>)}</pre>
-      {isDialogueBlock(block) && <ReaderRolePlay block={block} onPlayText={onPlayText} onPlayLines={onPlayLines} onPracticeText={onPracticeText} />}
+      {isDialogueBlock(block) && <ReaderRolePlay block={block} onPlayText={onPlayText} onPlayLines={onPlayLines} />}
     </div>
   }
   if (block.type === 'table') {
     const [head, ...body] = block.rows || []
     return <div className="readerTableWrap">
-      {showContinuous && <button className="readerBlockPlay" onClick={() => onPlayLines(playableLines)}>▶ Table</button>}
       <table className="readerTable">
         {head && <thead><tr>{head.map((cell, cellIndex) => <th key={`${cell}-${cellIndex}`}><ReaderInline text={cell} /></th>)}</tr></thead>}
         <tbody>{body.map((row, rowIndex) => <tr key={`row-${index}-${rowIndex}`}>
           {row.map((cell, cellIndex) => <td key={`${cell}-${cellIndex}`}>
             <span><ReaderInline text={cell} /></span>
-            <ReaderAudioActions text={cell} onPlayText={onPlayText} onPracticeText={onPracticeText} />
+            <ReaderAudioActions text={cell} onPlayText={onPlayText} />
           </td>)}
         </tr>)}</tbody>
       </table>
@@ -6367,26 +6404,24 @@ function ReaderBlock({ block, index, onPlayText, onPlayLines, onPracticeText }) 
   }
   if (block.type === 'list') {
     return <div className="readerListBlock">
-      {showContinuous && <button className="readerBlockPlay inline" onClick={() => onPlayLines(playableLines)}>▶ List</button>}
       <ul className="readerList">
         {block.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`}>
           <span><ReaderInline text={item} /></span>
-          <ReaderAudioActions text={item} onPlayText={onPlayText} onPracticeText={onPracticeText} />
+          <ReaderAudioActions text={item} onPlayText={onPlayText} />
         </li>)}
       </ul>
     </div>
   }
   const lines = String(block.text || '').split('\n')
   return <div className="readerParagraph">
-    {showContinuous && <button className="readerBlockPlay inline" onClick={() => onPlayLines(playableLines)}>▶ Paragraph</button>}
     {lines.map((line, lineIndex) => <p key={`${line}-${lineIndex}`}>
       <span><ReaderInline text={line} /></span>
-      <ReaderAudioActions text={line} onPlayText={onPlayText} onPracticeText={onPracticeText} />
+      <ReaderAudioActions text={line} onPlayText={onPlayText} />
     </p>)}
   </div>
 }
 
-function ReaderRolePlay({ block, onPlayText, onPlayLines, onPracticeText }) {
+function ReaderRolePlay({ block, onPlayText, onPlayLines }) {
   const dialogue = parseDialogueLines(block.text)
   const speakers = [...new Set(dialogue.map(line => line.speaker))]
   const [role, setRole] = useState(speakers.find(speaker => /Kevin/i.test(speaker)) || speakers[0] || '')
@@ -6413,7 +6448,6 @@ function ReaderRolePlay({ block, onPlayText, onPlayLines, onPracticeText }) {
             <span>{isUser ? `Your turn (${line.speaker})` : line.speaker}</span>
             <strong>{line.text}</strong>
           </button>
-          <button className="readerRoleSpell" onClick={() => onPracticeText(line.text)}>Spell</button>
         </div>
       })}
     </div>
