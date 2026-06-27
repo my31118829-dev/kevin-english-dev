@@ -4061,7 +4061,7 @@ textarea{
   border-bottom:1px solid #e7ded0;
 }
 
-.readerBrand span,.readerLessonList>span,.readerContents>span,.readerPracticePanel span,.readerTopline span,.readerSideSectionTitle span{
+.readerBrand span,.readerLessonList>span,.readerContents>span,.readerTopline span,.readerSideSectionTitle span{
   color:#247154;
   font-size:12px;
   font-weight:850;
@@ -4115,23 +4115,51 @@ textarea{
   line-height:1.15;
 }
 
-.readerPrimaryTools,.readerPracticeShortcut{
+.readerIconBar{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:7px;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
 }
 
-.readerStudyControls button{
-  min-height:40px;
+.readerIconButton,.readerMiniIcon{
+  display:grid;
+  place-items:center;
+  border:1px solid #ded5c8;
+  border-radius:14px;
+  background:#f3f0ea;
+  color:#2b2925;
+  min-height:44px;
+  padding:0;
+  font-size:18px;
+  font-weight:900;
+  line-height:1;
 }
 
-.readerStudyControls .primary,.readerStudyControls .secondary{
+.readerIconButton.primaryIcon{
+  background:#1d1d1b;
+  border-color:#1d1d1b;
+  color:#fffefa;
+}
+
+.readerIconButton.active{
+  background:#edf7ef;
+  border-color:#a9d7bb;
+  color:#247154;
+  box-shadow:inset 0 0 0 2px #d9ecd8;
+}
+
+.readerIconButton:disabled,.readerMiniIcon:disabled{
+  color:#aaa49a;
+  background:#f0ede7;
+  border-color:#ebe4da;
+}
+
+.readerBlockActions{
+  display:grid;
+}
+
+.readerIconButton.wide{
   width:100%;
-  border-radius:12px;
-}
-
-.readerFullButton{
-  justify-self:stretch;
 }
 
 .readerBlockSelect,.readerAdvancedControls label{
@@ -4262,85 +4290,28 @@ textarea{
   color:#777064;
 }
 
-.readerPracticePanel{
+.readerTypingBanner{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:12px;
-  align-items:center;
-  background:linear-gradient(180deg,#f3f7ef 0%,#fffefa 100%);
-  border:1px solid #d8e7d8;
-  border-radius:20px;
-  padding:18px;
-  margin:0 auto 22px;
+  gap:3px;
   max-width:920px;
-  box-shadow:0 16px 34px rgba(31,58,46,.06);
+  margin:0 auto 18px;
+  background:#edf7ef;
+  border:1px solid #cfe4d6;
+  border-radius:14px;
+  padding:12px 14px;
 }
 
-.readerPracticePanel>div{
-  display:grid;
-  gap:4px;
-}
-
-.readerPracticePanel strong{
-  color:#1d1d1f;
-  font-size:16px;
-}
-
-.readerPracticePanel label{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  margin:0;
-  color:#52625a;
-  white-space:nowrap;
-}
-
-.readerPracticeMode{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  gap:8px;
-}
-
-.readerPracticePanel input[type=checkbox]{
-  width:auto;
-  min-height:0;
-  margin:0;
-}
-
-.readerPracticePanel p{
-  grid-column:1 / -1;
-  margin:2px 0 0;
-  color:#1d1d1f;
-  font-size:18px;
-  line-height:1.35;
-  font-weight:720;
-}
-
-.readerPracticePanel textarea{
-  grid-column:1 / -1;
-  min-height:84px;
-  margin:0;
-  background:#fffefa;
-}
-
-.readerPracticeActions{
-  grid-column:1 / -1;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.readerPracticeActions strong{
-  font-size:14px;
-}
-
-.readerPracticeActions .correct{
+.readerTypingBanner span{
   color:#247154;
+  font-size:11px;
+  font-weight:850;
+  text-transform:uppercase;
 }
 
-.readerPracticeActions .retry{
-  color:#9a3412;
+.readerTypingBanner strong{
+  color:#263b32;
+  font-size:15px;
+  line-height:1.25;
 }
 
 .readerBlocks{
@@ -4388,11 +4359,15 @@ textarea{
   margin:12px 0;
 }
 
+.readerParagraphLine{
+  margin:0 0 12px;
+}
+
 .readerParagraph p{
   display:flex;
   align-items:flex-start;
   gap:8px;
-  margin:0 0 10px;
+  margin:0;
   color:#35322d;
   font-size:17px;
   line-height:1.68;
@@ -4419,7 +4394,12 @@ textarea{
   overflow:auto;
 }
 
-.readerCodeBlock pre span{
+.readerCodeBlock pre .readerCodeLine{
+  display:grid;
+  gap:8px;
+}
+
+.readerCodeBlock pre .readerCodeLine>span:first-child{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   gap:8px;
@@ -4530,8 +4510,76 @@ textarea{
   line-height:1.55;
 }
 
+.readerListLine{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+}
+
 .readerList li span{
   margin-right:8px;
+}
+
+.readerInlineTyping{
+  display:grid;
+  gap:8px;
+  margin:9px 0 2px;
+  padding:10px;
+  background:#fffefa;
+  border:1px solid #e4dacb;
+  border-radius:12px;
+}
+
+.readerCodeBlock .readerInlineTyping{
+  white-space:normal;
+}
+
+.readerTable .readerInlineTyping{
+  margin-top:10px;
+}
+
+.readerInlineTyping textarea{
+  min-height:58px;
+  margin:0;
+  border-radius:10px;
+  background:#fbfaf6;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.readerInlineTypingActions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+}
+
+.readerInlineTypingActions .secondary{
+  min-height:34px;
+  border-radius:10px;
+  padding:0 12px;
+  font-size:12px;
+}
+
+.readerMiniIcon{
+  width:36px;
+  min-height:34px;
+  border-radius:10px;
+  font-size:13px;
+  padding-left:2px;
+}
+
+.readerInlineTypingActions strong{
+  font-size:12px;
+  font-weight:850;
+}
+
+.readerInlineTypingActions .correct{
+  color:#247154;
+}
+
+.readerInlineTypingActions .retry{
+  color:#9a3412;
 }
 
 .readerEmpty{
@@ -4847,14 +4895,6 @@ textarea{
 
   .readerDocument{
     padding:20px;
-  }
-
-  .readerPracticePanel{
-    grid-template-columns:1fr;
-  }
-
-  .readerPracticeMode{
-    justify-content:flex-start;
   }
 }
 
