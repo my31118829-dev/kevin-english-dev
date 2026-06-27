@@ -4081,19 +4081,16 @@ textarea{
   font-weight:620;
 }
 
-.readerImportBox{
-  display:grid;
-  gap:8px;
-  background:#fffefa;
-  border:1px solid #eadfce;
-  border-radius:14px;
-  padding:12px;
-}
-
-.readerImportBox textarea{
-  min-height:150px;
-  font-size:13px;
-  line-height:1.45;
+.readerSettingsShortcut{
+  justify-self:start;
+  min-height:34px;
+  border:1px solid #cfe4d6;
+  border-radius:999px;
+  background:#edf7ef;
+  color:#247154;
+  padding:0 12px;
+  font-size:12px;
+  font-weight:850;
 }
 
 .readerLessonList,.readerContents{
@@ -4190,7 +4187,7 @@ textarea{
 
 .readerControls label{
   margin:0;
-  min-width:124px;
+  min-width:112px;
 }
 
 .readerControls select{
@@ -4204,9 +4201,9 @@ textarea{
   grid-template-columns:minmax(0,1fr) auto auto auto;
   gap:8px 10px;
   align-items:center;
-  background:#f3f7ef;
+  background:linear-gradient(180deg,#f3f7ef 0%,#fffefa 100%);
   border:1px solid #d8e7d8;
-  border-radius:16px;
+  border-radius:18px;
   padding:14px;
   margin:16px 0 20px;
 }
@@ -4384,18 +4381,41 @@ textarea{
 
 .readerPlayButton{
   flex:0 0 auto;
+  display:grid;
+  place-items:center;
   border:1px solid #d8e7d8;
-  border-radius:999px;
+  border-radius:50%;
   background:#edf7ef;
   color:#247154;
-  min-height:28px;
-  padding:0 9px;
-  font-size:11px;
+  width:30px;
+  height:30px;
+  min-height:30px;
+  padding:0 0 0 2px;
+  font-size:12px;
   font-weight:850;
   transition:background .16s ease, transform .16s ease;
 }
 
-.readerPlayButton:hover,.readerBlockPlay:hover{
+.readerSpellButton{
+  flex:0 0 auto;
+  border:1px solid #e3d8c9;
+  border-radius:999px;
+  background:#fffefa;
+  color:#756d61;
+  min-height:30px;
+  padding:0 9px;
+  font-size:11px;
+  font-weight:850;
+}
+
+.readerAudioActions{
+  display:inline-flex;
+  flex:0 0 auto;
+  align-items:center;
+  gap:5px;
+}
+
+.readerPlayButton:hover,.readerBlockPlay:hover,.readerSpellButton:hover{
   transform:translateY(-1px);
 }
 
@@ -4560,6 +4580,52 @@ textarea{
   color:#1d1d1f;
   padding:10px 12px;
   text-align:left;
+}
+
+.readerRoleSpell{
+  align-self:center;
+  width:auto!important;
+  min-height:30px;
+  border:1px solid #e3d8c9!important;
+  border-radius:999px!important;
+  background:#fffefa!important;
+  color:#756d61!important;
+  padding:0 10px!important;
+  font-size:11px!important;
+  font-weight:850!important;
+}
+
+.readerSettingsImport{
+  background:#f3f7ef;
+  border:1px solid #d8e7d8;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.readerSettingsImport strong{
+  display:block;
+  color:#1d1d1f;
+  font-size:16px;
+}
+
+.readerSettingsImport p{
+  margin:6px 0 10px;
+  color:#52625a;
+  font-size:12px;
+  font-weight:650;
+}
+
+.readerSettingsImport textarea{
+  min-height:170px;
+  margin:0 0 10px;
+  background:#fffefa;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.readerSettingsImport button{
+  width:100%;
 }
 
 .readerRoleBubble.user button{
