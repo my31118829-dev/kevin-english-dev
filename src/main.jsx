@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const STORE_KEY = 'ke_dev_store_v3963'
-const SETTINGS_KEY = 'ke_dev_settings_v3963'
-const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3962', 'ke_dev_settings_v3961', 'ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
-const TAB_KEY = 'ke_dev_tab_v3963'
-const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3963'
+const STORE_KEY = 'ke_dev_store_v3964'
+const SETTINGS_KEY = 'ke_dev_settings_v3964'
+const PREVIOUS_SETTINGS_KEYS = ['ke_dev_settings_v3963', 'ke_dev_settings_v3962', 'ke_dev_settings_v3961', 'ke_dev_settings_v3960', 'ke_dev_settings_v3959', 'ke_dev_settings_v3958', 'ke_dev_settings_v3957', 'ke_dev_settings_v3956', 'ke_dev_settings_v3955', 'ke_dev_settings_v3954', 'ke_dev_settings_v3953', 'ke_dev_settings_v3952']
+const TAB_KEY = 'ke_dev_tab_v3964'
+const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3964'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.63'
+const APP_VERSION = '3.9.64'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -6150,6 +6150,39 @@ function evaluatePracticeAnswer(typed, expected) {
   return { state: 'retry', tone: 'wrong', titleKey: 'practiceResultRetry', bodyKey: 'practiceResultRetryBody' }
 }
 
+function readerTypingFeedback(input, expected, fullText, mode) {
+  const rawInput = String(input || '').replace(/\s+/g, ' ').trim()
+  const rawExpected = String(expected || '').replace(/\s+/g, ' ').trim()
+  const normalizedInput = normalizeAnswerText(input)
+  const normalizedExpected = normalizeAnswerText(expected)
+  const normalizedFull = normalizeAnswerText(fullText)
+  if (!normalizedInput) return null
+  if (mode === 'blank' && normalizedInput === normalizedFull) {
+    return { tone: 'correct', title: 'Correct', detail: 'Full sentence accepted.' }
+  }
+  if (rawInput === rawExpected || normalizedInput === normalizedExpected) {
+    if (rawInput !== rawExpected && normalizedInput === normalizedExpected) {
+      return { tone: 'close', title: 'Almost correct', detail: 'Words are right. Check punctuation, spacing, or capitalization.' }
+    }
+    return { tone: 'correct', title: 'Correct', detail: 'Good spelling.' }
+  }
+  const result = evaluatePracticeAnswer(input, expected)
+  const inputTokens = new Set(normalizedInput.split(' ').filter(Boolean))
+  const missing = normalizedExpected.split(' ').filter(Boolean).filter(token => !inputTokens.has(token)).slice(0, 3)
+  if (result.state === 'close') {
+    return {
+      tone: 'close',
+      title: 'Close',
+      detail: missing.length ? `Check: ${missing.join(', ')}` : 'Very close. Check word order or small spelling differences.'
+    }
+  }
+  return {
+    tone: 'retry',
+    title: 'Try again',
+    detail: missing.length ? `Missing or different: ${missing.join(', ')}` : 'Compare with the answer, then try once more.'
+  }
+}
+
 function PracticeCard({ item, index, total, typed, setTyped, answerShown, setAnswerShown, playText, onSaveReview, onNext, nextLabel, t }) {
   const expected = String(item.answerEn || '').trim()
   const prompt = item.type === 'replacement'
@@ -6383,15 +6416,19 @@ function ReaderAudioActions({ text, onPlayText, showStudyActions, onOpenTyping }
   if (!playable) return null
   return <span className="readerAudioActions">
     <button className="readerPlayButton" title="Play English" onClick={() => onPlayText(playable)}>▶</button>
-    {showStudyActions && shouldShowReaderTyping(playable) && <button className="readerTypeButton" title="Typing practice" onClick={() => onOpenTyping(playable)}>⌨ Type</button>}
+    {showStudyActions && shouldShowReaderTyping(playable) && <button className="readerTypeButton" title="Typing practice" aria-label="Typing practice" onClick={() => onOpenTyping(playable)}>⌨</button>}
   </span>
 }
 
 function ReaderTypingDialog({ text, mode, input, checked, revealed, onModeChange, onInputChange, onCheck, onReveal, onClear, onClose, onPlayText }) {
   const blank = readerKeywordPrompt(text)
   const expected = mode === 'blank' ? blank.answer : text
-  const acceptsFullSentence = mode === 'blank' && normalizeAnswerText(input) === normalizeAnswerText(text)
-  const correct = checked && (normalizeAnswerText(input) === normalizeAnswerText(expected) || acceptsFullSentence)
+  const feedback = checked ? readerTypingFeedback(input, expected, text, mode) : null
+  function handleTypingKeyDown(event) {
+    if (event.key !== 'Enter' || event.shiftKey) return
+    event.preventDefault()
+    if (input.trim()) onCheck()
+  }
   return <div className="readerTypingOverlay" role="dialog" aria-modal="true" aria-label="Typing practice">
     <div className="readerTypingDialog">
       <div className="readerTypingDialogTop">
@@ -6410,13 +6447,16 @@ function ReaderTypingDialog({ text, mode, input, checked, revealed, onModeChange
       {mode === 'copy' && <p className="readerTypingSource">{text}</p>}
       {mode === 'blank' && <p className="readerTypingSource blank">{blank.prompt}</p>}
       {mode === 'listen' && <p className="readerTypingSource hiddenText">Listen first, then type.</p>}
-      <textarea value={input} onChange={event => onInputChange(event.target.value)} placeholder={mode === 'blank' ? 'Type the missing keywords or full sentence...' : 'Type the English here...'} />
+      <textarea value={input} onChange={event => onInputChange(event.target.value)} onKeyDown={handleTypingKeyDown} placeholder={mode === 'blank' ? 'Type the missing keywords or full sentence...' : 'Type the English here...'} />
       <div className="readerTypingActions">
         <button className="primary compact" onClick={onCheck} disabled={!input.trim()}>Check</button>
         <button className="secondary compact" onClick={onReveal}>{revealed ? 'Hide answer' : 'Show answer'}</button>
         <button className="secondary compact weakAction" onClick={onClear} disabled={!input}>Clear</button>
-        {checked && <strong className={correct ? 'correct' : 'retry'}>{correct ? 'Correct' : 'Try again'}</strong>}
       </div>
+      {feedback && <div className={`readerTypingFeedback ${feedback.tone}`}>
+        <strong>{feedback.title}</strong>
+        <span>{feedback.detail}</span>
+      </div>}
       {revealed && <p className="readerTypingAnswer">{text}</p>}
     </div>
   </div>
