@@ -5337,6 +5337,36 @@ textarea{
   color:#71695f;
 }
 
+.phoneToolEntry{
+  display:grid;
+  gap:4px;
+  text-align:left;
+  width:100%;
+  background:#faf6ef;
+  border:1px solid #eadfce;
+  border-radius:22px;
+  padding:16px 18px;
+  cursor:pointer;
+}
+
+.phoneToolEntry span{
+  color:#1d9e75;
+  font-size:12px;
+  font-weight:850;
+  text-transform:uppercase;
+}
+
+.phoneToolEntry strong{
+  font-size:18px;
+  overflow-wrap:anywhere;
+}
+
+.phoneToolEntry em{
+  color:#71695f;
+  font-style:normal;
+  font-size:13px;
+}
+
 .mobileStageRail{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -6446,4 +6476,264 @@ textarea{
     min-height:56px;
     border-radius:16px;
   }
+}
+
+/* Phrase Drill (短语速练) */
+.phraseShell{
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+
+.phraseSidebar{
+  position:sticky;
+  top:14px;
+  max-height:calc(100vh - 28px);
+  overflow:auto;
+  display:grid;
+  gap:14px;
+  align-content:start;
+  background:rgba(247,245,239,.92);
+  border:1px solid #e5ddcf;
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 18px 42px rgba(31,58,46,.06);
+  backdrop-filter:blur(18px);
+}
+
+.phraseBrand{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding-bottom:12px;
+  border-bottom:1px solid #e7ded0;
+}
+
+.phraseBrand span{
+  font-weight:700;
+  letter-spacing:.04em;
+}
+
+.phraseComposer{
+  display:grid;
+  gap:8px;
+}
+
+.phraseComposer textarea{
+  width:100%;
+  resize:vertical;
+  border:1px solid #e0d7c8;
+  border-radius:14px;
+  padding:10px 12px;
+  font:inherit;
+  line-height:1.5;
+  background:#fff;
+}
+
+.phraseCardList{
+  display:grid;
+  gap:8px;
+}
+
+.phraseCardList>span{
+  font-size:.78rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:#8a8270;
+}
+
+.phraseCardList>button{
+  display:grid;
+  gap:3px;
+  text-align:left;
+  border:1px solid #e6ddce;
+  border-radius:14px;
+  padding:9px 11px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.phraseCardList>button.active{
+  border-color:#1f3a2e;
+  box-shadow:0 0 0 2px rgba(31,58,46,.12);
+}
+
+.phraseCardList>button small{
+  color:#8a8270;
+  font-size:.74rem;
+}
+
+.phraseDocument{
+  min-height:60vh;
+  background:rgba(255,255,255,.78);
+  border:1px solid #e8e0d2;
+  border-radius:22px;
+  padding:22px 24px;
+  box-shadow:0 18px 42px rgba(31,58,46,.05);
+}
+
+.phraseTopline{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding-bottom:14px;
+  border-bottom:1px solid #ece4d6;
+  margin-bottom:16px;
+}
+
+.phraseTopline h2{
+  margin:4px 0 2px;
+}
+
+.phraseTopline span{
+  font-size:.78rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:#8a8270;
+}
+
+.phraseTopline p{
+  color:#6f6957;
+  font-size:.86rem;
+  margin:0;
+}
+
+.phraseToplineActions{
+  display:flex;
+  gap:8px;
+  flex:0 0 auto;
+}
+
+.phraseSentences{
+  display:grid;
+  gap:16px;
+}
+
+.phraseSentence{
+  display:grid;
+  gap:10px;
+  padding:14px;
+  border:1px solid #ece4d6;
+  border-radius:16px;
+  background:#fdfcf8;
+}
+
+.phraseSentenceHead{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.phraseSentenceText{
+  display:grid;
+  gap:2px;
+}
+
+.phraseSentenceText strong{
+  font-size:1.02rem;
+}
+
+.phraseSentenceText span{
+  color:#7c7563;
+  font-size:.85rem;
+}
+
+.phraseChips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.phraseChip{
+  display:grid;
+  gap:6px;
+  border:1px solid #e3dac9;
+  border-radius:12px;
+  padding:7px 9px;
+  background:#fff;
+  max-width:100%;
+}
+
+.phraseChipMain{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.phraseChipText{
+  display:grid;
+  gap:1px;
+}
+
+.phraseChipText strong{
+  font-size:.92rem;
+}
+
+.phraseChipText span{
+  color:#8a8270;
+  font-size:.76rem;
+}
+
+.phraseChipTools{
+  display:flex;
+  gap:4px;
+}
+
+.phraseChipTools button{
+  border:1px solid #e3dac9;
+  background:#f7f4ec;
+  border-radius:8px;
+  width:26px;
+  height:26px;
+  line-height:1;
+  cursor:pointer;
+  font-size:.82rem;
+}
+
+.phraseChipTools button:disabled{
+  opacity:.35;
+  cursor:default;
+}
+
+.phrasePlay{
+  border:1px solid #1f3a2e;
+  background:#1f3a2e;
+  color:#fff;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  line-height:1;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+
+.phrasePlay.small{
+  width:26px;
+  height:26px;
+  font-size:.72rem;
+}
+
+.phraseEmpty{
+  display:grid;
+  gap:8px;
+  place-content:center;
+  text-align:center;
+  min-height:40vh;
+  color:#6f6957;
+}
+
+.platform-phone .phraseShell{
+  grid-template-columns:minmax(0,1fr);
+}
+
+.platform-phone .phraseSidebar{
+  position:static;
+  max-height:none;
+}
+
+.platform-phone .phraseDocument{
+  padding:16px 14px;
 }

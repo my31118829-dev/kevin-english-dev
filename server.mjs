@@ -118,6 +118,54 @@ ${text}
   }
 })
 
+app.post('/api/openai-phrase-split', async (req, res) => {
+  try {
+    const { text = '', apiKey = '' } = req.body || {}
+    const finalKey = String(req.headers['x-openai-key'] || apiKey || process.env.OPENAI_API_KEY || '').trim()
+    if (!finalKey || !finalKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API Key is missing. Set key in Settings or server env OPENAI_API_KEY.' })
+    if (!text || typeof text !== 'string') return res.status(400).json({ error: 'Text is missing.' })
+
+    const prompt = `你是英语意群切分助手。下面是用户贴的一句长句或一小段英语：
+
+${text}
+
+请把它切成"句子 + 意群短语 + 中文"，规则：
+1. 先按标点 / 语义把整段分成自然句子。
+2. 每个句子按"意思群"（sense group）切成短语，不是按词数硬切。
+3. 短语必须覆盖整句、不丢词，按原文顺序排列。
+4. 每个句子和每个短语都给一个简洁自然的中文翻译（中文只用于显示，不要音译）。
+5. 只返回 JSON，不要任何解释、不要 markdown 围栏。
+
+返回这个结构：
+{ "sentences": [
+    { "en": "原句英文", "zh": "原句中文",
+      "phrases": [ { "en": "意群短语", "zh": "短语中文" } ] }
+] }`
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${finalKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: 'You split English text into sentences and sense-group phrases with Chinese translations. You only output JSON.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    })
+
+    if (!response.ok) return res.status(response.status).json({ error: await response.text() })
+    const data = await response.json()
+    const content = data.choices?.[0]?.message?.content || ''
+    res.status(200).json({ content })
+  } catch (error) {
+    console.error('[OpenAI Phrase Split Error]', error)
+    res.status(500).json({ error: error.message || 'OpenAI phrase split failed.' })
+  }
+})
+
 app.post('/api/openai-rewrite-course', async (req, res) => {
   try {
     const { apiKey = '', title = '', level = 'A2', userName = 'Kevin', lines = [] } = req.body || {}
@@ -274,7 +322,7 @@ const host = process.env.HOST || '0.0.0.0'
 app.listen(port, host, () => {
   const networkUrl = localNetworkUrl(port)
   console.log('')
-  console.log('  Kevin English Learning System V3.9.64')
+  console.log('  Kevin English Learning System V3.9.65')
   console.log(`  Local:   http://127.0.0.1:${port}/`)
   if (networkUrl) console.log(`  Phone:   ${networkUrl}`)
   console.log('  Tip: open the Phone URL on the same Wi-Fi.')

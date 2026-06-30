@@ -1,6 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
+import {
+  checkPhraseInput,
+  parsePhraseAnalysis,
+  normalizePhraseCards,
+  makePhraseCard,
+  upsertPhraseCard,
+  deletePhrase,
+  updatePhrase,
+  mergePhraseWithNext,
+  splitPhrase,
+  updateCardSentencePhrases,
+  MAX_PHRASE_CARDS
+} from './phraseDrill.js'
 
 const STORE_KEY = 'ke_dev_store_v3964'
 const SETTINGS_KEY = 'ke_dev_settings_v3964'
@@ -9,7 +22,9 @@ const TAB_KEY = 'ke_dev_tab_v3964'
 const OUTPUT_MODE_KEY = 'ke_dev_output_mode_v3964'
 const READER_LESSONS_KEY = 'ke_aus_reader_lessons_v1'
 const READER_ACTIVE_KEY = 'ke_aus_reader_active_v1'
-const APP_VERSION = '3.9.64'
+const PHRASE_DRILL_CARDS_KEY = 'ke_phrase_drill_cards_v1'
+const PHRASE_DRILL_ACTIVE_KEY = 'ke_phrase_drill_active_v1'
+const APP_VERSION = '3.9.65'
 const LOCAL_AUDIO_DB = 'ke_dev_original_audio_v1'
 const LOCAL_AUDIO_STORE = 'originalAudio'
 const ACTIVE_USER_KEY = 'ke_dev_active_user_v1'
@@ -70,6 +85,10 @@ const UI_TEXT = {
     'nav.output': 'Speak',
     'nav.speak': 'Speak',
     'nav.review': 'Review',
+    'phraseDrill.title': 'Phrase Drill',
+    'phraseDrill.todayCard': 'Phrase Drill',
+    'phraseDrill.todayHint': 'Paste a sentence, AI splits it into sense-group phrases to shadow.',
+    'phraseDrill.open': 'Open Phrase Drill',
     'navHint.today': 'Daily',
     'navHint.reader': 'Kevin in Australia',
     'navHint.library': 'Content',
@@ -85,6 +104,7 @@ const UI_TEXT = {
     'navHint.phone.speak': 'Talk',
     'navHint.phone.review': 'Recall',
     'title.today': 'Today',
+    'title.phrase': 'Phrase Drill',
     'title.reader': 'Kevin in Australia',
     'title.library': 'Library',
     'title.learn': 'Learn Input',
@@ -540,6 +560,10 @@ const UI_TEXT = {
     'nav.output': '开口',
     'nav.speak': '说',
     'nav.review': '复习',
+    'phraseDrill.title': '短语速练',
+    'phraseDrill.todayCard': '短语速练',
+    'phraseDrill.todayHint': '贴一句话，AI 切成意群短语，逐条跟读。',
+    'phraseDrill.open': '打开短语速练',
     'navHint.today': '学习首页',
     'navHint.reader': '澳洲课程',
     'navHint.library': '课程管理',
@@ -555,6 +579,7 @@ const UI_TEXT = {
     'navHint.phone.speak': '开口',
     'navHint.phone.review': '回忆',
     'title.today': '今日',
+    'title.phrase': '短语速练',
     'title.reader': 'Kevin in Australia',
     'title.library': '内容库',
     'title.learn': '输入理解',
@@ -3076,6 +3101,11 @@ function App() {
   const [store, setStore] = useState(() => normalizeStore(loadUserStore(activeUserId)))
   const [readerLessons, setReaderLessons] = useState(() => normalizeReaderLessons(load(READER_LESSONS_KEY, [])))
   const [readerActiveId, setReaderActiveId] = useState(() => load(READER_ACTIVE_KEY, ''))
+  const [phraseCards, setPhraseCards] = useState(() => normalizePhraseCards(load(PHRASE_DRILL_CARDS_KEY, [])))
+  const [phraseActiveId, setPhraseActiveId] = useState(() => load(PHRASE_DRILL_ACTIVE_KEY, ''))
+  const [phraseDraft, setPhraseDraft] = useState('')
+  const [phrasePreview, setPhrasePreview] = useState(null)
+  const [phraseAnalyzing, setPhraseAnalyzing] = useState(false)
   const [readerDraft, setReaderDraft] = useState('')
   const [readerSpeed, setReaderSpeed] = useState(1)
   const [readerPauseSeconds, setReaderPauseSeconds] = useState(2.5)
@@ -3145,6 +3175,10 @@ function App() {
     () => parseReaderMarkdown(activeReaderLesson?.raw || ''),
     [activeReaderLesson]
   )
+  const activePhraseCard = useMemo(
+    () => phraseCards.find(card => card.id === phraseActiveId) || null,
+    [phraseCards, phraseActiveId]
+  )
   const readerSentences = useMemo(
     () => readerEnglishSentences(activeReaderParsed.blocks),
     [activeReaderParsed]
@@ -3205,6 +3239,8 @@ function App() {
   useEffect(() => save(userStoreKey(activeUserId), store), [store, activeUserId])
   useEffect(() => save(READER_LESSONS_KEY, readerLessons), [readerLessons])
   useEffect(() => save(READER_ACTIVE_KEY, activeReaderLesson?.id || readerActiveId || ''), [activeReaderLesson, readerActiveId])
+  useEffect(() => save(PHRASE_DRILL_CARDS_KEY, phraseCards), [phraseCards])
+  useEffect(() => save(PHRASE_DRILL_ACTIVE_KEY, phraseActiveId), [phraseActiveId])
   useEffect(() => save(ACTIVE_USER_KEY, activeUserId), [activeUserId])
   useEffect(() => save(USER_PROFILES_KEY, userProfiles), [userProfiles])
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
@@ -3449,6 +3485,98 @@ function App() {
   function deleteReaderLesson(lessonId) {
     setReaderLessons(prev => prev.filter(lesson => lesson.id !== lessonId))
     if (readerActiveId === lessonId) setReaderActiveId('')
+  }
+
+  async function analyzePhraseDraft() {
+    const raw = phraseDraft.trim()
+    const guard = checkPhraseInput(raw)
+    if (!guard.ok) {
+      if (guard.reason === 'empty') setMessage('Paste a sentence or short passage first.')
+      else setMessage(`Too long for one analysis (${guard.words} words / ${guard.sentences} sentences). Please split it into smaller batches.`)
+      return
+    }
+    try {
+      setPhraseAnalyzing(true)
+      setPhrasePreview(null)
+      setMessage('Analyzing phrases...')
+      const response = await fetch('/api/openai-phrase-split', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(settings.apiKey ? { 'x-openai-key': settings.apiKey } : {})
+        },
+        body: JSON.stringify({ text: raw })
+      })
+      if (!response.ok) throw new Error(await response.text())
+      const json = await response.json()
+      let analysis
+      try {
+        analysis = parsePhraseAnalysis(json.content || '')
+      } catch {
+        setMessage('Analysis failed — please retry or simplify the text.')
+        return
+      }
+      setPhrasePreview({ raw, sentences: analysis.sentences })
+      setMessage(`Found ${analysis.sentences.length} sentence(s). Edit if needed, then save.`)
+    } catch (error) {
+      setMessage(`Phrase analysis failed: ${error?.message || error}`)
+    } finally {
+      setPhraseAnalyzing(false)
+    }
+  }
+
+  function savePhraseCard() {
+    if (!phrasePreview?.sentences?.length) {
+      setMessage('Nothing to save yet. Analyze a sentence first.')
+      return
+    }
+    const card = makePhraseCard({ sentences: phrasePreview.sentences }, phrasePreview.raw)
+    if (!card) {
+      setMessage('Could not save this card.')
+      return
+    }
+    setPhraseCards(prev => upsertPhraseCard(prev, card, MAX_PHRASE_CARDS))
+    setPhraseActiveId(card.id)
+    setPhrasePreview(null)
+    setPhraseDraft('')
+    setMessage(`Saved. Keeping the latest ${MAX_PHRASE_CARDS} cards.`)
+  }
+
+  function renamePhraseCard(cardId) {
+    const card = phraseCards.find(item => item.id === cardId)
+    if (!card) return
+    const next = window.prompt('Rename this phrase card', card.title)
+    if (next == null) return
+    const title = next.trim()
+    if (!title) return
+    setPhraseCards(prev => prev.map(item => item.id === cardId
+      ? { ...item, title, updatedAt: new Date().toISOString() }
+      : item))
+  }
+
+  function deletePhraseCard(cardId) {
+    setPhraseCards(prev => prev.filter(card => card.id !== cardId))
+    if (phraseActiveId === cardId) setPhraseActiveId('')
+  }
+
+  // Edit one phrase inside the active saved card (merge / split / edit / delete).
+  function editActiveCardPhrases(sentenceId, transform) {
+    if (!activePhraseCard) return
+    setPhraseCards(prev => prev.map(card => card.id === activePhraseCard.id
+      ? updateCardSentencePhrases(card, sentenceId, transform)
+      : card))
+  }
+
+  // Same edits, but applied to the unsaved preview before a card exists.
+  function editPreviewPhrases(sentenceId, transform) {
+    setPhrasePreview(prev => prev
+      ? {
+          ...prev,
+          sentences: prev.sentences.map(sentence => sentence.id === sentenceId
+            ? { ...sentence, phrases: transform(sentence.phrases || []) }
+            : sentence)
+        }
+      : prev)
   }
 
   function delay(ms) {
@@ -5116,6 +5244,129 @@ function App() {
     </div>
   }
 
+  function promptEditPhrase(onEdit, sentenceId, phrase) {
+    const nextEn = window.prompt('English phrase', phrase.en)
+    if (nextEn == null) return
+    const en = nextEn.trim()
+    if (!en) return
+    const nextZh = window.prompt('Chinese (display only)', phrase.zh || '')
+    if (nextZh == null) {
+      onEdit(sentenceId, phrases => updatePhrase(phrases, phrase.id, { en }))
+      return
+    }
+    onEdit(sentenceId, phrases => updatePhrase(phrases, phrase.id, { en, zh: nextZh.trim() }))
+  }
+
+  function promptSplitPhrase(onEdit, sentenceId, phrase) {
+    const words = phrase.en.split(/\s+/).filter(Boolean)
+    const mid = Math.max(1, Math.floor(words.length / 2))
+    const left = window.prompt('First phrase (English)', words.slice(0, mid).join(' '))
+    if (left == null) return
+    const right = window.prompt('Second phrase (English)', words.slice(mid).join(' '))
+    if (right == null) return
+    if (!left.trim() || !right.trim()) {
+      setMessage('Both halves are required to split a phrase.')
+      return
+    }
+    onEdit(sentenceId, phrases => splitPhrase(phrases, phrase.id, left, right))
+  }
+
+  function renderPhraseSentences(sentences, onEdit) {
+    return <div className="phraseSentences">
+      {sentences.map(sentence => <div className="phraseSentence" key={sentence.id}>
+        <div className="phraseSentenceHead">
+          <button className="phrasePlay" title="Play sentence" aria-label="Play sentence" onClick={() => playText(sentence.en)}>▶</button>
+          <div className="phraseSentenceText">
+            <strong>{sentence.en}</strong>
+            {sentence.zh && <span>{sentence.zh}</span>}
+          </div>
+        </div>
+        <div className="phraseChips">
+          {sentence.phrases.map((phrase, index) => <div className="phraseChip" key={phrase.id}>
+            <div className="phraseChipMain">
+              <button className="phrasePlay small" title="Play phrase" aria-label="Play phrase" onClick={() => playText(phrase.en)}>▶</button>
+              <div className="phraseChipText">
+                <strong>{phrase.en}</strong>
+                {phrase.zh && <span>{phrase.zh}</span>}
+              </div>
+            </div>
+            <div className="phraseChipTools">
+              <button title="Edit phrase" aria-label="Edit phrase" onClick={() => promptEditPhrase(onEdit, sentence.id, phrase)}>✎</button>
+              <button title="Split into two" aria-label="Split phrase" onClick={() => promptSplitPhrase(onEdit, sentence.id, phrase)}>✂</button>
+              <button title="Merge with next" aria-label="Merge with next phrase" disabled={index >= sentence.phrases.length - 1} onClick={() => onEdit(sentence.id, phrases => mergePhraseWithNext(phrases, phrase.id))}>⊕</button>
+              <button title="Delete phrase" aria-label="Delete phrase" onClick={() => onEdit(sentence.id, phrases => deletePhrase(phrases, phrase.id))}>✕</button>
+            </div>
+          </div>)}
+        </div>
+      </div>)}
+    </div>
+  }
+
+  function renderPhraseDrillWorkspace() {
+    return <section className="phraseShell" data-testid="phrase-drill">
+      <aside className="phraseSidebar">
+        <div className="phraseBrand">
+          <span>{t('phraseDrill.title')}</span>
+          <button className="secondary compact" onClick={() => goToTab('today')}>← {t('nav.today')}</button>
+        </div>
+        <div className="phraseComposer">
+          <textarea
+            value={phraseDraft}
+            onChange={event => setPhraseDraft(event.target.value)}
+            placeholder="Paste one long sentence or a short passage (≤3–4 sentences)..."
+            rows={5}
+          />
+          <button className="primary" onClick={analyzePhraseDraft} disabled={phraseAnalyzing || !phraseDraft.trim()}>
+            {phraseAnalyzing ? 'Analyzing…' : 'Analyze'}
+          </button>
+        </div>
+        <div className="phraseCardList">
+          <span>Recent cards · max {MAX_PHRASE_CARDS}</span>
+          {phraseCards.length ? phraseCards.map(card => <button
+            key={card.id}
+            className={activePhraseCard?.id === card.id ? 'active' : ''}
+            onClick={() => { setPhraseActiveId(card.id); setPhrasePreview(null) }}
+          >
+            <strong>{card.title}</strong>
+            <small>{shortDateLabel(card.updatedAt || card.createdAt)} · {card.sentences.length} sent.</small>
+          </button>) : <p>No cards yet.</p>}
+        </div>
+      </aside>
+      <article className="phraseDocument">
+        {phrasePreview ? <>
+          <div className="phraseTopline">
+            <div>
+              <span>Preview</span>
+              <h2>Review &amp; edit, then save</h2>
+              <p>Edit phrases (merge / split / change text / delete). Chinese is display only.</p>
+            </div>
+            <div className="phraseToplineActions">
+              <button className="primary compact" onClick={savePhraseCard}>Save card</button>
+              <button className="secondary compact" onClick={() => setPhrasePreview(null)}>Discard</button>
+            </div>
+          </div>
+          {renderPhraseSentences(phrasePreview.sentences, editPreviewPhrases)}
+        </> : activePhraseCard ? <>
+          <div className="phraseTopline">
+            <div>
+              <span>Saved card</span>
+              <h2>{activePhraseCard.title}</h2>
+              <p>{activePhraseCard.sentences.length} sentence(s) · saved {shortDateLabel(activePhraseCard.updatedAt || activePhraseCard.createdAt)}</p>
+            </div>
+            <div className="phraseToplineActions">
+              <button className="secondary compact" onClick={() => renamePhraseCard(activePhraseCard.id)}>Rename</button>
+              <button className="secondary compact weakAction" onClick={() => deletePhraseCard(activePhraseCard.id)}>Delete</button>
+            </div>
+          </div>
+          {renderPhraseSentences(activePhraseCard.sentences, editActiveCardPhrases)}
+        </> : <div className="phraseEmpty">
+          <h2>{t('phraseDrill.title')}</h2>
+          <p>Paste a sentence on the left and press Analyze. AI splits it into sense-group phrases you can shadow with TTS.</p>
+        </div>}
+      </article>
+    </section>
+  }
+
   function renderReaderWorkspace() {
     const readerBlockChoices = readerPlayableBlockChoices(activeReaderParsed.blocks)
     const selectedReaderBlock = readerBlockChoices.find(choice => choice.id === readerBlockTarget) || readerBlockChoices[0]
@@ -5263,6 +5514,8 @@ function App() {
 
       {tab === 'reader' && renderReaderWorkspace()}
 
+      {tab === 'phrase' && renderPhraseDrillWorkspace()}
+
       {tab === 'today' && <section className="pageGrid">
         {isPhoneView && <div className="phoneGreeting">
           <span>{t('dailyTrainer')}</span>
@@ -5270,6 +5523,11 @@ function App() {
           <p>{t('mobileGoal')}</p>
         </div>}
         {renderTodayMission()}
+        {isPhoneView && <button className="phoneToolEntry" data-testid="phrase-drill-entry-phone" onClick={() => goToTab('phrase')}>
+          <span>{t('phraseDrill.todayCard')}</span>
+          <strong>{phraseCards[0]?.title || t('phraseDrill.open')}</strong>
+          <em>{t('phraseDrill.todayHint')}</em>
+        </button>}
         {!isPhoneView && showTodayDetails && renderMacCommandCenter()}
         {!isPhoneView && showTodayDetails && renderMacStudyQueue()}
         {(!isPhoneView ? showTodayDetails : true) && <div className="heroPanel">
@@ -5316,6 +5574,12 @@ function App() {
           <strong>{todayActivity.review}</strong><em>{t('reviewDone')}</em>
         </div>}
         {(!isPhoneView ? showTodayDetails : true) && <div className={`todayGrid ${isPhoneView ? 'phoneQuickGrid' : ''}`}>
+          <article>
+            <span>{t('phraseDrill.todayCard')}</span>
+            <strong>{phraseCards[0]?.title || t('phraseDrill.todayCard')}</strong>
+            <p>{t('phraseDrill.todayHint')}</p>
+            <button className="secondary compact" onClick={() => goToTab('phrase')}>{t('phraseDrill.open')}</button>
+          </article>
           <article>
             <span>{t('todayPractice')}</span>
             <strong>{todayPractice[0]?.promptCn || todayPractice[0]?.base || t('quickResponse')}</strong>
